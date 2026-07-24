@@ -2,57 +2,32 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function Portfolio() {
+export default function Portfolio({ projects = [] }: { projects?: any[] }) {
   const [filter, setFilter] = useState("all");
 
-  const portfolioItems = [
-    {
-      category: "development",
-      categoryLabel: "DEVELOPMENT",
-      title: "E-Commerce Platform",
-      subtitle: "Full-Stack Development",
-      image: "/download/Development.jpg",
-    },
-    {
-      category: "application",
-      categoryLabel: "APPLICATION",
-      title: "Task Management App",
-      subtitle: "React Native",
-      image: "/download/Apps.jpg",
-    },
-    {
-      category: "design",
-      categoryLabel: "DESIGN",
-      title: "Brand Identity Design",
-      subtitle: "UI/UX & Branding",
-      image: "/download/Landing page.jpg",
-    },
-    {
-      category: "development",
-      categoryLabel: "CLOUD",
-      title: "Cloud Infrastructure",
-      subtitle: "AWS Deployment",
-      image: "/download/Cloud.jpg",
-    },
-  ];
-
+  const uniqueCategories = Array.from(new Set(projects.map(p => p.category.toLowerCase())));
   const filters = [
     { label: "All Projects", value: "all" },
-    { label: "Development", value: "development" },
-    { label: "Application", value: "application" },
-    { label: "Design", value: "design" },
+    ...uniqueCategories.map(cat => ({ label: cat, value: cat }))
   ];
 
   const filteredItems = filter === "all" 
-    ? portfolioItems 
-    : portfolioItems.filter(item => item.category === filter);
+    ? projects 
+    : projects.filter(item => item.category.toLowerCase() === filter);
 
   return (
-    <section id="portfolio" className="py-[100px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)]">
+    <section id="portfolio" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden">
       
       {/* Header section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8">
+      <motion.div 
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8 }}
+      >
         <div className="max-w-[400px]">
           <h2 className="text-[36px] md:text-[48px] text-[var(--color-text-dark)] font-serif uppercase leading-[1.1] mb-[20px]">
             Selected<br />
@@ -71,15 +46,21 @@ export default function Portfolio() {
             VIEW ALL PROJECTS <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
           </a>
         </div>
-      </div>
+      </motion.div>
 
       {/* Filters (Minimal Editorial Style) */}
-      <div className="flex gap-[30px] mb-[60px] border-b border-[var(--color-border)] pb-[20px] overflow-x-auto whitespace-nowrap">
+      <motion.div 
+        className="flex gap-[30px] mb-[60px] border-b border-[var(--color-border)] pb-[20px] overflow-x-auto whitespace-nowrap"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
         {filters.map((f) => (
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
-            className={`text-[12px] uppercase tracking-[1.5px] font-bold cursor-pointer transition-colors
+            className={`text-[12px] uppercase tracking-[1.5px] font-bold cursor-pointer transition-colors relative
               ${filter === f.value 
                 ? "text-[var(--color-text-dark)]" 
                 : "text-[var(--color-text-light)] hover:text-[var(--color-text-dark)]"
@@ -87,41 +68,65 @@ export default function Portfolio() {
             `}
           >
             {f.label}
+            {filter === f.value && (
+              <motion.div 
+                layoutId="activeFilter"
+                className="absolute bottom-[-21px] left-0 right-0 h-[2px] bg-[var(--color-primary)]"
+              />
+            )}
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px]">
-        {filteredItems.map((item, index) => (
-          <div key={index} className="group cursor-pointer">
-            <div className="w-full aspect-[4/5] overflow-hidden mb-[20px] bg-white border border-[var(--color-border)] p-[10px]">
-              <div className="relative w-full h-full overflow-hidden bg-[var(--color-dark-bg)]">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
-                />
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px]"
+        layout
+      >
+        <AnimatePresence mode="popLayout">
+          {filteredItems.map((item, index) => (
+            <motion.div 
+              key={item.id}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.4 }}
+              className="group cursor-pointer"
+            >
+              <div className="w-full aspect-square overflow-hidden mb-[20px] bg-white border border-[var(--color-border)] p-[10px]">
+                <div className="relative w-full h-full overflow-hidden bg-[var(--color-dark-bg)]">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    fill
+                    className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                  />
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-start gap-[15px]">
-              <span className="text-[24px] font-serif text-[var(--color-primary)] leading-[1]">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <div>
-                <h3 className="text-[16px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px] mb-[5px]">
-                  {item.title}
-                </h3>
-                <p className="text-[var(--color-text-light)] text-[12px]">
-                  {item.subtitle}
-                </p>
+              
+              <div className="flex items-start gap-[15px]">
+                <span className="text-[24px] font-serif text-[var(--color-primary)] leading-[1]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-[16px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px] mb-[5px]">
+                    {item.title}
+                  </h3>
+                  <p className="text-[var(--color-text-light)] text-[12px] mb-2">
+                    {item.subtitle}
+                  </p>
+                  {item.projectUrl && (
+                    <a href={item.projectUrl} target="_blank" rel="noreferrer" className="text-[10px] uppercase font-bold text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
+                      View Project →
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

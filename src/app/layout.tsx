@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   },
 };
 
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Preloader, ScrollProgress, BackToTop } from "@/components/ClientUtilities";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,8 +33,15 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased`}>
-        {children}
+      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh]`}>
+        <Preloader />
+        <ScrollProgress />
+        <Navbar />
+        <main className="flex-1 flex flex-col w-full">
+          {children}
+        </main>
+        <Footer />
+        <BackToTop />
       </body>
     </html>
   );

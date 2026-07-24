@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function Testimonials() {
   const testimonials = [
@@ -23,10 +26,16 @@ export default function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="py-[100px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)]">
+    <section id="testimonials" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8">
+      <motion.div 
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8 }}
+      >
         <div className="max-w-[400px]">
           <h2 className="text-[36px] md:text-[48px] text-[var(--color-text-dark)] font-serif uppercase leading-[1.1] mb-[20px]">
             What Clients<br />
@@ -45,13 +54,17 @@ export default function Testimonials() {
             MORE REVIEWS <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
           </a>
         </div>
-      </div>
+      </motion.div>
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[30px]">
         {testimonials.map((testimonial, index) => (
-          <div
+          <motion.div
             key={index}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: index * 0.2 }}
             className="bg-[var(--color-light-bg)] border border-[var(--color-border)] p-[40px] flex flex-col justify-between"
           >
             <div>
@@ -82,7 +95,7 @@ export default function Testimonials() {
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
