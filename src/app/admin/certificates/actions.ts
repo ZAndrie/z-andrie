@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
-export async function createCertificate(data: { title: string, issuer: string, date: string, imageUrl: string }) {
+export async function createCertificate(data: { title: string, issuer: string, date: string, imageUrl: string, order?: number }) {
   await prisma.certificate.create({
     data
   })
@@ -11,7 +11,7 @@ export async function createCertificate(data: { title: string, issuer: string, d
   revalidatePath("/certificates")
 }
 
-export async function updateCertificate(id: string, data: { title: string, issuer: string, date: string, imageUrl: string }) {
+export async function updateCertificate(id: string, data: { title: string, issuer: string, date: string, imageUrl: string, order?: number }) {
   await prisma.certificate.update({
     where: { id },
     data
