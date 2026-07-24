@@ -38,3 +38,16 @@ body {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+/* Quill Editor overrides */
+.quill-dark-text .ql-editor,
+.quill-dark-text .ql-editor * {
+  color: #000000 !important;
+}
+.quill-dark-text .ql-editor {
+  font-size: 15px;
+}
+.quill-dark-text .ql-editor.ql-blank::before {
+  color: #999999 !important;
+  font-style: italic;
+}

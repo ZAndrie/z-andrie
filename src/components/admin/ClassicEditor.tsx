@@ -31,7 +31,7 @@ export default function ClassicEditor({ value, onChange }: ClassicEditorProps) {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white text-black quill-dark-text">
       <ReactQuill
         theme="snow"
         value={value}

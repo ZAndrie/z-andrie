@@ -6,11 +6,10 @@ import dynamic from "next/dynamic";
 import { UploadButton } from "@/utils/uploadthing";
 
 const ClassicEditor = dynamic(() => import("@/components/admin/ClassicEditor"), { ssr: false });
-const BlockEditor = dynamic(() => import("@/components/admin/BlockEditor"), { ssr: false });
 
 export default function NewPostForm() {
   const router = useRouter();
-  const [editorType, setEditorType] = useState<"html" | "json">("html");
+  const [editorType] = useState<"html" | "json">("html");
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
@@ -69,7 +68,7 @@ export default function NewPostForm() {
 
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Short Excerpt
+            Short Summary
           </label>
           <textarea
             required
@@ -114,52 +113,11 @@ export default function NewPostForm() {
       </div>
 
       <div className="bg-white p-6 rounded-md border border-[var(--color-border)]">
-        <div className="flex justify-between items-center mb-6">
-          <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500">
-            Post Content
-          </label>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (confirm("Changing editors will clear your current content. Proceed?")) {
-                  setEditorType("html");
-                  setContent("");
-                }
-              }}
-              className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded transition-colors ${
-                editorType === "html"
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              Classic Editor
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (confirm("Changing editors will clear your current content. Proceed?")) {
-                  setEditorType("json");
-                  setContent("");
-                }
-              }}
-              className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded transition-colors ${
-                editorType === "json"
-                  ? "bg-black text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              Block Editor
-            </button>
-          </div>
-        </div>
-
+        <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-6">
+          Post Content
+        </label>
         <div className="min-h-[400px]">
-          {editorType === "html" ? (
-            <ClassicEditor value={content} onChange={setContent} />
-          ) : (
-            <BlockEditor value={content} onChange={setContent} />
-          )}
+          <ClassicEditor value={content} onChange={setContent} />
         </div>
       </div>
 
