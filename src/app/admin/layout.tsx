@@ -67,7 +67,7 @@ export default function AdminLayout({
 
           <div className="p-4 border-t border-gray-100 mt-auto">
             <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={() => signOut({ callbackUrl: '/' })}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-500 hover:text-white hover:bg-red-500 rounded-md transition-all duration-300 group border border-transparent hover:border-red-600"
             >
               <LogOut size={16} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
