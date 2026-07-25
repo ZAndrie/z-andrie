@@ -13,7 +13,8 @@ export default function Certificates({ certificates = [] }: { certificates?: any
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-[400px]">
@@ -44,10 +45,11 @@ export default function Certificates({ certificates = [] }: { certificates?: any
             <motion.div 
               key={item.id}
               layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group cursor-pointer"
             >
               <div className="w-full aspect-[4/3] overflow-hidden mb-[20px] bg-white border border-[var(--color-border)] p-[10px] shadow-sm group-hover:shadow-md transition-shadow">

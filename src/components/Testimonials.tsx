@@ -3,27 +3,11 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-export default function Testimonials() {
-  const testimonials = [
-    {
-      name: "Sarah Jenkins",
-      role: "CEO, TechStart",
-      text: "Z Andrie is an incredible designer. He understood our vision perfectly and delivered a website that exceeded our expectations.",
-      image: "/download/testimonial/person3.jpg",
-    },
-    {
-      name: "Michael Chen",
-      role: "Creative Director",
-      text: "Professional, creative, and detail-oriented. The whole process was smooth from start to finish.",
-      image: "/download/testimonial/person1.jpg",
-    },
-    {
-      name: "Emily Davis",
-      role: "Product Manager",
-      text: "Our new website not only looks amazing but also performs exceptionally well. Highly recommended!",
-      image: "/download/testimonial/person2.jpg",
-    },
-  ];
+export default function Testimonials({
+  testimonials = []
+}: {
+  testimonials?: { id: string; name: string; role: string; content: string; imageUrl: string | null; rating?: number }[]
+}) {
 
   return (
     <section id="testimonials" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden">
@@ -33,7 +17,7 @@ export default function Testimonials() {
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-[400px]">
@@ -58,34 +42,48 @@ export default function Testimonials() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[30px]">
-        {testimonials.map((testimonial, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
-            className="bg-[var(--color-light-bg)] border border-[var(--color-border)] p-[40px] flex flex-col justify-between"
-          >
-            <div>
-              <div className="text-[60px] font-serif text-[var(--color-primary)] opacity-40 leading-none h-[40px] mb-[10px]">
-                “
+        {testimonials.length > 0 ? (
+          testimonials.map((testimonial, index) => (
+            <motion.div
+              key={testimonial.id || index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="bg-[var(--color-light-bg)] border border-[var(--color-border)] p-[40px] flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-[10px]">
+                  <div className="text-[60px] font-serif text-[var(--color-primary)] opacity-40 leading-none h-[40px]">
+                    “
+                  </div>
+                  <div className="flex gap-1 text-[var(--color-primary)] text-sm">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} style={{ color: (testimonial.rating || 5) >= star ? "#fbbf24" : "#e5e7eb" }}>★</span>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-[14px] leading-[1.8] text-[var(--color-text-dark)] mb-[40px] italic">
+                  {testimonial.content}
+                </p>
               </div>
-              <p className="text-[14px] leading-[1.8] text-[var(--color-text-dark)] mb-[40px]">
-                {testimonial.text}
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-[15px]">
-              <div className="w-[45px] h-[45px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
-                <Image
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  width={45}
-                  height={45}
-                  className="w-full h-full object-cover grayscale"
-                />
-              </div>
+              
+              <div className="flex items-center gap-[15px]">
+                <div className="w-[45px] h-[45px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
+                  {testimonial.imageUrl ? (
+                    <Image
+                      src={testimonial.imageUrl}
+                      alt={testimonial.name}
+                      width={45}
+                      height={45}
+                      className="w-full h-full object-cover grayscale"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold uppercase">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
               <div>
                 <h4 className="text-[13px] font-bold text-[var(--color-text-dark)]">
                   {testimonial.name}
@@ -96,7 +94,12 @@ export default function Testimonials() {
               </div>
             </div>
           </motion.div>
-        ))}
+          ))
+        ) : (
+          <div className="col-span-1 md:col-span-3 text-center py-20 text-gray-400 text-sm uppercase tracking-widest border border-dashed border-[var(--color-border)]">
+            No testimonials found.
+          </div>
+        )}
       </div>
     </section>
   );

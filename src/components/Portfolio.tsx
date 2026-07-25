@@ -25,7 +25,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-[400px]">
@@ -53,7 +53,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         className="flex gap-[30px] mb-[60px] border-b border-[var(--color-border)] pb-[20px] overflow-x-auto whitespace-nowrap"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         {filters.map((f) => (
@@ -88,10 +88,11 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
             <motion.div 
               key={item.id}
               layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group cursor-pointer"
             >
               <div className="w-full aspect-square overflow-hidden mb-[20px] bg-white border border-[var(--color-border)] p-[10px]">

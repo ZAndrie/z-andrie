@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +63,13 @@ export default function Contact() {
       <div className="flex flex-col lg:flex-row justify-between gap-[50px] lg:gap-[80px]">
         
         {/* Left: Giant Text */}
-        <div className="flex-1 max-w-[800px]">
+        <motion.div 
+          className="flex-1 max-w-[800px]"
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8 }}
+        >
           <p className="text-[var(--color-primary)] text-[14px] uppercase tracking-[2px] font-bold mb-[15px]">
             HAVE AN IDEA?
           </p>
@@ -85,10 +92,16 @@ export default function Contact() {
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right: Minimal Form & QR Code */}
-        <div className="w-full lg:w-[400px] flex flex-col gap-[30px]">
+        <motion.div 
+          className="w-full lg:w-[400px] flex flex-col gap-[30px]"
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-[15px]">
             <div>
@@ -150,7 +163,7 @@ export default function Contact() {
             </div>
           </div>
           
-        </div>
+        </motion.div>
         
       </div>
     </section>

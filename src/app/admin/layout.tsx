@@ -17,6 +17,7 @@ export default function AdminLayout({
     { href: "/admin", label: "Overview", icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
     { href: "/admin/projects", label: "Projects", icon: <FolderKanban size={18} strokeWidth={1.5} /> },
     { href: "/admin/certificates", label: "Certificates", icon: <Award size={18} strokeWidth={1.5} /> },
+    { href: "/admin/testimonials", label: "Testimonials", icon: <MessageSquare size={18} strokeWidth={1.5} /> },
     { href: "/admin/blog", label: "Blog & Updates", icon: <FileText size={18} strokeWidth={1.5} /> },
     { href: "/admin/messages", label: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} /> },
   ];

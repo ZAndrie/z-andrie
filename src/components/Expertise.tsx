@@ -120,7 +120,7 @@ export default function Expertise() {
         className="mb-[60px]"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
         transition={{ duration: 0.8 }}
       >
         <h2 className="text-[36px] md:text-[48px] text-[var(--color-text-dark)] font-serif uppercase leading-[1.1]">
@@ -135,7 +135,7 @@ export default function Expertise() {
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.8, delay: 0.1 }}
         >
           {/* Tabs */}
@@ -193,7 +193,7 @@ export default function Expertise() {
                       <motion.div 
                         initial={{ x: "-100%" }}
                         whileInView={{ x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false }}
                         transition={{ duration: 1, delay: 0.3 + (index * 0.1), ease: "easeOut" }}
                         className="absolute top-0 left-0 h-[2px] -mt-[0.5px] bg-[var(--color-primary)]"
                         style={{ width: item.percentage }}
@@ -211,7 +211,7 @@ export default function Expertise() {
           className="flex flex-col justify-center px-[0] lg:px-[20px]"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <div className="text-[80px] font-serif text-[var(--color-primary)] opacity-30 leading-none h-[60px]">
@@ -230,7 +230,7 @@ export default function Expertise() {
               className="flex gap-[20px] items-start"
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.3 + (index * 0.1) }}
             >
               <div className="w-[45px] h-[45px] flex-shrink-0 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-[16px] shadow-sm">
