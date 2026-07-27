@@ -35,7 +35,10 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-  }
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 import Navbar from "@/components/Navbar";
@@ -48,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         
@@ -71,11 +74,11 @@ export default function RootLayout({
         </Script>
         */}
       </head>
-      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh]`}>
+      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden`}>
         <Preloader />
         <ScrollProgress />
         <Navbar />
-        <main className="flex-1 flex flex-col w-full">
+        <main className="flex-1 flex flex-col w-full overflow-x-hidden">
           {children}
         </main>
         <Footer />

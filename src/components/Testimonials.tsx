@@ -41,7 +41,7 @@ export default function Testimonials({
       </motion.div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-[30px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[25px] md:gap-[30px]">
         {testimonials.length > 0 ? (
           testimonials.map((testimonial, index) => (
             <motion.div
@@ -50,7 +50,7 @@ export default function Testimonials({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.2, margin: "-50px" }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-[var(--color-light-bg)] border border-[var(--color-border)] p-[40px] flex flex-col justify-between"
+              className="bg-[var(--color-light-bg)] border border-[var(--color-border)] p-[25px] sm:p-[35px] md:p-[40px] flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-[10px]">

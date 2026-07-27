@@ -50,13 +50,13 @@ export default function Hero() {
           <p className="text-[var(--color-text-dark)] text-[14px] mb-[15px] uppercase tracking-[2px] font-bold">
             HELLO, I'M
           </p>
-          <h2 className="text-[48px] md:text-[72px] lg:text-[100px] leading-[0.9] font-serif text-[var(--color-text-dark)] mb-[20px] uppercase">
+          <h2 className="text-[38px] sm:text-[48px] md:text-[72px] lg:text-[100px] leading-[0.9] font-serif text-[var(--color-text-dark)] mb-[20px] uppercase">
             Z<br />Andrie
           </h2>
           <p className="text-[var(--color-primary)] font-bold text-[13px] uppercase tracking-[2px] mb-[25px]">
             WEB DESIGNER & DIGITAL CREATIVE
           </p>
-          <p className="text-[var(--color-text-light)] mb-[40px] leading-[1.8] text-[16px] max-w-[400px]">
+          <p className="text-[var(--color-text-light)] mb-[40px] leading-[1.8] text-[15px] sm:text-[16px] max-w-full md:max-w-[400px]">
             I craft clean, modern, and user-focused websites that help brands stand out and connect with the right audience.
           </p>
           
@@ -80,6 +80,7 @@ export default function Hero() {
               src="/profile.png"
               alt="Z Andrie"
               fill
+              sizes="(max-width: 768px) 300px, 400px"
               className="object-cover object-center scale-[1.05]"
               priority
             />

@@ -46,6 +46,7 @@ export default function Navbar() {
             src="/logo-primary.jpg"
             alt="Z Andrie Logo"
             fill
+            sizes="(max-width: 768px) 130px, 150px"
             className="object-contain object-left mix-blend-multiply"
             priority
           />

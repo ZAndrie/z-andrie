@@ -36,6 +36,7 @@ export default function AdminLayout({
                     src="/logo-primary.jpg"
                     alt="Z Andrie Logo"
                     fill
+                    sizes="130px"
                     className="object-contain object-left mix-blend-multiply"
                     priority
                   />

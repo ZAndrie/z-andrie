@@ -129,7 +129,7 @@ export default function Expertise() {
         </h2>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-[60px] lg:gap-[40px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[40px] md:gap-[50px] lg:gap-[40px]">
         
         {/* Left Column: Tabs & Progress Bars */}
         <motion.div
