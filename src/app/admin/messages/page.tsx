@@ -1,10 +1,7 @@
-import prisma from "@/lib/prisma";
 import { Mail, CheckCircle } from "lucide-react";
 
-export default async function MessagesAdminPage() {
-  const messages = await prisma.message.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+export default function MessagesAdminPage() {
+  const messages: any[] = [];
 
   return (
     <div className="flex flex-col gap-10">

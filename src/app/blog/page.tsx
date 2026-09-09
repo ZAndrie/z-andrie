@@ -1,15 +1,10 @@
-import prisma from "@/lib/prisma"
-import Image from "next/image"
-import Link from "next/link"
+import { fetchGitHubBlogPosts } from "@/lib/github"
 import AnimatedBlogList from "./AnimatedBlogList"
 
 export const dynamic = "force-dynamic"
 
 export default async function BlogPage() {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" }
-  })
+  const posts = await fetchGitHubBlogPosts();
 
   return (
     <div className="min-h-screen bg-[var(--color-light-bg)] pt-32 pb-20">
@@ -25,8 +20,16 @@ export default async function BlogPage() {
         </header>
 
         {posts.length === 0 ? (
-          <div className="text-gray-500 py-10 border-t border-[var(--color-border)]">
-            No articles published yet. Check back soon!
+          <div className="flex flex-col items-center justify-center text-center py-20 px-8 bg-white/60 backdrop-blur-sm border border-[var(--color-border)] rounded-2xl shadow-sm">
+            <div className="w-14 h-14 rounded-full bg-[var(--color-light-bg)] flex items-center justify-center text-[var(--color-primary)] text-xl mb-5 border border-[var(--color-border)]">
+              ✦
+            </div>
+            <h3 className="text-xl md:text-2xl font-serif text-[var(--color-text-dark)] mb-3">
+              Articles & Publications
+            </h3>
+            <p className="text-[14px] text-[var(--color-text-light)] max-w-lg font-light leading-relaxed mb-6">
+              New articles, technical case studies, and insights are currently being written and published. Check back soon for fresh updates.
+            </p>
           </div>
         ) : (
           <AnimatedBlogList posts={posts} />

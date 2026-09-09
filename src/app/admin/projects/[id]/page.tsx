@@ -1,12 +1,11 @@
-import prisma from "@/lib/prisma"
+import { fetchGitHubProjects } from "@/lib/github"
 import EditProjectForm from "./EditProjectForm"
 import { notFound } from "next/navigation"
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
-  const project = await prisma.project.findUnique({
-    where: { id: resolvedParams.id }
-  })
+  const projects = await fetchGitHubProjects();
+  const project = projects.find((p) => p.id === resolvedParams.id);
 
   if (!project) {
     notFound()

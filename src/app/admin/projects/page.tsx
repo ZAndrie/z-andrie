@@ -1,13 +1,11 @@
-import prisma from "@/lib/prisma"
+import { fetchGitHubProjects } from "@/lib/github"
 import ProjectForm from "./ProjectForm"
 import ProjectList from "./ProjectList"
 
 export const dynamic = "force-dynamic"
 
 export default async function ProjectsPage() {
-  const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" }
-  })
+  const projects = await fetchGitHubProjects()
 
   return (
     <div className="flex flex-col gap-10 pb-20">

@@ -1,12 +1,10 @@
 import Certificates from "@/components/Certificates";
-import prisma from "@/lib/prisma";
+import { fetchGitHubCertificates } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
 
 export default async function CertificatesPage() {
-  const certificates = await prisma.certificate.findMany({
-    orderBy: { createdAt: "desc" }
-  });
+  const certificates = await fetchGitHubCertificates();
 
   return (
     <>

@@ -3,7 +3,7 @@
 import { signOut, SessionProvider } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, FileText, Settings, MessageSquare, LogOut, Award } from "lucide-react";
+import { LayoutDashboard, FolderKanban, FileText, Settings, MessageSquare, LogOut, Award, Briefcase } from "lucide-react";
 import Image from "next/image";
 
 export default function AdminLayout({
@@ -16,8 +16,8 @@ export default function AdminLayout({
   const links = [
     { href: "/admin", label: "Overview", icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
     { href: "/admin/projects", label: "Projects", icon: <FolderKanban size={18} strokeWidth={1.5} /> },
+    { href: "/admin/expertise", label: "Expertise", icon: <Briefcase size={18} strokeWidth={1.5} /> },
     { href: "/admin/certificates", label: "Certificates", icon: <Award size={18} strokeWidth={1.5} /> },
-    { href: "/admin/testimonials", label: "Testimonials", icon: <MessageSquare size={18} strokeWidth={1.5} /> },
     { href: "/admin/blog", label: "Blog & Updates", icon: <FileText size={18} strokeWidth={1.5} /> },
     { href: "/admin/messages", label: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} /> },
   ];

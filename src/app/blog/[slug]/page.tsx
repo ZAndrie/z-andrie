@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"
+import { fetchGitHubBlogPost } from "@/lib/github"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic"
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   
-  const post = await prisma.post.findUnique({
-    where: { slug }
-  })
+  const post = await fetchGitHubBlogPost(slug)
 
   if (!post || !post.published) {
     notFound()

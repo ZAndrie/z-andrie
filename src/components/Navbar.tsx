@@ -30,7 +30,6 @@ export default function Navbar() {
     { name: "EXPERTISE", href: "/expertise" },
     { name: "CERTIFICATES", href: "/certificates" },
     { name: "BLOG", href: "/blog" },
-    { name: "TESTIMONIALS", href: "/testimonials" },
     { name: "CONTACT", href: "/contact" },
   ];
 
@@ -41,7 +40,7 @@ export default function Navbar() {
       }`}
     >
       <div className="relative flex items-center gap-[10px]">
-        <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block relative h-[25px] w-[130px] md:h-[30px] md:w-[150px]" title="Admin Access">
+        <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block relative h-[25px] w-[130px] md:h-[30px] md:w-[150px]" title="Z Andrie Portfolio">
           <Image
             src="/logo-primary.jpg"
             alt="Z Andrie Logo"

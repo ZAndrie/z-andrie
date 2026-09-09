@@ -1,12 +1,11 @@
 import Portfolio from "@/components/Portfolio";
-import prisma from "@/lib/prisma";
+import { fetchGitHubProjects } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
 
 export default async function WorksPage() {
-  const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" }
-  });
+  // Fetch live projects directly from GitHub
+  const projects = await fetchGitHubProjects();
 
   return (
     <>

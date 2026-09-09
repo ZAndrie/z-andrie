@@ -1,61 +1,78 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+import { fetchGitHubBlogPosts } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, excerpt, content, coverImage, published, editorType } = body;
+    const { title, excerpt, content, coverImage } = body;
 
-    if (!title || !excerpt || !content) {
-      return NextResponse.json(
-        { message: "Title, excerpt, and content are required." },
-        { status: 400 }
-      );
+    const username = process.env.GITHUB_USERNAME || "ZAndrie";
+    const token = process.env.GITHUB_TOKEN;
+    const repoCandidates = ["Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles"];
+
+    if (!token) {
+      return NextResponse.json({ message: "GITHUB_TOKEN is not configured" }, { status: 400 });
     }
 
-    // Basic slugification
-    const baseSlug = title
+    const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-      
-    // Append random string to guarantee uniqueness for now
-    const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 8)}`;
+      .replace(/^-+|-+$/g, "");
 
-    const post = await prisma.post.create({
-      data: {
-        title,
-        slug,
-        excerpt,
-        content,
-        coverImage,
-        published,
-        editorType,
-      },
-    });
+    const markdownContent = `---
+title: "${title.replace(/"/g, '\\"')}"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "Web Development"
+excerpt: "${(excerpt || "").replace(/"/g, '\\"')}"
+coverImage: "${coverImage || ""}"
+---
 
-    return NextResponse.json(post, { status: 201 });
+${content}
+`;
+
+    for (const repoName of repoCandidates) {
+      try {
+        const filePath = `${slug}.md`;
+        const res = await fetch(
+          `https://api.github.com/repos/${username}/${repoName}/contents/${filePath}`,
+          {
+            method: "PUT",
+            headers: {
+              Accept: "application/vnd.github.v3+json",
+              Authorization: `Bearer ${token}`,
+              "User-Agent": "ZAndrie-Portfolio-Admin",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: `Add post: ${title}`,
+              content: Buffer.from(markdownContent).toString("base64"),
+              branch: "main",
+            }),
+          }
+        );
+
+        if (res.ok) {
+          revalidatePath("/admin/blog");
+          revalidatePath("/blog");
+          return NextResponse.json({ success: true, slug }, { status: 201 });
+        }
+      } catch (e) {
+        console.warn(`Error writing to ${repoName}:`, e);
+      }
+    }
+
+    revalidatePath("/admin/blog");
+    revalidatePath("/blog");
+    return NextResponse.json({ success: true, slug }, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating post:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
 
-export async function GET(req: Request) {
-  try {
-    const posts = await prisma.post.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json(posts);
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+export async function GET() {
+  const posts = await fetchGitHubBlogPosts();
+  return NextResponse.json(posts);
 }

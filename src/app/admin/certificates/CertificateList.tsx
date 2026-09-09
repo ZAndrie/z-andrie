@@ -1,7 +1,20 @@
-"use client"
-import { deleteCertificate } from "./actions"
+"use client";
+
+import { useState } from "react";
+import { deleteCertificateFromGitHub } from "./actions";
 
 export default function CertificateList({ certificates }: { certificates: any[] }) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this certificate from GitHub?")) return;
+    setDeletingId(id);
+    const res = await deleteCertificateFromGitHub(id);
+    if (!res.success) {
+      alert(res.error || "Failed to delete certificate from GitHub");
+    }
+    setDeletingId(null);
+  };
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {certificates.map((c) => (
@@ -24,13 +37,15 @@ export default function CertificateList({ certificates }: { certificates: any[] 
           
           <div className="flex justify-end items-center pt-3 border-t border-gray-100">
              <div className="flex gap-4">
-                <a href={`/admin/certificates/${c.id}`} className="text-gray-500 text-[10px] uppercase font-bold hover:text-[var(--color-primary)] tracking-wider transition-colors">
-                  Edit
+                <a href={c.repoUrl || "https://github.com/ZAndrie/Certificates-Repository"} target="_blank" rel="noreferrer" className="text-gray-500 text-[10px] uppercase font-bold hover:text-[var(--color-primary)] tracking-wider transition-colors">
+                  GitHub ↗
                 </a>
-                <button onClick={async () => {
-                  if (confirm("Are you sure you want to delete this certificate?")) await deleteCertificate(c.id)
-                }} className="text-red-500 text-[10px] uppercase font-bold hover:text-red-700 tracking-wider transition-colors">
-                  Delete
+                <button 
+                  disabled={deletingId === c.id}
+                  onClick={() => handleDelete(c.id)} 
+                  className="text-red-500 text-[10px] uppercase font-bold hover:text-red-700 tracking-wider transition-colors disabled:opacity-50"
+                >
+                  {deletingId === c.id ? "Deleting..." : "Delete"}
                 </button>
              </div>
           </div>

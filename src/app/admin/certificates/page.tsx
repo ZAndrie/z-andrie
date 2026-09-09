@@ -1,13 +1,11 @@
-import prisma from "@/lib/prisma"
+import { fetchGitHubCertificates } from "@/lib/github"
 import CertificateList from "./CertificateList"
 import NewCertificateForm from "./NewCertificateForm"
 
 export const dynamic = "force-dynamic"
 
 export default async function CertificatesAdminPage() {
-  const certificates = await prisma.certificate.findMany({
-    orderBy: { createdAt: "desc" }
-  })
+  const certificates = await fetchGitHubCertificates();
 
   return (
     <div className="flex flex-col gap-10 pb-20">

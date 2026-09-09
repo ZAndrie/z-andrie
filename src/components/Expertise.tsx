@@ -13,11 +13,15 @@ type ResumeItem = {
   percentage: string;
 };
 
-export default function Expertise() {
+export default function Expertise({ initialItems = [] }: { initialItems?: any[] }) {
   const [activeTab, setActiveTab] = useState<ResumeCategory>("skills");
 
+  const dbEducation = initialItems?.filter(i => i.category === "education");
+  const dbSkills = initialItems?.filter(i => i.category === "skills");
+  const dbExperience = initialItems?.filter(i => i.category === "experience");
+
   const resumeData: Record<ResumeCategory, ResumeItem[]> = {
-    education: [
+    education: dbEducation && dbEducation.length > 0 ? dbEducation : [
       {
         id: "edu1",
         year: "2023 - 2027",
@@ -33,7 +37,7 @@ export default function Expertise() {
         percentage: "100%",
       },
     ],
-    skills: [
+    skills: dbSkills && dbSkills.length > 0 ? dbSkills : [
       {
         id: "skill1",
         year: "95%",
@@ -65,7 +69,7 @@ export default function Expertise() {
         percentage: "80%",
       },
     ],
-    experience: [
+    experience: dbExperience && dbExperience.length > 0 ? dbExperience : [
       {
         id: "exp1",
         year: "2024 - Present",
@@ -85,7 +89,7 @@ export default function Expertise() {
 
   const tabs: { label: string; value: ResumeCategory }[] = [
     { label: "Skills", value: "skills" },
-    { label: "Education", value: "education" },
+    { label: "Education & Training", value: "education" },
     { label: "Experience", value: "experience" },
   ];
 
@@ -179,25 +183,35 @@ export default function Expertise() {
                       <h3 className="text-[12px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px]">
                         {item.title}
                       </h3>
-                      <span className="text-[11px] text-[var(--color-text-light)]">
-                        {item.year}
-                      </span>
+                      {activeTab !== "skills" && (
+                        <span className="text-[11px] text-[var(--color-text-light)]">
+                          {item.year}
+                        </span>
+                      )}
                     </div>
                     {item.subtitle && (
                       <p className="text-[11px] text-[var(--color-text-light)] mb-[8px] italic">
                         {item.subtitle}
                       </p>
                     )}
-                    {/* Progress Line */}
+                    {/* Divider / Progress Line */}
                     <div className="w-full h-[1px] bg-[var(--color-border)] relative overflow-hidden">
-                      <motion.div 
-                        initial={{ x: "-100%" }}
-                        whileInView={{ x: 0 }}
-                        viewport={{ once: false }}
-                        transition={{ duration: 1, delay: 0.3 + (index * 0.1), ease: "easeOut" }}
-                        className="absolute top-0 left-0 h-[2px] -mt-[0.5px] bg-[var(--color-primary)]"
-                        style={{ width: item.percentage }}
-                      ></motion.div>
+                      {activeTab !== "skills" && (
+                        <motion.div 
+                          initial={{ x: "-100%" }}
+                          whileInView={{ x: 0 }}
+                          viewport={{ once: false }}
+                          transition={{ duration: 1, delay: 0.3 + (index * 0.1), ease: "easeOut" }}
+                          className="absolute top-0 left-0 h-[2px] -mt-[0.5px] bg-[var(--color-primary)]"
+                          style={{ 
+                            width: !item.percentage 
+                              ? "100%" 
+                              : String(item.percentage).trim().endsWith("%") 
+                              ? item.percentage 
+                              : `${String(item.percentage).trim()}%` 
+                          }}
+                        ></motion.div>
+                      )}
                     </div>
                   </div>
                 </motion.div>

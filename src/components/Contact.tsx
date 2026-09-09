@@ -27,21 +27,6 @@ export default function Contact() {
       const data = await response.json();
 
       if (data.success) {
-        // Also save to our own database for the admin panel Messages tab
-        try {
-          await fetch("/api/contact", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: formData.get("name"),
-              email: formData.get("email"),
-              message: formData.get("message"),
-            }),
-          });
-        } catch (dbError) {
-          console.error("Failed to save to database", dbError);
-        }
-
         setSubmitStatus("success");
         (e.target as HTMLFormElement).reset();
       } else {
@@ -87,8 +72,8 @@ export default function Contact() {
             </div>
             <div>
               <p className="text-[11px] text-[var(--color-text-light)] uppercase tracking-[1.5px] mb-[5px]">PHONE</p>
-              <a href="tel:+639123456789" className="text-[14px] md:text-[16px] font-bold hover:text-[var(--color-primary)] transition-colors">
-                +63 912 345 6789
+              <a href="tel:+639285893984" className="text-[14px] md:text-[16px] font-bold hover:text-[var(--color-primary)] transition-colors">
+                +63 928 589 3984
               </a>
             </div>
           </div>

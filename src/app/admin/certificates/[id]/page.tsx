@@ -1,12 +1,11 @@
-import prisma from "@/lib/prisma"
+import { fetchGitHubCertificates } from "@/lib/github"
 import EditCertificateForm from "./EditCertificateForm"
 import { notFound } from "next/navigation"
 
 export default async function EditCertificatePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
-  const certificate = await prisma.certificate.findUnique({
-    where: { id: resolvedParams.id }
-  })
+  const certificates = await fetchGitHubCertificates();
+  const certificate = certificates.find((c) => c.id === resolvedParams.id);
 
   if (!certificate) {
     notFound()

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { PlusCircle, Edit3, Trash2, FileText, CheckCircle } from "lucide-react";
-import prisma from "@/lib/prisma";
+import { fetchGitHubBlogPosts } from "@/lib/github";
+
+export const dynamic = "force-dynamic";
 
 export default async function BlogAdminPage() {
-  const posts = await prisma.post.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const posts = await fetchGitHubBlogPosts();
 
   return (
     <div className="flex flex-col gap-10">
