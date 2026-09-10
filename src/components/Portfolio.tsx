@@ -48,7 +48,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
+        viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-[400px]">
@@ -81,7 +81,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         className="flex gap-[30px] mb-[60px] border-b border-[var(--color-border)] pb-[20px] overflow-x-auto whitespace-nowrap scrollbar-none"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         {filters.map((f) => (
@@ -127,7 +127,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
                   layout
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.2 }}
+                  viewport={{ once: true, amount: 0.1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.5, delay: index * 0.08 }}
                   className="group cursor-pointer flex flex-col justify-between"

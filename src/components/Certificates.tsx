@@ -19,7 +19,7 @@ export default function Certificates({ certificates = [] }: { certificates?: any
         className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[80px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.2, margin: "-100px" }}
+        viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-[400px]">
@@ -83,7 +83,7 @@ export default function Certificates({ certificates = [] }: { certificates?: any
                 layout
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group cursor-pointer flex flex-col justify-between"

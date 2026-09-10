@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Preloader, ScrollProgress, BackToTop } from "@/components/ClientUtilities";
+import { ScrollProgress, BackToTop } from "@/components/ClientUtilities";
 
 export default function RootLayout({
   children,
@@ -75,7 +75,6 @@ export default function RootLayout({
         */}
       </head>
       <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden`}>
-        <Preloader />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1 flex flex-col w-full overflow-x-hidden">

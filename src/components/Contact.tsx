@@ -52,7 +52,7 @@ export default function Contact() {
           className="flex-1 max-w-[800px]"
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.8 }}
         >
           <p className="text-[var(--color-primary)] text-[14px] uppercase tracking-[2px] font-bold mb-[15px]">
@@ -84,7 +84,7 @@ export default function Contact() {
           className="w-full lg:w-[400px] flex flex-col gap-[30px]"
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           
