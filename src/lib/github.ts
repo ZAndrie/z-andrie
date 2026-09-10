@@ -163,7 +163,7 @@ function getHeaders(): Record<string, string> {
 }
 
 export function getContentRepoName(): string {
-  return process.env.GITHUB_CONTENT_REPO || "Portfolio-Content";
+  return process.env.GITHUB_CONTENT_REPO || "portfolio-contents";
 }
 
 // ==========================================
@@ -195,6 +195,7 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
     const contentRepo = getContentRepoName().toLowerCase();
     const excludedRepos = [
       contentRepo,
+      "portfolio-contents",
       "portfolio-content",
       "portfolio-data",
       "portfolio-assets",
@@ -263,7 +264,7 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
 export async function fetchGitHubCertificates(customUsername?: string): Promise<GitHubCertificate[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const contentRepo = getContentRepoName();
-  const repoCandidates = [contentRepo, "Certificates-Repository", "certificates-repository", "certificates", "Certificates"];
+  const repoCandidates = [contentRepo, "portfolio-contents", "Portfolio-Content", "Certificates-Repository", "certificates-repository", "certificates", "Certificates"];
 
   for (const repoName of repoCandidates) {
     try {
@@ -357,7 +358,7 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
 export async function fetchGitHubBlogPosts(customUsername?: string): Promise<GitHubBlogPost[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const contentRepo = getContentRepoName();
-  const repoCandidates = [contentRepo, "Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles", "posts"];
+  const repoCandidates = [contentRepo, "portfolio-contents", "Portfolio-Content", "Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles", "posts"];
 
   for (const repoName of repoCandidates) {
     try {
@@ -550,7 +551,7 @@ function getFallbackProjects(): GitHubProject[] {
 export async function fetchGitHubExpertise(customUsername?: string): Promise<GitHubExpertiseItem[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const contentRepo = getContentRepoName();
-  const repoCandidates = [contentRepo, "Expertise-Repository", "expertise-repository", "expertise", "Expertise"];
+  const repoCandidates = [contentRepo, "portfolio-contents", "Portfolio-Content", "Expertise-Repository", "expertise-repository", "expertise", "Expertise"];
 
   for (const repoName of repoCandidates) {
     try {
