@@ -37,6 +37,16 @@ export interface GitHubBlogPost {
   editorType?: string;
 }
 
+export interface GitHubExpertiseItem {
+  id: string;
+  category: "skills" | "education" | "experience";
+  title: string;
+  subtitle?: string;
+  year: string;
+  percentage: string;
+  order?: number;
+}
+
 interface RawGitHubRepo {
   id: number;
   name: string;
@@ -458,5 +468,49 @@ function getFallbackProjects(): GitHubProject[] {
       order: 4,
     },
   ];
+}
+
+// ==========================================
+// 4. EXPERTISE (From GitHub Repository)
+// ==========================================
+export async function fetchGitHubExpertise(customUsername?: string): Promise<GitHubExpertiseItem[]> {
+  const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
+  const repoCandidates = ["Expertise-Repository", "expertise-repository", "expertise", "Expertise"];
+
+  for (const repoName of repoCandidates) {
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${username}/${repoName}/contents`,
+        {
+          headers: getHeaders(),
+          cache: "no-store",
+        }
+      );
+
+      if (response.ok) {
+        const contents: GitHubContentItem[] = await response.json();
+        if (Array.isArray(contents)) {
+          const jsonFile = contents.find(
+            (c) =>
+              c.name.toLowerCase() === "expertise.json" ||
+              c.name.toLowerCase() === "data.json" ||
+              c.name.toLowerCase() === "resume.json"
+          );
+
+          if (jsonFile && jsonFile.download_url) {
+            const jsonRes = await fetch(jsonFile.download_url, { cache: "no-store" });
+            if (jsonRes.ok) {
+              const data = await jsonRes.json();
+              if (Array.isArray(data)) return data;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`Error fetching expertise from repo ${repoName}:`, err);
+    }
+  }
+
+  return [];
 }
 

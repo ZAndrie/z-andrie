@@ -1,19 +1,20 @@
-import ExpertiseForm from "./ExpertiseForm"
-import ExpertiseList from "./ExpertiseList"
+import { fetchGitHubExpertise } from "@/lib/github";
+import ExpertiseForm from "./ExpertiseForm";
+import ExpertiseList from "./ExpertiseList";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 export default async function ExpertiseAdminPage() {
-  const items: any[] = []
+  const items = await fetchGitHubExpertise();
 
   return (
     <div className="flex flex-col gap-10 pb-20">
       <div>
         <h1 className="text-3xl font-serif text-[var(--color-text-dark)] uppercase mb-2">
-          Manage <span className="text-[var(--color-primary)] font-light italic">Expertise & Resume</span>
+          Manage <span className="text-[var(--color-primary)] font-light italic">Expertise &amp; Resume</span>
         </h1>
         <p className="text-[var(--color-text-light)] text-[13px] leading-relaxed font-light">
-          Add, edit, or remove entries under your Skills, Education, and Experience tabs. Changes will update instantly across your portfolio.
+          Add, edit, or remove entries under your Skills, Education, and Experience tabs. Changes are committed directly to <strong className="text-[var(--color-primary)]">Expertise-Repository</strong> on GitHub.
         </p>
       </div>
 
@@ -26,5 +27,5 @@ export default async function ExpertiseAdminPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

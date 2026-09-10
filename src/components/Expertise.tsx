@@ -11,80 +11,20 @@ type ResumeItem = {
   title: string;
   subtitle?: string;
   percentage: string;
+  category?: string;
 };
 
 export default function Expertise({ initialItems = [] }: { initialItems?: any[] }) {
   const [activeTab, setActiveTab] = useState<ResumeCategory>("skills");
 
-  const dbEducation = initialItems?.filter(i => i.category === "education");
-  const dbSkills = initialItems?.filter(i => i.category === "skills");
-  const dbExperience = initialItems?.filter(i => i.category === "experience");
+  const dbEducation = initialItems?.filter((i) => i.category === "education") || [];
+  const dbSkills = initialItems?.filter((i) => i.category === "skills") || [];
+  const dbExperience = initialItems?.filter((i) => i.category === "experience") || [];
 
   const resumeData: Record<ResumeCategory, ResumeItem[]> = {
-    education: dbEducation && dbEducation.length > 0 ? dbEducation : [
-      {
-        id: "edu1",
-        year: "2023 - 2027",
-        title: "BS Information Technology",
-        subtitle: "Cor Jesu College",
-        percentage: "100%",
-      },
-      {
-        id: "edu2",
-        year: "2019 - 2021",
-        title: "Senior High School (ICT)",
-        subtitle: "Specialized in Tech",
-        percentage: "100%",
-      },
-    ],
-    skills: dbSkills && dbSkills.length > 0 ? dbSkills : [
-      {
-        id: "skill1",
-        year: "95%",
-        title: "UI / UX DESIGN",
-        percentage: "95%",
-      },
-      {
-        id: "skill2",
-        year: "90%",
-        title: "WEB DEVELOPMENT",
-        percentage: "90%",
-      },
-      {
-        id: "skill3",
-        year: "85%",
-        title: "BRANDING",
-        percentage: "85%",
-      },
-      {
-        id: "skill4",
-        year: "90%",
-        title: "RESPONSIVE DESIGN",
-        percentage: "90%",
-      },
-      {
-        id: "skill5",
-        year: "80%",
-        title: "INTERACTION DESIGN",
-        percentage: "80%",
-      },
-    ],
-    experience: dbExperience && dbExperience.length > 0 ? dbExperience : [
-      {
-        id: "exp1",
-        year: "2024 - Present",
-        title: "Freelance Web Developer",
-        subtitle: "Self-Employed",
-        percentage: "100%",
-      },
-      {
-        id: "exp2",
-        year: "Summer 2023",
-        title: "Web Development Intern",
-        subtitle: "Tech Startup",
-        percentage: "100%",
-      },
-    ],
+    education: dbEducation,
+    skills: dbSkills,
+    experience: dbExperience,
   };
 
   const tabs: { label: string; value: ResumeCategory }[] = [
@@ -117,20 +57,33 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
   ];
 
   return (
-    <section id="expertise" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden">
+    <section id="expertise" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden min-h-screen">
       
       {/* Header */}
       <motion.div 
-        className="mb-[60px]"
+        className="flex flex-col md:flex-row justify-between items-start md:items-end mb-[60px] gap-8"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.2, margin: "-100px" }}
         transition={{ duration: 0.8 }}
       >
-        <h2 className="text-[36px] md:text-[48px] text-[var(--color-text-dark)] font-serif uppercase leading-[1.1]">
-          Skills &<br />
-          <span className="text-[var(--color-primary)]">Expertise</span>
-        </h2>
+        <div>
+          <h2 className="text-[36px] md:text-[48px] text-[var(--color-text-dark)] font-serif uppercase leading-[1.1]">
+            Skills &amp;<br />
+            <span className="text-[var(--color-primary)]">Expertise</span>
+          </h2>
+        </div>
+
+        <div className="flex justify-end w-full md:w-auto">
+          <a 
+            href="https://github.com/ZAndrie/Expertise-Repository" 
+            target="_blank" 
+            rel="noreferrer"
+            className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-[10px]"
+          >
+            VIEW REPOSITORY <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
+          </a>
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[40px] md:gap-[50px] lg:gap-[40px]">
@@ -169,34 +122,44 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
           {/* Tab Content */}
           <div className="flex flex-col gap-[25px]">
             <AnimatePresence mode="popLayout">
-              {resumeData[activeTab].map((item, index) => (
-                <motion.div 
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="flex items-center gap-[15px]"
+              {resumeData[activeTab].length === 0 ? (
+                <motion.div
+                  key="empty-state"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="py-12 px-6 bg-white/40 border border-dashed border-[var(--color-border)] rounded-xl text-center"
                 >
-                  <div className="flex-1">
-                    <div className="flex justify-between items-end mb-[8px]">
-                      <h3 className="text-[12px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px]">
-                        {item.title}
-                      </h3>
-                      {activeTab !== "skills" && (
-                        <span className="text-[11px] text-[var(--color-text-light)]">
+                  <p className="text-[13px] text-[var(--color-text-light)] font-light italic">
+                    Official entries under {tabs.find((t) => t.value === activeTab)?.label} are currently being updated and cataloged.
+                  </p>
+                </motion.div>
+              ) : (
+                resumeData[activeTab].map((item, index) => (
+                  <motion.div 
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className="flex items-center gap-[15px]"
+                  >
+                    <div className="flex-1">
+                      <div className="flex justify-between items-end mb-[8px]">
+                        <h3 className="text-[12px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px]">
+                          {item.title}
+                        </h3>
+                        <span className="text-[11px] text-[var(--color-primary)] font-bold">
                           {item.year}
                         </span>
+                      </div>
+                      {item.subtitle && (
+                        <p className="text-[11px] text-[var(--color-text-light)] mb-[8px] italic">
+                          {item.subtitle}
+                        </p>
                       )}
-                    </div>
-                    {item.subtitle && (
-                      <p className="text-[11px] text-[var(--color-text-light)] mb-[8px] italic">
-                        {item.subtitle}
-                      </p>
-                    )}
-                    {/* Divider / Progress Line */}
-                    <div className="w-full h-[1px] bg-[var(--color-border)] relative overflow-hidden">
-                      {activeTab !== "skills" && (
+                      {/* Divider / Progress Line */}
+                      <div className="w-full h-[1px] bg-[var(--color-border)] relative overflow-hidden">
                         <motion.div 
                           initial={{ x: "-100%" }}
                           whileInView={{ x: 0 }}
@@ -210,12 +173,12 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
                               ? item.percentage 
                               : `${String(item.percentage).trim()}%` 
                           }}
-                        ></motion.div>
-                      )}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </AnimatePresence>
           </div>
         </motion.div>
