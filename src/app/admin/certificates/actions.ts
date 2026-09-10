@@ -152,6 +152,146 @@ export async function uploadCertificateToGitHub(params: UploadCertificateParams)
   }
 }
 
+interface UpdateCertificateParams {
+  id: string;
+  title: string;
+  issuer: string;
+  date: string;
+  fileName?: string;
+  fileBase64?: string; // optional — only if replacing the image
+}
+
+export async function updateCertificateOnGitHub(params: UpdateCertificateParams) {
+  const username = process.env.GITHUB_USERNAME || "ZAndrie";
+  const repoName = "Certificates-Repository";
+  const token = process.env.GITHUB_TOKEN;
+
+  if (!token) {
+    return {
+      success: false,
+      error: "GITHUB_TOKEN is missing in your .env file.",
+    };
+  }
+
+  try {
+    // 1. Fetch current certificates.json
+    const jsonRes = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      { headers: getGitHubHeaders(), cache: "no-store" }
+    );
+
+    if (!jsonRes.ok) {
+      throw new Error("Could not find certificates.json on GitHub");
+    }
+
+    const jsonData = await jsonRes.json();
+    let certificatesJsonSha = jsonData.sha;
+    let list: any[] = [];
+    if (jsonData.content) {
+      const decoded = Buffer.from(jsonData.content, "base64").toString("utf-8");
+      list = JSON.parse(decoded);
+    }
+
+    // 2. Find the certificate entry
+    const certIndex = list.findIndex((c: any) => c.id === params.id);
+    if (certIndex === -1) {
+      throw new Error(`Certificate with id "${params.id}" not found in certificates.json`);
+    }
+
+    let imageUrl = list[certIndex].imageUrl;
+
+    // 3. If a new image file was provided, upload it
+    if (params.fileBase64 && params.fileName) {
+      const ext = params.fileName.split(".").pop()?.toLowerCase() || "png";
+      const baseClean = params.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const cleanFileName = `${baseClean || "certificate"}.${ext}`;
+      const filePath = `certificates/${cleanFileName}`;
+
+      // Check if file exists to get SHA for overwrite
+      let existingFileSha: string | undefined = undefined;
+      try {
+        const checkRes = await fetch(
+          `https://api.github.com/repos/${username}/${repoName}/contents/${filePath}`,
+          { headers: getGitHubHeaders(), cache: "no-store" }
+        );
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          existingFileSha = checkData.sha;
+        }
+      } catch {
+        // file doesn't exist yet
+      }
+
+      const uploadRes = await fetch(
+        `https://api.github.com/repos/${username}/${repoName}/contents/${filePath}`,
+        {
+          method: "PUT",
+          headers: {
+            ...getGitHubHeaders(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: `Update certificate image: ${params.title}`,
+            content: params.fileBase64,
+            sha: existingFileSha,
+            branch: "main",
+          }),
+        }
+      );
+
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json();
+        throw new Error(errData.message || `Failed to commit image (status: ${uploadRes.status})`);
+      }
+
+      imageUrl = `https://raw.githubusercontent.com/${username}/${repoName}/main/${filePath}`;
+    }
+
+    // 4. Update the certificate metadata in the list
+    list[certIndex] = {
+      ...list[certIndex],
+      title: params.title,
+      issuer: params.issuer,
+      date: params.date,
+      imageUrl,
+    };
+
+    // 5. Commit updated certificates.json
+    const updateJsonRes = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      {
+        method: "PUT",
+        headers: {
+          ...getGitHubHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `Update certificate: ${params.title}`,
+          content: Buffer.from(JSON.stringify(list, null, 2)).toString("base64"),
+          sha: certificatesJsonSha,
+          branch: "main",
+        }),
+      }
+    );
+
+    if (!updateJsonRes.ok) {
+      const errData = await updateJsonRes.json();
+      throw new Error(errData.message || `Failed to update certificates.json (status: ${updateJsonRes.status})`);
+    }
+
+    revalidatePath("/admin/certificates");
+    revalidatePath("/certificates");
+
+    return { success: true, certificate: list[certIndex] };
+  } catch (error: any) {
+    console.error("Error updating certificate on GitHub:", error);
+    return { success: false, error: error.message || "Failed to update certificate on GitHub" };
+  }
+}
+
 export async function deleteCertificateFromGitHub(id: string) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = "Certificates-Repository";
