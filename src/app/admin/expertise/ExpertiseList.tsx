@@ -18,7 +18,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   const education = items.filter((i) => i.category === "education");
   const experience = items.filter((i) => i.category === "experience");
 
-  const renderSection = (title: string, data: any[], icon: React.ReactNode) => (
+  const renderSection = (title: string, data: any[], icon: React.ReactNode, isSkills: boolean = false) => (
     <div className="flex flex-col gap-4 mb-8">
       <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2">
         <div className="flex items-center gap-2">
@@ -44,19 +44,23 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
                   <span className="font-bold text-[14px] uppercase text-[var(--color-text-dark)]">
                     {item.title}
                   </span>
-                  <span className="text-[11px] text-[var(--color-primary)] font-bold">
-                    {item.year}
-                  </span>
+                  {!isSkills && item.year && (
+                    <span className="text-[11px] text-[var(--color-primary)] font-bold">
+                      {item.year}
+                    </span>
+                  )}
                 </div>
                 {item.subtitle && (
                   <span className="text-[12px] text-gray-500 italic font-light">{item.subtitle}</span>
                 )}
-                <div className="w-48 h-[3px] bg-gray-100 mt-2 rounded overflow-hidden">
-                  <div
-                    className="h-full bg-[var(--color-primary)]"
-                    style={{ width: item.percentage || "100%" }}
-                  />
-                </div>
+                {!isSkills && (
+                  <div className="w-48 h-[3px] bg-gray-100 mt-2 rounded overflow-hidden">
+                    <div
+                      className="h-full bg-[var(--color-primary)]"
+                      style={{ width: item.percentage || "100%" }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -109,7 +113,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
         </a>
       </div>
 
-      {renderSection("Skills & Proficiency", skills, <Wrench size={16} />)}
+      {renderSection("Skills", skills, <Wrench size={16} />, true)}
       {renderSection("Education & Training", education, <GraduationCap size={16} />)}
       {renderSection("Work Experience", experience, <Briefcase size={16} />)}
     </div>

@@ -18,8 +18,7 @@ export default function ExpertiseForm() {
     const formData = new FormData(form);
 
     const title = (formData.get("title") as string).trim();
-    const year = (formData.get("year") as string).trim();
-    const percentage = (formData.get("percentage") as string).trim();
+    const year = (formData.get("year") as string)?.trim() || "";
     const subtitle = (formData.get("subtitle") as string)?.trim() || undefined;
 
     const res = await createExpertiseItem({
@@ -27,7 +26,7 @@ export default function ExpertiseForm() {
       title,
       subtitle,
       year,
-      percentage,
+      percentage: "100%",
       order: 0,
     });
 
@@ -92,42 +91,32 @@ export default function ExpertiseForm() {
         <input 
           name="title" 
           required 
-          placeholder={category === "skills" ? "e.g. UI / UX DESIGN" : category === "education" ? "e.g. BS Information Technology" : "e.g. Freelance Web Developer"} 
+          placeholder={category === "skills" ? "e.g. QUALITY ASSURANCE or UI / UX DESIGN" : category === "education" ? "e.g. BS Information Technology" : "e.g. Freelance Web Developer"} 
           className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
         />
       </div>
+
+      {category !== "skills" && (
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
+            Date Range / Years (e.g. 2023 - 2027 or Nov 2025)
+          </label>
+          <input 
+            name="year" 
+            required={category !== "skills"} 
+            placeholder="e.g. 2023 - 2027" 
+            className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
+          />
+        </div>
+      )}
 
       <div className="flex flex-col gap-1">
         <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
-          {category === "skills" ? "Proficiency Display (e.g. 95%)" : "Date Range / Years (e.g. 2023 - 2027 or Nov 2025)"}
-        </label>
-        <input 
-          name="year" 
-          required 
-          placeholder={category === "skills" ? "95%" : "2023 - 2027"} 
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
-        />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">Progress Bar Width (%)</label>
-        <input 
-          name="percentage" 
-          required 
-          defaultValue={category === "skills" ? "90%" : "100%"} 
-          placeholder="e.g. 95% or 100%" 
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
-        />
-        <span className="text-[10px] text-gray-400">Controls the accent line width under the item.</span>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
-          Subtitle / Institution (Optional)
+          {category === "skills" ? "Tools & Focus / Subtitle (Optional)" : category === "education" ? "School / Institution (Optional)" : "Company / Organization (Optional)"}
         </label>
         <input 
           name="subtitle" 
-          placeholder={category === "education" ? "e.g. Cor Jesu College" : category === "experience" ? "e.g. Tech Startup or Self-Employed" : "Optional notes"} 
+          placeholder={category === "skills" ? "e.g. Manual Testing, Automation, Cypress" : category === "education" ? "e.g. Cor Jesu College" : "e.g. Tech Startup or Self-Employed"} 
           className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
         />
       </div>

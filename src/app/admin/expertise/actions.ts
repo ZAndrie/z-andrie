@@ -38,8 +38,8 @@ export async function createExpertiseItem(data: {
   category: string;
   title: string;
   subtitle?: string;
-  year: string;
-  percentage: string;
+  year?: string;
+  percentage?: string;
   order?: number;
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
@@ -81,8 +81,8 @@ export async function createExpertiseItem(data: {
       category: data.category,
       title: data.title,
       subtitle: data.subtitle || "",
-      year: data.year,
-      percentage: data.percentage,
+      year: data.year || "",
+      percentage: data.percentage || "100%",
       order: list.length + 1,
     };
 

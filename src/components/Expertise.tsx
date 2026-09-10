@@ -149,9 +149,11 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
                         <h3 className="text-[12px] font-bold text-[var(--color-text-dark)] uppercase tracking-[1px]">
                           {item.title}
                         </h3>
-                        <span className="text-[11px] text-[var(--color-primary)] font-bold">
-                          {item.year}
-                        </span>
+                        {activeTab !== "skills" && item.year && (
+                          <span className="text-[11px] text-[var(--color-primary)] font-bold">
+                            {item.year}
+                          </span>
+                        )}
                       </div>
                       {item.subtitle && (
                         <p className="text-[11px] text-[var(--color-text-light)] mb-[8px] italic">
@@ -160,20 +162,17 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
                       )}
                       {/* Divider / Progress Line */}
                       <div className="w-full h-[1px] bg-[var(--color-border)] relative overflow-hidden">
-                        <motion.div 
-                          initial={{ x: "-100%" }}
-                          whileInView={{ x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1, delay: 0.3 + (index * 0.1), ease: "easeOut" }}
-                          className="absolute top-0 left-0 h-[2px] -mt-[0.5px] bg-[var(--color-primary)]"
-                          style={{ 
-                            width: !item.percentage 
-                              ? "100%" 
-                              : String(item.percentage).trim().endsWith("%") 
-                              ? item.percentage 
-                              : `${String(item.percentage).trim()}%` 
-                          }}
-                        />
+                        {activeTab !== "skills" ? (
+                          <motion.div 
+                            initial={{ x: "-100%" }}
+                            whileInView={{ x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, delay: 0.3 + (index * 0.1), ease: "easeOut" }}
+                            className="absolute top-0 left-0 h-[2px] -mt-[0.5px] bg-[var(--color-primary)] w-full"
+                          />
+                        ) : (
+                          <div className="h-[1px] bg-[var(--color-border)] w-full" />
+                        )}
                       </div>
                     </div>
                   </motion.div>
