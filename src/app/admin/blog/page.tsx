@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusCircle, Edit3, Trash2, FileText, CheckCircle } from "lucide-react";
+import { PlusCircle, Edit3, FileText, CheckCircle } from "lucide-react";
 import { fetchGitHubBlogPosts } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
@@ -70,7 +70,7 @@ export default async function BlogAdminPage() {
                     </td>
                     <td className="p-4">
                       <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded uppercase">
-                        {post.editorType === "json" ? "Block" : "Classic"}
+                        {post.editorType === "json" ? "Block" : "Markdown"}
                       </span>
                     </td>
                     <td className="p-4 text-xs text-gray-500">
@@ -78,19 +78,15 @@ export default async function BlogAdminPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/blog/edit/${post.id}`}
+                        <a
+                          href={post.githubUrl || `/blog/${post.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
                           className="p-2 text-gray-400 hover:text-[var(--color-primary)] transition-colors rounded hover:bg-[var(--color-light-bg)]"
-                          title="Edit Post"
+                          title="View on GitHub / Website"
                         >
                           <Edit3 size={16} />
-                        </Link>
-                        <button
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded hover:bg-red-50"
-                          title="Delete Post"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        </a>
                       </div>
                     </td>
                   </tr>

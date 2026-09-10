@@ -34,6 +34,7 @@ export interface GitHubBlogPost {
   published: boolean;
   createdAt: string;
   githubUrl?: string;
+  editorType?: string;
 }
 
 interface RawGitHubRepo {
