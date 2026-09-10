@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { UploadCloud, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { uploadCertificateToGitHub } from "./actions";
 
 export default function NewCertificateForm() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,7 @@ export default function NewCertificateForm() {
         });
         handleRemoveFile();
         form.reset();
+        router.refresh();
       } else {
         setStatusMessage({
           type: "error",

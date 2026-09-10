@@ -167,17 +167,16 @@ export function getContentRepoName(): string {
 }
 
 // ==========================================
-// 1. PROJECTS (Live from GitHub Repositories)
-// ==========================================
-export async function fetchGitHubProjects(customUsername?: string): Promise<GitHubProject[]> {
+export async function fetchGitHubProjects(customUsername?: string, bypassCache: boolean = false): Promise<GitHubProject[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
+  const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
   try {
     const response = await fetch(
       `https://api.github.com/users/${username}/repos?sort=pushed&per_page=100`,
       {
         headers: getHeaders(),
-        next: { revalidate: 60 },
+        ...cacheOption,
       }
     );
 
@@ -242,7 +241,7 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
           `https://api.github.com/repos/${username}/${repo.name}/contents`,
           {
             headers: getHeaders(),
-            next: { revalidate: 60 },
+            ...cacheOption,
           }
         );
 
@@ -310,10 +309,11 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
 // ==========================================
 // 2. CERTIFICATES (From GitHub Repository)
 // ==========================================
-export async function fetchGitHubCertificates(customUsername?: string): Promise<GitHubCertificate[]> {
+export async function fetchGitHubCertificates(customUsername?: string, bypassCache: boolean = false): Promise<GitHubCertificate[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const contentRepo = getContentRepoName();
   const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
+  const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
   for (const repoName of repoCandidates) {
     try {
@@ -321,14 +321,14 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
       try {
         const subfolderRes = await fetch(
           `https://api.github.com/repos/${username}/${repoName}/contents/certificates`,
-          { headers: getHeaders(), next: { revalidate: 60 } }
+          { headers: getHeaders(), ...cacheOption }
         );
         if (subfolderRes.ok) {
           const subContents: GitHubContentItem[] = await subfolderRes.json();
           if (Array.isArray(subContents)) {
             const jsonFile = subContents.find((c) => c.name.toLowerCase() === "certificates.json" || c.name.toLowerCase() === "data.json");
             if (jsonFile && jsonFile.download_url) {
-              const jsonRes = await fetch(jsonFile.download_url, { next: { revalidate: 60 } });
+              const jsonRes = await fetch(jsonFile.download_url, { ...cacheOption });
               if (jsonRes.ok) {
                 const data = await jsonRes.json();
                 if (Array.isArray(data) && data.length > 0) return data;
@@ -358,7 +358,7 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
         `https://api.github.com/repos/${username}/${repoName}/contents`,
         {
           headers: getHeaders(),
-          next: { revalidate: 60 },
+          ...cacheOption,
         }
       );
 
@@ -368,7 +368,7 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
           // Check for certificates.json or data.json
           const jsonFile = contents.find((c) => c.name.toLowerCase() === "certificates.json" || c.name.toLowerCase() === "data.json");
           if (jsonFile && jsonFile.download_url) {
-            const jsonRes = await fetch(jsonFile.download_url, { next: { revalidate: 60 } });
+            const jsonRes = await fetch(jsonFile.download_url, { ...cacheOption });
             if (jsonRes.ok) {
               const data = await jsonRes.json();
               if (Array.isArray(data) && data.length > 0) return data;
@@ -597,10 +597,11 @@ function getFallbackProjects(): GitHubProject[] {
 // ==========================================
 // 4. EXPERTISE (From GitHub Repository)
 // ==========================================
-export async function fetchGitHubExpertise(customUsername?: string): Promise<GitHubExpertiseItem[]> {
+export async function fetchGitHubExpertise(customUsername?: string, bypassCache: boolean = false): Promise<GitHubExpertiseItem[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const contentRepo = getContentRepoName();
   const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
+  const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
   for (const repoName of repoCandidates) {
     try {
@@ -608,7 +609,7 @@ export async function fetchGitHubExpertise(customUsername?: string): Promise<Git
       try {
         const subRes = await fetch(
           `https://api.github.com/repos/${username}/${repoName}/contents/expertise`,
-          { headers: getHeaders(), next: { revalidate: 60 } }
+          { headers: getHeaders(), ...cacheOption }
         );
         if (subRes.ok) {
           const subContents: GitHubContentItem[] = await subRes.json();
@@ -620,7 +621,7 @@ export async function fetchGitHubExpertise(customUsername?: string): Promise<Git
                 c.name.toLowerCase() === "resume.json"
             );
             if (jsonFile && jsonFile.download_url) {
-              const jsonRes = await fetch(jsonFile.download_url, { next: { revalidate: 60 } });
+              const jsonRes = await fetch(jsonFile.download_url, { ...cacheOption });
               if (jsonRes.ok) {
                 const data = await jsonRes.json();
                 if (Array.isArray(data)) return data;
@@ -637,7 +638,7 @@ export async function fetchGitHubExpertise(customUsername?: string): Promise<Git
         `https://api.github.com/repos/${username}/${repoName}/contents`,
         {
           headers: getHeaders(),
-          next: { revalidate: 60 },
+          ...cacheOption,
         }
       );
 
@@ -652,7 +653,7 @@ export async function fetchGitHubExpertise(customUsername?: string): Promise<Git
           );
 
           if (jsonFile && jsonFile.download_url) {
-            const jsonRes = await fetch(jsonFile.download_url, { next: { revalidate: 60 } });
+            const jsonRes = await fetch(jsonFile.download_url, { ...cacheOption });
             if (jsonRes.ok) {
               const data = await jsonRes.json();
               if (Array.isArray(data)) return data;

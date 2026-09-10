@@ -5,7 +5,7 @@ import ExpertiseList from "./ExpertiseList";
 export const dynamic = "force-dynamic";
 
 export default async function ExpertiseAdminPage() {
-  const items = await fetchGitHubExpertise();
+  const items = await fetchGitHubExpertise(undefined, true);
 
   return (
     <div className="flex flex-col gap-10 pb-20">

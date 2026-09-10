@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { deleteExpertiseItem } from "./actions";
 import { Trash2, Briefcase, GraduationCap, Wrench, Loader2 } from "lucide-react";
 
 export default function ExpertiseList({ items = [] }: { items?: any[] }) {
+  const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string, title: string) => {
@@ -12,6 +14,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
     setDeletingId(id);
     await deleteExpertiseItem(id);
     setDeletingId(null);
+    router.refresh();
   };
 
   const skills = items.filter((i) => i.category === "skills");

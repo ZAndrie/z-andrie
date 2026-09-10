@@ -1,7 +1,9 @@
 "use client"
+import { useRouter } from "next/navigation"
 import { deleteProject } from "./actions"
 
 export default function ProjectList({ projects }: { projects: any[] }) {
+  const router = useRouter()
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {projects.map((p) => (
@@ -25,7 +27,10 @@ export default function ProjectList({ projects }: { projects: any[] }) {
                   Edit
                 </a>
                 <button onClick={async () => {
-                  if (confirm("Are you sure you want to delete this project?")) await deleteProject(p.id)
+                  if (confirm("Are you sure you want to delete this project?")) {
+                    await deleteProject(p.id)
+                    router.refresh()
+                  }
                 }} className="text-red-500 text-[10px] uppercase font-bold hover:text-red-700 tracking-wider transition-colors">
                   Delete
                 </button>

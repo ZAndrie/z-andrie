@@ -5,7 +5,7 @@ import NewCertificateForm from "./NewCertificateForm"
 export const dynamic = "force-dynamic"
 
 export default async function CertificatesAdminPage() {
-  const certificates = await fetchGitHubCertificates();
+  const certificates = await fetchGitHubCertificates(undefined, true);
 
   return (
     <div className="flex flex-col gap-10 pb-20">

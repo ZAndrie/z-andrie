@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createExpertiseItem } from "./actions";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 export default function ExpertiseForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState<string>("skills");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -38,6 +40,7 @@ export default function ExpertiseForm() {
         text: `Committed "${title}" to GitHub Portfolio-Content (expertise/)!`,
       });
       form.reset();
+      router.refresh();
     } else {
       setStatusMessage({
         type: "error",

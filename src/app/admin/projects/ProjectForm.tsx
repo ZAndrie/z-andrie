@@ -1,10 +1,12 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { UploadDropzone } from "@/utils/uploadthing"
 import "@uploadthing/react/styles.css"
 import { createProject } from "./actions"
 
 export default function ProjectForm() {
+  const router = useRouter()
   const [imageUrl, setImageUrl] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
@@ -24,6 +26,7 @@ export default function ProjectForm() {
     setLoading(false)
     setImageUrl("")
     form.reset()
+    router.refresh()
   }
 
   return (

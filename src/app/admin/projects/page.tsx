@@ -5,7 +5,7 @@ import ProjectList from "./ProjectList"
 export const dynamic = "force-dynamic"
 
 export default async function ProjectsPage() {
-  const projects = await fetchGitHubProjects()
+  const projects = await fetchGitHubProjects(undefined, true)
 
   return (
     <div className="flex flex-col gap-10 pb-20">

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { deleteCertificateFromGitHub } from "./actions";
 
 export default function CertificateList({ certificates }: { certificates: any[] }) {
+  const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -14,6 +16,7 @@ export default function CertificateList({ certificates }: { certificates: any[] 
       alert(res.error || "Failed to delete certificate from GitHub");
     }
     setDeletingId(null);
+    router.refresh();
   };
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
