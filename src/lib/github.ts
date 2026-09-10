@@ -177,7 +177,7 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
       `https://api.github.com/users/${username}/repos?sort=pushed&per_page=100`,
       {
         headers: getHeaders(),
-        next: { revalidate: 3600 },
+        next: { revalidate: 60 },
       }
     );
 
@@ -225,7 +225,7 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
       return !repo.private && !repo.fork;
     });
 
-    return projectRepos.map((repo, index) => {
+    const projectPromises = projectRepos.map(async (repo, index) => {
       const title = formatTitle(repo.name);
       const category = determineCategory(repo.language, repo.topics);
       const subtitle =
@@ -234,14 +234,61 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
           ? `${repo.language} project featuring interactive design and robust system architecture.`
           : `Project repository developed by ${username}.`);
 
-      const openGraphUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
+      let imageUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
+
+      // Check if the repository contains an uploaded preview image (e.g. Library-Booking-Image.png, preview.png, etc.)
+      try {
+        const contentsRes = await fetch(
+          `https://api.github.com/repos/${username}/${repo.name}/contents`,
+          {
+            headers: getHeaders(),
+            next: { revalidate: 60 },
+          }
+        );
+
+        if (contentsRes.ok) {
+          const files: GitHubContentItem[] = await contentsRes.json();
+          if (Array.isArray(files)) {
+            const imageFiles = files.filter((f) =>
+              /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(f.name)
+            );
+
+            if (imageFiles.length > 0) {
+              // Priority 1: Images explicitly named with image/cover/preview/screenshot/banner/thumb/showcase
+              const explicitCover = imageFiles.find((f) =>
+                /image|cover|preview|screenshot|banner|thumb|showcase/i.test(f.name)
+              );
+
+              // Priority 2: Images matching repository name
+              const repoMatch = imageFiles.find((f) =>
+                f.name.toLowerCase().includes(repo.name.toLowerCase().replace(/[-_]/g, ""))
+              );
+
+              // Priority 3: General image (excluding ML training loss/history charts)
+              const generalImage = imageFiles.find((f) =>
+                !/training|history|loss|epoch|metric|confusion|roc|curve/i.test(f.name)
+              );
+
+              const preferred = explicitCover || repoMatch || generalImage;
+
+              if (preferred) {
+                imageUrl =
+                  preferred.download_url ||
+                  `https://raw.githubusercontent.com/${username}/${repo.name}/${repo.default_branch || "main"}/${preferred.path}`;
+              }
+            }
+          }
+        }
+      } catch {
+        // Fallback to default openGraphUrl
+      }
 
       return {
         id: `gh-${repo.id}`,
         title,
         category,
         subtitle,
-        imageUrl: openGraphUrl,
+        imageUrl,
         projectUrl: repo.homepage || repo.html_url,
         githubUrl: repo.html_url,
         stars: repo.stargazers_count || 0,
@@ -252,6 +299,8 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
         order: index + 1,
       };
     });
+
+    return await Promise.all(projectPromises);
   } catch (error) {
     console.error("Failed to fetch GitHub projects:", error);
     return getFallbackProjects();
