@@ -71,6 +71,7 @@ export default function Navbar() {
             <li key={link.name}>
               <Link
                 href={link.href}
+                prefetch={true}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`relative font-semibold uppercase text-[11px] md:text-[12px] tracking-[1.5px] transition-all duration-300 hover:text-[var(--color-primary)] ${
                   isActive ? "text-[var(--color-primary)]" : "text-[var(--color-text-dark)]"
@@ -86,6 +87,7 @@ export default function Navbar() {
       <div className="hidden md:flex items-center gap-[15px]">
         <Link
           href="/contact"
+          prefetch={true}
           className="text-[12px] font-bold uppercase tracking-[1.5px] text-[var(--color-text-dark)] transition-all duration-300 hover:text-[var(--color-primary)] flex items-center gap-[10px]"
         >
           AVAILABLE FOR FREELANCE 

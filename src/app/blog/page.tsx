@@ -1,7 +1,7 @@
 import { fetchGitHubBlogPosts } from "@/lib/github"
 import AnimatedBlogList from "./AnimatedBlogList"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 60;
 
 export default async function BlogPage() {
   const posts = await fetchGitHubBlogPosts();
