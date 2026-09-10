@@ -14,7 +14,7 @@ export default async function ExpertiseAdminPage() {
           Manage <span className="text-[var(--color-primary)] font-light italic">Expertise &amp; Resume</span>
         </h1>
         <p className="text-[var(--color-text-light)] text-[13px] leading-relaxed font-light">
-          Add, edit, or remove entries under your Skills, Education, and Experience tabs. Changes are committed directly to <strong className="text-[var(--color-primary)]">Expertise-Repository</strong> on GitHub.
+          Add, edit, or remove entries under your Skills, Education, and Experience tabs. Changes are committed directly to <strong className="text-[var(--color-primary)]">Portfolio-Content (expertise/)</strong> on GitHub.
         </p>
       </div>
 

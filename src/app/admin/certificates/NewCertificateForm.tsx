@@ -64,7 +64,7 @@ export default function NewCertificateForm() {
       if (res.success) {
         setStatusMessage({
           type: "success",
-          text: `Successfully committed "${title}" to GitHub Certificates-Repository!`,
+          text: `Successfully committed "${title}" to GitHub Portfolio-Content/certificates!`,
         });
         handleRemoveFile();
         form.reset();
@@ -89,7 +89,7 @@ export default function NewCertificateForm() {
       <div>
         <h3 className="font-serif text-lg text-[var(--color-text-dark)] uppercase">Add New Certificate</h3>
         <p className="text-xs text-gray-500 font-light mt-0.5">
-          Uploads image & metadata directly to <strong className="text-[var(--color-primary)]">Certificates-Repository</strong> on GitHub.
+          Uploads image &amp; metadata directly to <strong className="text-[var(--color-primary)]">Portfolio-Content (certificates/)</strong> on GitHub.
         </p>
       </div>
 

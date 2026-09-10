@@ -78,7 +78,7 @@ export default async function AdminDashboard() {
             </div>
             <h2 className="text-xl font-serif mb-1">Expertise &amp; Resume</h2>
             <p className="text-sm text-gray-500 font-light mb-6">
-              You have <strong className="text-[var(--color-text-dark)]">{expertiseCount}</strong> items synced from Expertise-Repository.
+              You have <strong className="text-[var(--color-text-dark)]">{expertiseCount}</strong> items synced from Portfolio-Content.
             </p>
           </div>
           

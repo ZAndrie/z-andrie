@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getContentRepoName } from "@/lib/github";
 
 function getGitHubHeaders() {
   const token = process.env.GITHUB_TOKEN;
@@ -14,6 +15,25 @@ function getGitHubHeaders() {
   return headers;
 }
 
+async function resolveExpertiseJsonPath(username: string, repoName: string): Promise<string> {
+  try {
+    const checkSub = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/expertise/expertise.json`,
+      { headers: getGitHubHeaders(), cache: "no-store" }
+    );
+    if (checkSub.ok) return "expertise/expertise.json";
+
+    const checkRoot = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      { headers: getGitHubHeaders(), cache: "no-store" }
+    );
+    if (checkRoot.ok) return "expertise.json";
+  } catch {
+    // fallback
+  }
+  return "expertise/expertise.json";
+}
+
 export async function createExpertiseItem(data: {
   category: string;
   title: string;
@@ -23,7 +43,7 @@ export async function createExpertiseItem(data: {
   order?: number;
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Expertise-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
@@ -34,13 +54,13 @@ export async function createExpertiseItem(data: {
   }
 
   try {
-    // 1. Fetch current expertise.json from GitHub
+    const jsonPath = await resolveExpertiseJsonPath(username, repoName);
     let expertiseJsonSha: string | undefined = undefined;
     let list: any[] = [];
 
     try {
       const res = await fetch(
-        `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+        `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
         { headers: getGitHubHeaders(), cache: "no-store" }
       );
       if (res.ok) {
@@ -56,7 +76,6 @@ export async function createExpertiseItem(data: {
       list = [];
     }
 
-    // 2. Append new item
     const newItem = {
       id: `exp-${Date.now()}`,
       category: data.category,
@@ -69,9 +88,8 @@ export async function createExpertiseItem(data: {
 
     list.push(newItem);
 
-    // 3. Commit updated expertise.json back to GitHub
     const updateRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {
@@ -104,7 +122,7 @@ export async function createExpertiseItem(data: {
 
 export async function deleteExpertiseItem(id: string) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Expertise-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
@@ -115,14 +133,14 @@ export async function deleteExpertiseItem(id: string) {
   }
 
   try {
-    // 1. Fetch current expertise.json
+    const jsonPath = await resolveExpertiseJsonPath(username, repoName);
     const res = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       { headers: getGitHubHeaders(), cache: "no-store" }
     );
 
     if (!res.ok) {
-      throw new Error("Could not find expertise.json on GitHub");
+      throw new Error(`Could not find ${jsonPath} on GitHub`);
     }
 
     const jsonData = await res.json();
@@ -133,12 +151,10 @@ export async function deleteExpertiseItem(id: string) {
       list = JSON.parse(decoded);
     }
 
-    // 2. Filter out item
     const updatedList = list.filter((item: any) => item.id !== id);
 
-    // 3. Commit updated expertise.json
     const updateRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {
@@ -178,7 +194,7 @@ export async function updateExpertiseItem(id: string, data: {
   order?: number;
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Expertise-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
@@ -189,13 +205,14 @@ export async function updateExpertiseItem(id: string, data: {
   }
 
   try {
+    const jsonPath = await resolveExpertiseJsonPath(username, repoName);
     const res = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       { headers: getGitHubHeaders(), cache: "no-store" }
     );
 
     if (!res.ok) {
-      throw new Error("Could not find expertise.json on GitHub");
+      throw new Error(`Could not find ${jsonPath} on GitHub`);
     }
 
     const jsonData = await res.json();
@@ -221,7 +238,7 @@ export async function updateExpertiseItem(id: string, data: {
     };
 
     const updateRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/expertise.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {

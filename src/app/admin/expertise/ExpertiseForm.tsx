@@ -36,7 +36,7 @@ export default function ExpertiseForm() {
     if (res.success) {
       setStatusMessage({
         type: "success",
-        text: `Committed "${title}" to GitHub Expertise-Repository!`,
+        text: `Committed "${title}" to GitHub Portfolio-Content (expertise/)!`,
       });
       form.reset();
     } else {
@@ -52,7 +52,7 @@ export default function ExpertiseForm() {
       <div>
         <h3 className="font-serif text-lg text-[var(--color-text-dark)] uppercase">Add New Resume Item</h3>
         <p className="text-xs text-gray-500 font-light mt-0.5">
-          Commits directly to <strong className="text-[var(--color-primary)]">Expertise-Repository</strong> on GitHub.
+          Commits directly to <strong className="text-[var(--color-primary)]">Portfolio-Content (expertise/)</strong> on GitHub.
         </p>
       </div>
 

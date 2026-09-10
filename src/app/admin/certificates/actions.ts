@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getContentRepoName } from "@/lib/github";
 
 interface UploadCertificateParams {
   title: string;
@@ -22,15 +23,35 @@ function getGitHubHeaders() {
   return headers;
 }
 
+// Determines where certificates.json is located (preferring certificates/certificates.json in unified repo)
+async function resolveCertificatesJsonPath(username: string, repoName: string): Promise<string> {
+  try {
+    const checkSub = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/certificates/certificates.json`,
+      { headers: getGitHubHeaders(), cache: "no-store" }
+    );
+    if (checkSub.ok) return "certificates/certificates.json";
+
+    const checkRoot = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      { headers: getGitHubHeaders(), cache: "no-store" }
+    );
+    if (checkRoot.ok) return "certificates.json";
+  } catch {
+    // fallback default
+  }
+  return "certificates/certificates.json";
+}
+
 export async function uploadCertificateToGitHub(params: UploadCertificateParams) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Certificates-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
     return {
       success: false,
-      error: "GITHUB_TOKEN is missing in your .env file. Please add a GitHub Personal Access Token with 'repo' scope to allow automatic commits.",
+      error: "GITHUB_TOKEN is missing in your environment variables. Please check your .env file or Vercel settings.",
     };
   }
 
@@ -83,12 +104,13 @@ export async function uploadCertificateToGitHub(params: UploadCertificateParams)
     }
 
     // 4. Fetch existing certificates.json
+    const jsonPath = await resolveCertificatesJsonPath(username, repoName);
     let certificatesJsonSha: string | undefined = undefined;
     let existingList: any[] = [];
 
     try {
       const jsonRes = await fetch(
-        `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+        `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
         { headers: getGitHubHeaders(), cache: "no-store" }
       );
       if (jsonRes.ok) {
@@ -112,7 +134,7 @@ export async function uploadCertificateToGitHub(params: UploadCertificateParams)
       issuer: params.issuer,
       date: params.date,
       imageUrl: rawImageUrl,
-      repoUrl: `https://github.com/${username}/${repoName}`,
+      repoUrl: `https://github.com/${username}/${repoName}/blob/main/${filePath}`,
       order: existingList.length + 1,
     };
 
@@ -120,7 +142,7 @@ export async function uploadCertificateToGitHub(params: UploadCertificateParams)
 
     // 6. Commit updated certificates.json to GitHub
     const updateJsonRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {
@@ -158,30 +180,32 @@ interface UpdateCertificateParams {
   issuer: string;
   date: string;
   fileName?: string;
-  fileBase64?: string; // optional — only if replacing the image
+  fileBase64?: string;
 }
 
 export async function updateCertificateOnGitHub(params: UpdateCertificateParams) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Certificates-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
     return {
       success: false,
-      error: "GITHUB_TOKEN is missing in your .env file.",
+      error: "GITHUB_TOKEN is missing in your environment variables.",
     };
   }
 
   try {
+    const jsonPath = await resolveCertificatesJsonPath(username, repoName);
+
     // 1. Fetch current certificates.json
     const jsonRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       { headers: getGitHubHeaders(), cache: "no-store" }
     );
 
     if (!jsonRes.ok) {
-      throw new Error("Could not find certificates.json on GitHub");
+      throw new Error(`Could not find ${jsonPath} on GitHub repository ${repoName}`);
     }
 
     const jsonData = await jsonRes.json();
@@ -195,7 +219,7 @@ export async function updateCertificateOnGitHub(params: UpdateCertificateParams)
     // 2. Find the certificate entry
     const certIndex = list.findIndex((c: any) => c.id === params.id);
     if (certIndex === -1) {
-      throw new Error(`Certificate with id "${params.id}" not found in certificates.json`);
+      throw new Error(`Certificate with id "${params.id}" not found in ${jsonPath}`);
     }
 
     let imageUrl = list[certIndex].imageUrl;
@@ -210,7 +234,6 @@ export async function updateCertificateOnGitHub(params: UpdateCertificateParams)
       const cleanFileName = `${baseClean || "certificate"}.${ext}`;
       const filePath = `certificates/${cleanFileName}`;
 
-      // Check if file exists to get SHA for overwrite
       let existingFileSha: string | undefined = undefined;
       try {
         const checkRes = await fetch(
@@ -261,7 +284,7 @@ export async function updateCertificateOnGitHub(params: UpdateCertificateParams)
 
     // 5. Commit updated certificates.json
     const updateJsonRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {
@@ -279,7 +302,7 @@ export async function updateCertificateOnGitHub(params: UpdateCertificateParams)
 
     if (!updateJsonRes.ok) {
       const errData = await updateJsonRes.json();
-      throw new Error(errData.message || `Failed to update certificates.json (status: ${updateJsonRes.status})`);
+      throw new Error(errData.message || `Failed to update ${jsonPath} (status: ${updateJsonRes.status})`);
     }
 
     revalidatePath("/admin/certificates");
@@ -294,25 +317,27 @@ export async function updateCertificateOnGitHub(params: UpdateCertificateParams)
 
 export async function deleteCertificateFromGitHub(id: string) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = "Certificates-Repository";
+  const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
     return {
       success: false,
-      error: "GITHUB_TOKEN is missing in your .env file.",
+      error: "GITHUB_TOKEN is missing in your environment variables.",
     };
   }
 
   try {
+    const jsonPath = await resolveCertificatesJsonPath(username, repoName);
+
     // 1. Fetch current certificates.json
     const jsonRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       { headers: getGitHubHeaders(), cache: "no-store" }
     );
 
     if (!jsonRes.ok) {
-      throw new Error("Could not find certificates.json on GitHub");
+      throw new Error(`Could not find ${jsonPath} on GitHub repository ${repoName}`);
     }
 
     const jsonData = await jsonRes.json();
@@ -328,7 +353,7 @@ export async function deleteCertificateFromGitHub(id: string) {
 
     // 3. Commit updated certificates.json back to GitHub
     const updateRes = await fetch(
-      `https://api.github.com/repos/${username}/${repoName}/contents/certificates.json`,
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
       {
         method: "PUT",
         headers: {

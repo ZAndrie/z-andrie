@@ -93,7 +93,7 @@ export default function EditCertificateForm({ certificate }: { certificate: any 
       <div>
         <h3 className="font-serif text-lg text-[var(--color-text-dark)] uppercase">Edit Certificate</h3>
         <p className="text-xs text-gray-500 font-light mt-0.5">
-          Updates metadata &amp; image on <strong className="text-[var(--color-primary)]">Certificates-Repository</strong> via GitHub.
+          Updates metadata &amp; image on <strong className="text-[var(--color-primary)]">Portfolio-Content (certificates/)</strong> via GitHub.
         </p>
       </div>
 

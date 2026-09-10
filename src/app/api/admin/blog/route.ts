@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { fetchGitHubBlogPosts } from "@/lib/github";
+import { fetchGitHubBlogPosts, getContentRepoName } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,8 @@ export async function POST(req: Request) {
 
     const username = process.env.GITHUB_USERNAME || "ZAndrie";
     const token = process.env.GITHUB_TOKEN;
-    const repoCandidates = ["Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles"];
+    const contentRepo = getContentRepoName();
+    const repoCandidates = [contentRepo, "Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles"];
 
     if (!token) {
       return NextResponse.json({ message: "GITHUB_TOKEN is not configured" }, { status: 400 });
@@ -35,7 +36,8 @@ ${content}
 
     for (const repoName of repoCandidates) {
       try {
-        const filePath = `${slug}.md`;
+        // Preferred subfolder is blogs/
+        const filePath = repoName === contentRepo ? `blogs/${slug}.md` : `${slug}.md`;
         const res = await fetch(
           `https://api.github.com/repos/${username}/${repoName}/contents/${filePath}`,
           {

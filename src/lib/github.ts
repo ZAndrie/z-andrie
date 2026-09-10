@@ -162,6 +162,10 @@ function getHeaders(): Record<string, string> {
   return headers;
 }
 
+export function getContentRepoName(): string {
+  return process.env.GITHUB_CONTENT_REPO || "Portfolio-Content";
+}
+
 // ==========================================
 // 1. PROJECTS (Live from GitHub Repositories)
 // ==========================================
@@ -188,7 +192,12 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
       return getFallbackProjects();
     }
 
+    const contentRepo = getContentRepoName().toLowerCase();
     const excludedRepos = [
+      contentRepo,
+      "portfolio-content",
+      "portfolio-data",
+      "portfolio-assets",
       "certificates-repository",
       "certificates",
       "my-certificates",
@@ -198,6 +207,8 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
       "blog",
       "articles",
       "posts",
+      "expertise-repository",
+      "expertise",
       "z-andrie",
       "portfolio",
     ];
@@ -251,22 +262,60 @@ export async function fetchGitHubProjects(customUsername?: string): Promise<GitH
 // ==========================================
 export async function fetchGitHubCertificates(customUsername?: string): Promise<GitHubCertificate[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoCandidates = ["Certificates-Repository", "certificates-repository", "certificates", "Certificates"];
+  const contentRepo = getContentRepoName();
+  const repoCandidates = [contentRepo, "Certificates-Repository", "certificates-repository", "certificates", "Certificates"];
 
   for (const repoName of repoCandidates) {
     try {
+      // 1. First check if certificates/ subfolder exists (in unified repo)
+      try {
+        const subfolderRes = await fetch(
+          `https://api.github.com/repos/${username}/${repoName}/contents/certificates`,
+          { headers: getHeaders(), cache: "no-store" }
+        );
+        if (subfolderRes.ok) {
+          const subContents: GitHubContentItem[] = await subfolderRes.json();
+          if (Array.isArray(subContents)) {
+            const jsonFile = subContents.find((c) => c.name.toLowerCase() === "certificates.json" || c.name.toLowerCase() === "data.json");
+            if (jsonFile && jsonFile.download_url) {
+              const jsonRes = await fetch(jsonFile.download_url, { cache: "no-store" });
+              if (jsonRes.ok) {
+                const data = await jsonRes.json();
+                if (Array.isArray(data) && data.length > 0) return data;
+              }
+            }
+
+            const imageFiles = subContents.filter((c) => /\.(png|jpg|jpeg|webp|pdf|svg)$/i.test(c.name));
+            if (imageFiles.length > 0) {
+              return imageFiles.map((file, index) => ({
+                id: `cert-${file.sha}`,
+                title: formatTitle(file.name),
+                issuer: "Verified Credential",
+                date: "GitHub Verified",
+                imageUrl: file.download_url || `https://raw.githubusercontent.com/${username}/${repoName}/main/${file.path}`,
+                repoUrl: file.html_url,
+                order: index + 1,
+              }));
+            }
+          }
+        }
+      } catch {
+        // subfolder didn't exist, proceed to root check
+      }
+
+      // 2. Check repository root
       const response = await fetch(
         `https://api.github.com/repos/${username}/${repoName}/contents`,
         {
           headers: getHeaders(),
-          cache: "no-store", // live refresh for immediate updates when user uploads
+          cache: "no-store",
         }
       );
 
       if (response.ok) {
         const contents: GitHubContentItem[] = await response.json();
         if (Array.isArray(contents)) {
-          // 1. Check for certificates.json or data.json
+          // Check for certificates.json or data.json
           const jsonFile = contents.find((c) => c.name.toLowerCase() === "certificates.json" || c.name.toLowerCase() === "data.json");
           if (jsonFile && jsonFile.download_url) {
             const jsonRes = await fetch(jsonFile.download_url, { cache: "no-store" });
@@ -276,30 +325,10 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
             }
           }
 
-          // 2. Scan image/pdf files in repository root
+          // Scan image/pdf files in repository root
           const imageFiles: GitHubContentItem[] = contents.filter((c) =>
             /\.(png|jpg|jpeg|webp|pdf|svg)$/i.test(c.name)
           );
-
-          // 3. Also check any subdirectories (e.g. certificates/, images/, certs/)
-          const subdirs = contents.filter((c) => c.type === "dir");
-          for (const dir of subdirs) {
-            try {
-              const subRes = await fetch(dir.url, { headers: getHeaders(), cache: "no-store" });
-              if (subRes.ok) {
-                const subItems: GitHubContentItem[] = await subRes.json();
-                if (Array.isArray(subItems)) {
-                  for (const subItem of subItems) {
-                    if (/\.(png|jpg|jpeg|webp|pdf|svg)$/i.test(subItem.name)) {
-                      imageFiles.push(subItem);
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              console.warn(`Error scanning subdir ${dir.name}:`, err);
-            }
-          }
 
           if (imageFiles.length > 0) {
             return imageFiles.map((file, index) => ({
@@ -312,9 +341,6 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
               order: index + 1,
             }));
           }
-
-          // Repository is connected but no certificates uploaded yet
-          return [];
         }
       }
     } catch (error) {
@@ -330,10 +356,58 @@ export async function fetchGitHubCertificates(customUsername?: string): Promise<
 // ==========================================
 export async function fetchGitHubBlogPosts(customUsername?: string): Promise<GitHubBlogPost[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoCandidates = ["Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles", "posts"];
+  const contentRepo = getContentRepoName();
+  const repoCandidates = [contentRepo, "Blogs-Repository", "blogs-repository", "blog", "Blog", "blogs", "articles", "posts"];
 
   for (const repoName of repoCandidates) {
     try {
+      // 1. Check blogs/ or blog/ subfolder first
+      for (const subDir of ["blogs", "blog"]) {
+        try {
+          const subRes = await fetch(
+            `https://api.github.com/repos/${username}/${repoName}/contents/${subDir}`,
+            { headers: getHeaders(), cache: "no-store" }
+          );
+          if (subRes.ok) {
+            const subContents: GitHubContentItem[] = await subRes.json();
+            if (Array.isArray(subContents) && subContents.length > 0) {
+              const mdFiles = subContents.filter((c) => /\.md$/i.test(c.name) && c.name.toLowerCase() !== "readme.md");
+              if (mdFiles.length > 0) {
+                const posts: GitHubBlogPost[] = [];
+                for (const file of mdFiles) {
+                  if (file.download_url) {
+                    const mdRes = await fetch(file.download_url, { cache: "no-store" });
+                    if (mdRes.ok) {
+                      const rawText = await mdRes.text();
+                      const slug = file.name.replace(/\.md$/i, "").toLowerCase();
+                      const firstHeadingMatch = rawText.match(/^#\s+(.*)$/m);
+                      const title = firstHeadingMatch ? firstHeadingMatch[1] : formatTitle(file.name);
+                      const lines = rawText.split("\n").filter((l) => l.trim() && !l.startsWith("#"));
+                      const excerpt = lines[0] ? lines[0].replace(/[*_#`[\]]/g, "").slice(0, 160) + "..." : "Read full article on GitHub.";
+
+                      posts.push({
+                        id: `post-${file.sha}`,
+                        title,
+                        slug,
+                        excerpt,
+                        content: simpleMarkdownToHtml(rawText),
+                        coverImage: `https://opengraph.githubassets.com/1/${username}/${repoName}`,
+                        published: true,
+                        createdAt: new Date().toISOString(),
+                        githubUrl: file.html_url,
+                      });
+                    }
+                  }
+                }
+                if (posts.length > 0) return posts;
+              }
+            }
+          }
+        } catch {
+          // continue
+        }
+      }
+
       const response = await fetch(
         `https://api.github.com/repos/${username}/${repoName}/contents`,
         {
@@ -475,10 +549,40 @@ function getFallbackProjects(): GitHubProject[] {
 // ==========================================
 export async function fetchGitHubExpertise(customUsername?: string): Promise<GitHubExpertiseItem[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoCandidates = ["Expertise-Repository", "expertise-repository", "expertise", "Expertise"];
+  const contentRepo = getContentRepoName();
+  const repoCandidates = [contentRepo, "Expertise-Repository", "expertise-repository", "expertise", "Expertise"];
 
   for (const repoName of repoCandidates) {
     try {
+      // 1. Check expertise/ subfolder first
+      try {
+        const subRes = await fetch(
+          `https://api.github.com/repos/${username}/${repoName}/contents/expertise`,
+          { headers: getHeaders(), cache: "no-store" }
+        );
+        if (subRes.ok) {
+          const subContents: GitHubContentItem[] = await subRes.json();
+          if (Array.isArray(subContents)) {
+            const jsonFile = subContents.find(
+              (c) =>
+                c.name.toLowerCase() === "expertise.json" ||
+                c.name.toLowerCase() === "data.json" ||
+                c.name.toLowerCase() === "resume.json"
+            );
+            if (jsonFile && jsonFile.download_url) {
+              const jsonRes = await fetch(jsonFile.download_url, { cache: "no-store" });
+              if (jsonRes.ok) {
+                const data = await jsonRes.json();
+                if (Array.isArray(data)) return data;
+              }
+            }
+          }
+        }
+      } catch {
+        // continue
+      }
+
+      // 2. Check root
       const response = await fetch(
         `https://api.github.com/repos/${username}/${repoName}/contents`,
         {

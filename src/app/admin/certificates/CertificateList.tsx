@@ -37,7 +37,7 @@ export default function CertificateList({ certificates }: { certificates: any[] 
           
           <div className="flex justify-end items-center pt-3 border-t border-gray-100">
              <div className="flex gap-4">
-                <a href={c.repoUrl || "https://github.com/ZAndrie/Certificates-Repository"} target="_blank" rel="noreferrer" className="text-gray-500 text-[10px] uppercase font-bold hover:text-[var(--color-primary)] tracking-wider transition-colors">
+                <a href={c.repoUrl || "https://github.com/ZAndrie/Portfolio-Content/tree/main/certificates"} target="_blank" rel="noreferrer" className="text-gray-500 text-[10px] uppercase font-bold hover:text-[var(--color-primary)] tracking-wider transition-colors">
                   GitHub ↗
                 </a>
                 <button 

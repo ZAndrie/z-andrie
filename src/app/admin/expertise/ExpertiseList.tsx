@@ -8,7 +8,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Delete "${title}" from GitHub Expertise-Repository?`)) return;
+    if (!confirm(`Delete "${title}" from GitHub Portfolio-Content?`)) return;
     setDeletingId(id);
     await deleteExpertiseItem(id);
     setDeletingId(null);
@@ -95,12 +95,12 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
               Connected to GitHub
             </h4>
             <p className="text-xs text-gray-500 font-light mt-0.5">
-              Synced with <strong className="text-[var(--color-primary)] font-medium">ZAndrie/Expertise-Repository</strong>
+              Synced with <strong className="text-[var(--color-primary)] font-medium">ZAndrie/Portfolio-Content (expertise/)</strong>
             </p>
           </div>
         </div>
         <a
-          href="https://github.com/ZAndrie/Expertise-Repository"
+          href="https://github.com/ZAndrie/Portfolio-Content/tree/main/expertise"
           target="_blank"
           rel="noreferrer"
           className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-black transition-colors"

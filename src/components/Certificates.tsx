@@ -37,7 +37,7 @@ export default function Certificates({ certificates = [] }: { certificates?: any
 
         <div className="flex justify-end w-full md:w-auto">
           <a 
-            href="https://github.com/ZAndrie/Certificates-Repository" 
+            href="https://github.com/ZAndrie/Portfolio-Content/tree/main/certificates" 
             target="_blank" 
             rel="noreferrer"
             className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-[10px]"
@@ -59,13 +59,13 @@ export default function Certificates({ certificates = [] }: { certificates?: any
                 ✦
               </div>
               <h3 className="text-xl md:text-2xl font-serif text-[var(--color-text-dark)] mb-3">
-                Certifications & Credentials
+                Certifications &amp; Credentials
               </h3>
               <p className="text-[14px] text-[var(--color-text-light)] max-w-lg font-light leading-relaxed mb-6">
                 Official certificates and professional credentials are currently being updated and cataloged. You can explore verified records and repositories directly on GitHub.
               </p>
               <a
-                href="https://github.com/ZAndrie/Certificates-Repository"
+                href="https://github.com/ZAndrie/Portfolio-Content/tree/main/certificates"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-7 py-3 bg-[var(--color-primary)] text-white text-[11px] font-bold uppercase tracking-[2px] rounded-full hover:bg-[var(--color-text-dark)] transition-all shadow-sm hover:shadow"
