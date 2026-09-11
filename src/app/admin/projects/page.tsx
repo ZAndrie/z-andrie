@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
       <div>
         <h1 className="text-3xl font-serif text-[var(--color-text-dark)] uppercase mb-2">Manage <span className="text-[var(--color-primary)] font-light italic">Projects</span></h1>
         <p className="text-[var(--color-text-light)] text-[13px] leading-relaxed font-light">
-          Add new portfolio works or remove existing ones. Changes will reflect instantly on your public website.
+          Add new portfolio projects, search, and edit custom titles, categories, and cover images. Repositories are preserved and cannot be deleted from here.
         </p>
       </div>
 
@@ -21,9 +21,6 @@ export default async function ProjectsPage() {
           <ProjectForm />
         </div>
         <div className="lg:col-span-2">
-          <div className="flex justify-between items-end border-b border-[var(--color-border)] pb-3 mb-6">
-             <h3 className="font-bold uppercase tracking-widest text-[12px] text-gray-400">Existing Projects ({projects.length})</h3>
-          </div>
           <ProjectList projects={projects} />
         </div>
       </div>

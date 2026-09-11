@@ -172,6 +172,42 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
   const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
   try {
+    // 1. Fetch custom projects / repository overrides from portfolio-contents repository
+    let customProjects: any[] = [];
+    try {
+      const contentRepo = getContentRepoName();
+      const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
+      for (const cRepo of repoCandidates) {
+        for (const jPath of ["projects/projects.json", "projects.json"]) {
+          try {
+            const res = await fetch(
+              `https://api.github.com/repos/${username}/${cRepo}/contents/${jPath}`,
+              { headers: getHeaders(), ...cacheOption }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (data.download_url) {
+                const fileRes = await fetch(data.download_url, { ...cacheOption });
+                if (fileRes.ok) {
+                  const parsed = await fileRes.json();
+                  if (Array.isArray(parsed)) {
+                    customProjects = parsed;
+                    break;
+                  }
+                }
+              }
+            }
+          } catch {
+            // continue checking
+          }
+        }
+        if (customProjects.length > 0) break;
+      }
+    } catch (e) {
+      console.warn("Could not fetch projects.json from content repo:", e);
+    }
+
+    // 2. Fetch live public repositories from GitHub
     const response = await fetch(
       `https://api.github.com/users/${username}/repos?sort=pushed&per_page=100`,
       {
@@ -180,54 +216,49 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
       }
     );
 
-    if (!response.ok) {
-      console.warn(`GitHub API responded with status ${response.status} for user ${username}`);
-      return getFallbackProjects();
-    }
+    let projectRepos: RawGitHubRepo[] = [];
+    if (response.ok) {
+      const repos: RawGitHubRepo[] = await response.json();
+      if (Array.isArray(repos)) {
+        const contentRepo = getContentRepoName().toLowerCase();
+        const excludedRepos = [
+          contentRepo,
+          "portfolio-contents",
+          "portfolio-content",
+          "portfolio-data",
+          "portfolio-assets",
+          "certificates-repository",
+          "certificates",
+          "my-certificates",
+          "blogs-repository",
+          "blog-repository",
+          "blogs",
+          "blog",
+          "articles",
+          "posts",
+          "expertise-repository",
+          "expertise",
+          "z-andrie",
+          "portfolio",
+        ];
 
-    const repos: RawGitHubRepo[] = await response.json();
-
-    if (!Array.isArray(repos)) {
-      return getFallbackProjects();
-    }
-
-    const contentRepo = getContentRepoName().toLowerCase();
-    const excludedRepos = [
-      contentRepo,
-      "portfolio-contents",
-      "portfolio-content",
-      "portfolio-data",
-      "portfolio-assets",
-      "certificates-repository",
-      "certificates",
-      "my-certificates",
-      "blogs-repository",
-      "blog-repository",
-      "blogs",
-      "blog",
-      "articles",
-      "posts",
-      "expertise-repository",
-      "expertise",
-      "z-andrie",
-      "portfolio",
-    ];
-
-    const projectRepos = repos.filter((repo) => {
-      const repoNameLower = repo.name.toLowerCase();
-      if (excludedRepos.includes(repoNameLower)) {
-        return false;
+        projectRepos = repos.filter((repo) => {
+          const repoNameLower = repo.name.toLowerCase();
+          if (excludedRepos.includes(repoNameLower)) {
+            return false;
+          }
+          if (repo.name.toLowerCase() === username.toLowerCase() && repo.size < 50 && !repo.description) {
+            return false;
+          }
+          return !repo.private && !repo.fork;
+        });
       }
-      if (repo.name.toLowerCase() === username.toLowerCase() && repo.size < 50 && !repo.description) {
-        return false;
-      }
-      return !repo.private && !repo.fork;
-    });
+    }
 
     const projectPromises = projectRepos.map(async (repo, index) => {
-      const title = formatTitle(repo.name);
-      const category = determineCategory(repo.language, repo.topics);
-      const subtitle =
+      const defaultTitle = formatTitle(repo.name);
+      const defaultCategory = determineCategory(repo.language, repo.topics);
+      const defaultSubtitle =
         repo.description ||
         (repo.language
           ? `${repo.language} project featuring interactive design and robust system architecture.`
@@ -235,7 +266,7 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
 
       let imageUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
 
-      // Check if the repository contains an uploaded preview image (e.g. Library-Booking-Image.png, preview.png, etc.)
+      // Check if the repository contains an uploaded preview image
       try {
         const contentsRes = await fetch(
           `https://api.github.com/repos/${username}/${repo.name}/contents`,
@@ -253,23 +284,17 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
             );
 
             if (imageFiles.length > 0) {
-              // Priority 1: Images explicitly named with image/cover/preview/screenshot/banner/thumb/showcase
               const explicitCover = imageFiles.find((f) =>
                 /image|cover|preview|screenshot|banner|thumb|showcase/i.test(f.name)
               );
-
-              // Priority 2: Images matching repository name
               const repoMatch = imageFiles.find((f) =>
                 f.name.toLowerCase().includes(repo.name.toLowerCase().replace(/[-_]/g, ""))
               );
-
-              // Priority 3: General image (excluding ML training loss/history charts)
               const generalImage = imageFiles.find((f) =>
                 !/training|history|loss|epoch|metric|confusion|roc|curve/i.test(f.name)
               );
 
               const preferred = explicitCover || repoMatch || generalImage;
-
               if (preferred) {
                 imageUrl =
                   preferred.download_url ||
@@ -282,24 +307,55 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
         // Fallback to default openGraphUrl
       }
 
+      // Check if this GitHub repo has custom overrides in projects.json
+      const override = customProjects.find(
+        (cp: any) =>
+          cp.id === `gh-${repo.id}` ||
+          (cp.githubUrl && cp.githubUrl.toLowerCase() === repo.html_url.toLowerCase())
+      );
+
       return {
         id: `gh-${repo.id}`,
-        title,
-        category,
-        subtitle,
-        imageUrl,
-        projectUrl: repo.homepage || repo.html_url,
-        githubUrl: repo.html_url,
+        title: override?.title || defaultTitle,
+        category: override?.category || defaultCategory,
+        subtitle: override?.subtitle || defaultSubtitle,
+        imageUrl: override?.imageUrl || imageUrl,
+        projectUrl: override?.projectUrl !== undefined && override?.projectUrl !== "" ? override.projectUrl : (repo.homepage || repo.html_url),
+        githubUrl: override?.githubUrl || repo.html_url,
         stars: repo.stargazers_count || 0,
         language: repo.language || undefined,
         topics: repo.topics || [],
         createdAt: repo.created_at,
-        updatedAt: repo.pushed_at || repo.updated_at,
-        order: index + 1,
+        updatedAt: override?.updatedAt || repo.pushed_at || repo.updated_at,
+        order: override?.order !== undefined ? override.order : index + 1,
       };
     });
 
-    return await Promise.all(projectPromises);
+    const resolvedRepoProjects = await Promise.all(projectPromises);
+
+    // 3. Standalone added projects (created via admin panel not mapped to a raw repo)
+    const standaloneProjects: GitHubProject[] = customProjects
+      .filter((cp: any) => !projectRepos.some((repo) => cp.id === `gh-${repo.id}` || (cp.githubUrl && cp.githubUrl.toLowerCase() === repo.html_url.toLowerCase())))
+      .map((cp: any, idx: number) => ({
+        id: cp.id || `proj-${Date.now()}-${idx}`,
+        title: cp.title || "Custom Project",
+        category: cp.category || "Web Development",
+        subtitle: cp.subtitle || "",
+        imageUrl: cp.imageUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200",
+        projectUrl: cp.projectUrl || "",
+        githubUrl: cp.githubUrl || "",
+        stars: cp.stars || 0,
+        language: cp.language || undefined,
+        topics: cp.topics || [],
+        createdAt: cp.createdAt || new Date().toISOString(),
+        updatedAt: cp.updatedAt || new Date().toISOString(),
+        order: cp.order !== undefined ? cp.order : (resolvedRepoProjects.length + idx + 1),
+      }));
+
+    const allProjects = [...resolvedRepoProjects, ...standaloneProjects];
+    allProjects.sort((a, b) => a.order - b.order);
+
+    return allProjects.length > 0 ? allProjects : getFallbackProjects();
   } catch (error) {
     console.error("Failed to fetch GitHub projects:", error);
     return getFallbackProjects();

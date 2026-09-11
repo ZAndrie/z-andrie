@@ -44,8 +44,8 @@ export default async function AdminDashboard() {
             </p>
           </div>
           
-          <Link href="/works" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
-            View Live Works <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          <Link href="/admin/projects" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
+            Manage Projects <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -101,8 +101,8 @@ export default async function AdminDashboard() {
             </p>
           </div>
           
-          <Link href="/blog" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
-            View Live Blog <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          <Link href="/admin/blog" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
+            Manage Blog <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -116,12 +116,12 @@ export default async function AdminDashboard() {
             </div>
             <h2 className="text-xl font-serif mb-1">Direct Contact</h2>
             <p className="text-sm text-gray-500 font-light mb-6">
-              Contact submissions are routed directly to your email via Web3Forms.
+              Review and manage incoming contact inquiries and messages.
             </p>
           </div>
           
-          <Link href="/contact" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
-            Go to Contact <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          <Link href="/admin/messages" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-[var(--color-text-dark)] transition-colors">
+            View Messages <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
