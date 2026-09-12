@@ -136,11 +136,15 @@ export default function Contact() {
             )}
           </form>
 
-          {/* QR Code Placeholder */}
-          <div className="border border-[#333] p-[20px] flex items-center gap-[20px]">
-            <div className="w-[70px] h-[70px] bg-white flex items-center justify-center p-[5px]">
-              {/* Fake QR code using borders */}
-              <div className="w-full h-full border-[8px] border-black border-dashed"></div>
+          {/* QR Code */}
+          <div className="border border-[#333] p-[20px] flex items-center gap-[20px] rounded-sm">
+            <div className="w-[70px] h-[70px] bg-white flex items-center justify-center p-[4px] rounded-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BEGIN%3AVCARD%0AVERSION%3A3.0%0AN%3ABarraba%3BZ%20Andrie%0AFN%3AZ%20Andrie%20Barraba%0AEMAIL%3Azandriebarraba.1305%40gmail.com%0ATEL%3A%2B639285893984%0AEND%3AVCARD"
+                alt="Z Andrie Contact QR Code"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <p className="text-[11px] uppercase tracking-[2px] font-bold mb-[5px]">SCAN QR</p>

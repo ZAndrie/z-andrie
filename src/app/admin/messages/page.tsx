@@ -1,73 +1,99 @@
-import { Mail, CheckCircle } from "lucide-react";
+import { Mail, ExternalLink, ShieldCheck, Phone, Inbox } from "lucide-react";
 
 export default function MessagesAdminPage() {
-  const messages: any[] = [];
-
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl font-serif text-[var(--color-text-dark)] uppercase mb-2">
-          Inbox <span className="text-[var(--color-primary)] font-light italic">Messages</span>
+          Inbox &amp; <span className="text-[var(--color-primary)] font-light italic">Inquiries</span>
         </h1>
         <p className="text-sm font-light text-gray-500 max-w-xl">
-          View all messages submitted through the contact form on your portfolio.
+          Contact submissions from your portfolio are delivered directly to your verified email via Web3Forms.
         </p>
       </div>
 
-      <div className="bg-white border border-[var(--color-border)] rounded-md overflow-hidden">
-        {messages.length === 0 ? (
-          <div className="p-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-[var(--color-light-bg)] rounded-full flex items-center justify-center mb-4 text-[var(--color-primary)]">
-              <Mail size={24} />
+      {/* Integration Status Card */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white border border-[var(--color-border)] rounded-lg p-6 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+              <ShieldCheck size={20} />
             </div>
-            <h3 className="text-lg font-bold text-[var(--color-text-dark)] mb-2">No messages yet</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-              When someone contacts you through your portfolio, their message will appear here.
-            </p>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Delivery Status</div>
+              <div className="text-sm font-bold text-green-700">Active &amp; Verified</div>
+            </div>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[var(--color-light-bg)] border-b border-[var(--color-border)]">
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Sender</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Message</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Date</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {messages.map((msg) => (
-                  <tr key={msg.id} className="border-b border-[var(--color-border)] hover:bg-gray-50 transition-colors">
-                    <td className="p-4 min-w-[200px]">
-                      <div className="font-bold text-[var(--color-text-dark)] mb-1">{msg.name}</div>
-                      <a href={`mailto:${msg.email}`} className="text-xs text-[var(--color-primary)] hover:underline">
-                        {msg.email}
-                      </a>
-                    </td>
-                    <td className="p-4 min-w-[300px] max-w-[500px]">
-                      <div className="text-sm text-gray-700 whitespace-pre-wrap">{msg.message}</div>
-                    </td>
-                    <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
-                      {new Date(msg.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="p-4 text-right">
-                      {msg.isRead ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wider">
-                          <CheckCircle size={12} /> Read
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[var(--color-primary)] text-white text-[10px] font-bold uppercase tracking-wider">
-                          New
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Form submissions are protected with spam filtering and forwarded instantly.
+          </p>
+        </div>
+
+        <div className="bg-white border border-[var(--color-border)] rounded-lg p-6 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-[var(--color-light-bg)] text-[var(--color-primary)] flex items-center justify-center">
+              <Mail size={20} />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Destination Inbox</div>
+              <div className="text-xs font-bold text-[var(--color-text-dark)] truncate max-w-[180px]">zandriebarraba.1305@gmail.com</div>
+            </div>
           </div>
-        )}
+          <a
+            href="https://mail.google.com/mail/u/0/#search/Z+Andrie+Portfolio"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--color-primary)] hover:underline uppercase tracking-wider"
+          >
+            Open in Gmail <ExternalLink size={12} />
+          </a>
+        </div>
+
+        <div className="bg-white border border-[var(--color-border)] rounded-lg p-6 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Phone size={20} />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Direct Phone</div>
+              <div className="text-sm font-bold text-[var(--color-text-dark)]">+63 928 589 3984</div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Displayed on your public contact section and encoded in your portfolio QR code.
+          </p>
+        </div>
+      </div>
+
+      {/* Main Info Box */}
+      <div className="bg-white border border-[var(--color-border)] rounded-lg p-10 flex flex-col items-center justify-center text-center shadow-sm">
+        <div className="w-16 h-16 bg-[var(--color-light-bg)] rounded-full flex items-center justify-center mb-4 text-[var(--color-primary)]">
+          <Inbox size={28} />
+        </div>
+        <h3 className="text-lg font-bold text-[var(--color-text-dark)] mb-2 font-serif uppercase">
+          Direct Email Dispatch Active
+        </h3>
+        <p className="text-sm text-gray-500 max-w-lg mx-auto mb-6 leading-relaxed">
+          Whenever a visitor submits the contact form on your portfolio, Web3Forms automatically delivers their name, email, and message directly to <strong className="text-[var(--color-text-dark)]">zandriebarraba.1305@gmail.com</strong>.
+        </p>
+        <div className="flex gap-4">
+          <a
+            href="https://mail.google.com/"
+            target="_blank"
+            rel="noreferrer"
+            className="bg-[var(--color-text-dark)] hover:bg-[var(--color-primary)] text-white px-6 py-3 rounded text-[11px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-2"
+          >
+            <Mail size={14} /> Check Gmail Inbox
+          </a>
+          <a
+            href="/contact"
+            target="_blank"
+            rel="noreferrer"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded text-[11px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-2"
+          >
+            <ExternalLink size={14} /> Test Contact Form
+          </a>
+        </div>
       </div>
     </div>
   );
