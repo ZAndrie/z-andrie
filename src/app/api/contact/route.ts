@@ -102,28 +102,36 @@ ${message}
       }
     }
 
-    // 3. Fallback: Web3Forms API
-    if (!delivered && process.env.WEB3FORMS_ACCESS_KEY) {
-      const web3Res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: process.env.WEB3FORMS_ACCESS_KEY,
-          name,
-          email,
-          message,
-          subject: `New Portfolio Message from ${name}`,
-          from_name: name,
-        }),
-      });
+    // 3. Fallback: Web3Forms API (using user's key from dashboard)
+    const web3Key = process.env.WEB3FORMS_ACCESS_KEY || "1a0fae38-6e0a-4cf5-855c-c90366f8e2cb";
+    if (!delivered && web3Key) {
+      try {
+        const web3Res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: web3Key,
+            name,
+            email,
+            message,
+            subject: `New Portfolio Message from ${name}`,
+            from_name: name,
+          }),
+        });
 
-      const web3Data = await web3Res.json();
-      if (web3Data.success) {
-        delivered = true;
-        deliveryMethod = "web3forms";
+        const contentType = web3Res.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const web3Data = await web3Res.json();
+          if (web3Data.success) {
+            delivered = true;
+            deliveryMethod = "web3forms";
+          }
+        }
+      } catch (err) {
+        console.warn("Web3Forms dispatch error:", err);
       }
     }
 
