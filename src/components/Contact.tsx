@@ -6,39 +6,46 @@ import { motion } from "framer-motion";
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
+    setErrorMessage("");
 
     try {
-      const formData = new FormData(e.currentTarget);
-      
-      // Web3Forms required fields
-      formData.append("access_key", "1a0fae38-6e0a-4cf5-855c-c90366f8e2cb");
-      formData.append("subject", "New Contact Form Submission - Z Andrie Portfolio");
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const message = formData.get("message") as string;
 
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        body: formData
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, message }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setSubmitStatus("success");
-        (e.target as HTMLFormElement).reset();
+        form.reset();
       } else {
-        console.error("Error submitting form", data);
+        console.error("Error submitting form:", data);
         setSubmitStatus("error");
+        setErrorMessage(data.error || "Failed to send message. Please try again.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Network error:", error);
       setSubmitStatus("error");
+      setErrorMessage("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => setSubmitStatus("idle"), 7000);
+      setTimeout(() => setSubmitStatus("idle"), 10000);
     }
   };
 
@@ -125,13 +132,13 @@ export default function Contact() {
             </button>
             
             {submitStatus === "success" && (
-              <div className="text-[11px] text-[var(--color-primary)] mt-1 uppercase tracking-[1px]">
-                Message sent successfully.
+              <div className="text-[11px] text-green-400 mt-1 uppercase tracking-[1px] bg-green-950/40 border border-green-800/60 p-2.5 rounded-sm">
+                ✓ Message sent! Delivered directly to my Gmail.
               </div>
             )}
             {submitStatus === "error" && (
-              <div className="text-[11px] text-red-500 mt-1 uppercase tracking-[1px]">
-                An error occurred. Please try again.
+              <div className="text-[11px] text-red-400 mt-1 uppercase tracking-[1px] bg-red-950/40 border border-red-800/60 p-2.5 rounded-sm">
+                {errorMessage || "An error occurred. Please try again."}
               </div>
             )}
           </form>
