@@ -125,26 +125,27 @@ export default function Contact() {
               <input
                 type="text"
                 name="name"
-                placeholder="YOUR NAME"
+                placeholder="Your Name"
                 required
-                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[12px] uppercase tracking-[1px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
+                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
               />
             </div>
             <div>
               <input
                 type="email"
                 name="email"
-                placeholder="EMAIL ADDRESS"
+                placeholder="Email Address"
                 required
-                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[12px] uppercase tracking-[1px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
+                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
               />
             </div>
             <div>
               <textarea
                 name="message"
-                placeholder="YOUR MESSAGE"
+                placeholder="Your Message..."
                 required
-                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[12px] uppercase tracking-[1px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] resize-y min-h-[80px] placeholder-[#666]"
+                rows={4}
+                className="w-full p-[12px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] resize-y min-h-[90px] placeholder-[#666]"
               ></textarea>
             </div>
             
