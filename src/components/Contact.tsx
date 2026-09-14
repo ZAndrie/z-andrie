@@ -21,23 +21,48 @@ export default function Contact() {
       const email = formData.get("email") as string;
       const message = formData.get("message") as string;
 
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, message }),
-      });
+      let success = false;
 
-      const data = await response.json();
+      // 1. Try server-side route
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, message }),
+        });
 
-      if (response.ok && data.success) {
+        const data = await response.json();
+        if (response.ok && data.success) {
+          success = true;
+        }
+      } catch (serverErr) {
+        console.warn("Server route error, trying direct fallback:", serverErr);
+      }
+
+      // 2. Direct Formspree fallback if needed
+      if (!success) {
+        const directRes = await fetch("https://formspree.io/f/xqpkvwqz", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ name, email, message, _replyto: email }),
+        });
+
+        if (directRes.ok) {
+          success = true;
+        }
+      }
+
+      if (success) {
         setSubmitStatus("success");
         form.reset();
       } else {
-        console.error("Error submitting form:", data);
         setSubmitStatus("error");
-        setErrorMessage(data.error || "Failed to send message. Please try again.");
+        setErrorMessage("Failed to send message. Please try again.");
       }
     } catch (error: any) {
       console.error("Network error:", error);
