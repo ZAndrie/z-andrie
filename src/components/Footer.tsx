@@ -31,7 +31,8 @@ export default function Footer() {
       <div className="flex gap-[30px] text-[12px] uppercase tracking-[2px]">
         <a href="https://github.com/ZAndrie" target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
         <a href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" className="hover:text-white transition-colors">LinkedIn</a>
-        <a href="#" className="hover:text-white transition-colors">Instagram</a>
+        <a href="https://www.instagram.com/4ndr_eiiz/" className="hover:text-white transition-colors">Instagram</a>
+        <a href="https://www.wattpad.com/user/RexSkyler" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Wattpad</a>
       </div>
     </motion.footer>
   );
