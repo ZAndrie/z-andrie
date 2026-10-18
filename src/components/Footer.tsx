@@ -28,11 +28,47 @@ export default function Footer() {
           • Admin
         </Link>
       </div>
-      <div className="flex gap-[30px] text-[12px] uppercase tracking-[2px]">
-        <a href="https://github.com/ZAndrie" target="_blank" rel="noreferrer" className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
-        <a href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" className="hover:text-white transition-colors">LinkedIn</a>
-        <a href="https://www.instagram.com/4ndr_eiiz/" className="hover:text-white transition-colors">Instagram</a>
-        <a href="https://www.wattpad.com/user/RexSkyler" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Wattpad</a>
+      <div className="flex items-center gap-[15px] text-[16px]">
+        <a 
+          href="https://github.com/ZAndrie" 
+          target="_blank" 
+          rel="noreferrer" 
+          aria-label="GitHub Profile"
+          title="GitHub Profile"
+          className="w-[36px] h-[36px] rounded-full border border-[#333] hover:border-[var(--color-primary)] flex items-center justify-center text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-all hover:scale-110"
+        >
+          <i className="fa-brands fa-github text-[15px]"></i>
+        </a>
+        <a 
+          href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" 
+          target="_blank" 
+          rel="noreferrer"
+          aria-label="LinkedIn Profile"
+          title="LinkedIn Profile"
+          className="w-[36px] h-[36px] rounded-full border border-[#333] hover:border-[var(--color-primary)] flex items-center justify-center text-[var(--color-text-light)] hover:text-white transition-all hover:scale-110"
+        >
+          <i className="fa-brands fa-linkedin-in text-[14px]"></i>
+        </a>
+        <a 
+          href="https://www.instagram.com/4ndr_eiiz/" 
+          target="_blank" 
+          rel="noreferrer"
+          aria-label="Instagram Profile"
+          title="Instagram Profile"
+          className="w-[36px] h-[36px] rounded-full border border-[#333] hover:border-[var(--color-primary)] flex items-center justify-center text-[var(--color-text-light)] hover:text-white transition-all hover:scale-110"
+        >
+          <i className="fa-brands fa-instagram text-[14px]"></i>
+        </a>
+        <a 
+          href="https://www.wattpad.com/user/RexSkyler" 
+          target="_blank" 
+          rel="noreferrer" 
+          aria-label="Wattpad Profile"
+          title="Wattpad Profile"
+          className="w-[36px] h-[36px] rounded-full border border-[#333] hover:border-[var(--color-primary)] flex items-center justify-center text-[var(--color-text-light)] hover:text-white transition-all hover:scale-110"
+        >
+          <i className="fa-solid fa-book-open text-[13px]"></i>
+        </a>
       </div>
     </motion.footer>
   );

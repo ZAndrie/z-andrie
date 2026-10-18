@@ -352,7 +352,11 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
         order: cp.order !== undefined ? cp.order : (resolvedRepoProjects.length + idx + 1),
       }));
 
-    const allProjects = [...resolvedRepoProjects, ...standaloneProjects];
+    const q1Projects = getQ1Projects();
+    const existingIds = new Set([...resolvedRepoProjects, ...standaloneProjects].map((p) => p.id));
+    const uniqueQ1 = q1Projects.filter((q) => !existingIds.has(q.id));
+
+    const allProjects = [...uniqueQ1, ...resolvedRepoProjects, ...standaloneProjects];
     allProjects.sort((a, b) => a.order - b.order);
 
     return allProjects.length > 0 ? allProjects : getFallbackProjects();
@@ -588,9 +592,61 @@ export async function fetchGitHubBlogPost(slug: string, customUsername?: string)
   return posts.find((p) => p.slug.toLowerCase() === slug.toLowerCase() && p.published);
 }
 
+// Q1 React/GSAP Mini-Projects (Required for Portfolio v1 Foundation)
+export function getQ1Projects(): GitHubProject[] {
+  return [
+    {
+      id: "q1-proj-1",
+      title: "GSAP Interactive Showcase",
+      category: "React / GSAP",
+      subtitle: "A modern React web portfolio featuring custom GSAP timeline entrance animations, hover transforms, and dynamic particle effects.",
+      imageUrl: "/download/Landing page.jpg",
+      projectUrl: "https://website-portfolio-murex-eight.vercel.app",
+      githubUrl: "https://github.com/ZAndrie/z-andrie",
+      stars: 1,
+      language: "React",
+      topics: ["React", "GSAP", "Tailwind CSS"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      order: 1,
+    },
+    {
+      id: "q1-proj-2",
+      title: "ScrollTrigger Product Experience",
+      category: "React / GSAP",
+      subtitle: "Interactive modern web showcase utilizing GSAP ScrollTrigger for pinned animations, scrub effects, and smooth card transitions.",
+      imageUrl: "/download/Webdesign.jpg",
+      projectUrl: "https://website-portfolio-murex-eight.vercel.app/works",
+      githubUrl: "https://github.com/ZAndrie",
+      stars: 0,
+      language: "React",
+      topics: ["React", "GSAP ScrollTrigger", "CSS Modules"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      order: 2,
+    },
+    {
+      id: "q1-proj-3",
+      title: "Motion UI Animated Cards",
+      category: "React / GSAP",
+      subtitle: "Dynamic card and dashboard interface with orchestrated GSAP stagger animations, responsive grid layouts, and interactive state.",
+      imageUrl: "/download/Apps.jpg",
+      projectUrl: "https://website-portfolio-murex-eight.vercel.app/expertise",
+      githubUrl: "https://github.com/ZAndrie",
+      stars: 0,
+      language: "React",
+      topics: ["React", "GSAP", "JavaScript"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      order: 3,
+    },
+  ];
+}
+
 // Fallbacks
 function getFallbackProjects(): GitHubProject[] {
   return [
+    ...getQ1Projects(),
     {
       id: "gh-fallback-1",
       title: "Library Booking System",
@@ -603,7 +659,7 @@ function getFallbackProjects(): GitHubProject[] {
       language: "Blade",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      order: 1,
+      order: 4,
     },
     {
       id: "gh-fallback-2",
@@ -617,7 +673,7 @@ function getFallbackProjects(): GitHubProject[] {
       language: "JavaScript",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      order: 2,
+      order: 5,
     },
     {
       id: "gh-fallback-3",
@@ -631,7 +687,7 @@ function getFallbackProjects(): GitHubProject[] {
       language: "TypeScript",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      order: 3,
+      order: 6,
     },
     {
       id: "gh-fallback-4",
@@ -645,7 +701,7 @@ function getFallbackProjects(): GitHubProject[] {
       language: "Python",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      order: 4,
+      order: 7,
     },
   ];
 }

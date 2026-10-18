@@ -95,17 +95,29 @@ export default function Contact() {
             <span className="italic text-[var(--color-primary)]">Together</span>
           </h2>
           
-          <div className="mt-[40px] flex gap-[40px]">
+          <div className="mt-[40px] grid grid-cols-1 sm:grid-cols-2 gap-[25px]">
             <div>
               <p className="text-[11px] text-[var(--color-text-light)] uppercase tracking-[1.5px] mb-[5px]">EMAIL</p>
-              <a href="mailto:zandriebarraba.1305@gmail.com" className="text-[14px] md:text-[16px] font-bold hover:text-[var(--color-primary)] transition-colors">
+              <a href="mailto:zandriebarraba.1305@gmail.com" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors">
                 zandriebarraba.1305@gmail.com
               </a>
             </div>
             <div>
               <p className="text-[11px] text-[var(--color-text-light)] uppercase tracking-[1.5px] mb-[5px]">PHONE</p>
-              <a href="tel:+639285893984" className="text-[14px] md:text-[16px] font-bold hover:text-[var(--color-primary)] transition-colors">
+              <a href="tel:+639285893984" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors">
                 +63 928 589 3984
+              </a>
+            </div>
+            <div>
+              <p className="text-[11px] text-[var(--color-text-light)] uppercase tracking-[1.5px] mb-[5px]">GITHUB</p>
+              <a href="https://github.com/ZAndrie" target="_blank" rel="noreferrer" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-1">
+                github.com/ZAndrie ↗
+              </a>
+            </div>
+            <div>
+              <p className="text-[11px] text-[var(--color-text-light)] uppercase tracking-[1.5px] mb-[5px]">LINKEDIN</p>
+              <a href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" target="_blank" rel="noreferrer" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-1">
+                in/z-andrie-barraba ↗
               </a>
             </div>
           </div>
