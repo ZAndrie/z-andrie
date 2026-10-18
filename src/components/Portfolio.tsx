@@ -174,7 +174,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
             <div className="flex flex-row items-stretch gap-5 sm:gap-6">
 
               {/* Intro Lead Card — top row */}
-              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[220px] sm:h-[240px] bg-white/40 border border-dashed border-[var(--color-border)] p-6 rounded-sm flex flex-col justify-between">
+              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[260px] sm:h-[280px] bg-white/40 border border-dashed border-[var(--color-border)] p-6 rounded-sm flex flex-col justify-between">
                 <div>
                   <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
                     CURATED REEL
@@ -214,7 +214,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
                     stars={item.stars}
                     topics={item.topics}
                     index={i * 2}
-                    className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[220px] sm:h-[240px] flex flex-col justify-between bg-white/90 hover:bg-white border border-[var(--color-border)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
+                    className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[260px] sm:h-[280px] flex flex-col bg-white/90 hover:bg-white border border-[var(--color-border)] rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group overflow-hidden"
                   />
                 ))
               )}
@@ -241,12 +241,12 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
                   stars={item.stars}
                   topics={item.topics}
                   index={i * 2 + 1}
-                  className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[220px] sm:h-[240px] flex flex-col justify-between bg-white/90 hover:bg-white border border-[var(--color-border)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
+                  className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[260px] sm:h-[280px] flex flex-col bg-white/90 hover:bg-white border border-[var(--color-border)] rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group overflow-hidden"
                 />
               ))}
 
               {/* Outro GitHub Explorer Card — bottom row */}
-              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[220px] sm:h-[240px] bg-[var(--color-dark-bg)] text-white p-6 rounded-sm flex flex-col justify-between border border-[#333]">
+              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[260px] sm:h-[280px] bg-[var(--color-dark-bg)] text-white p-6 rounded-sm flex flex-col justify-between border border-[#333]">
                 <div>
                   <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
                     EXPLORE ARCHIVE
