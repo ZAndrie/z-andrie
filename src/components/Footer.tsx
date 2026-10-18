@@ -22,10 +22,10 @@ export default function Footer() {
         <p className="text-[12px] uppercase tracking-[2px]">&copy; {new Date().getFullYear()} Z Andrie.</p>
         <Link 
           href="/admin" 
-          className="text-[10px] uppercase tracking-[2px] text-gray-600 hover:text-[var(--color-primary)] transition-colors opacity-40 hover:opacity-100"
+          className="text-[10px] uppercase tracking-[2px] text-gray-500 hover:text-[var(--color-primary)] transition-colors opacity-60 hover:opacity-100 flex items-center gap-1"
           title="Admin Portal"
         >
-          • Admin
+          🔒 Admin
         </Link>
       </div>
       <div className="flex items-center gap-[15px] text-[16px]">
