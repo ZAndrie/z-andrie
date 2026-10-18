@@ -222,26 +222,13 @@ export default function Hero() {
           className="relative flex justify-center items-center w-full max-w-[340px] sm:max-w-[390px] lg:max-w-[430px] py-6 select-none"
           style={{ perspective: 1000 }}
         >
-          {/* Architectural Blueprint Mat / Offset Backing Card */}
+          {/* Architectural Offset Backing Card — clean, no text */}
           <div
             ref={cardBackRef}
             className="absolute inset-0 w-full h-[95%] my-auto -rotate-3 rounded-sm bg-gradient-to-br from-[#d36b54]/10 via-[#d36b54]/5 to-transparent border border-[#d36b54]/30 pointer-events-none transition-transform duration-300"
             style={{ transformOrigin: "center center" }}
           >
-            {/* Blueprint Technical Metadata */}
-            <div className="absolute top-3 left-3 text-[9px] font-mono tracking-[1.5px] text-[var(--color-primary)] uppercase opacity-85 font-semibold">
-              FIG. 01 — DOSSIER
-            </div>
-            <div className="absolute top-3 right-3 text-[9px] font-mono tracking-[1px] text-[var(--color-text-light)] opacity-60">
-              2026 // ED.
-            </div>
-            <div className="absolute bottom-3 left-3 text-[9px] font-mono tracking-[1px] text-[var(--color-text-light)] opacity-60">
-              14.5995° N, 120.9842° E
-            </div>
-            <div className="absolute bottom-3 right-3 text-[9px] font-mono tracking-[1px] text-[var(--color-primary)] uppercase opacity-85 font-semibold">
-              MANILA, PH
-            </div>
-            {/* Dashed Inset Framing */}
+            {/* Dashed Inset Framing only */}
             <div className="absolute inset-7 border border-dashed border-[#d36b54]/25 pointer-events-none" />
           </div>
 
@@ -267,32 +254,8 @@ export default function Hero() {
                 className="object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 scale-[1.02] hover:scale-105"
                 priority
               />
-              {/* Editorial Gradient & Lighting Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none" />
-
-              {/* Bottom In-Frame Metadata Strip */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between z-10 text-white pointer-events-none">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-[9px] font-mono uppercase tracking-[2px] text-white/70">ARCHIVE REF:</span>
-                    <span className="text-[9px] font-mono uppercase tracking-[1.5px] text-[var(--color-primary)] font-bold">#001</span>
-                  </div>
-                  <p className="text-[15px] sm:text-[16px] font-bold uppercase tracking-[1.5px] font-serif leading-tight">
-                    Z Andrie
-                  </p>
-                  <p className="text-[10px] uppercase font-mono text-white/80 tracking-wider">
-                    Student Developer • Manila, PH
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded border border-white/10">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-[9px] uppercase font-mono tracking-[1px] text-emerald-300 font-semibold">Active</span>
-                </div>
-              </div>
+              {/* Gradient vignette only — no text overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
 
@@ -321,23 +284,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Floating Glassmorphic Student Credential Pill */}
-          <div
-            ref={badgeRef}
-            className="absolute -bottom-4 -left-4 sm:-bottom-5 sm:-left-6 z-20 bg-white/95 backdrop-blur-md border border-[var(--color-border)] shadow-xl px-4 py-2.5 rounded-sm flex items-center gap-3 pointer-events-none"
-          >
-            <div className="w-8 h-8 rounded-sm bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center text-sm font-bold border border-[var(--color-primary)]/20">
-              🎓
-            </div>
-            <div>
-              <p className="text-[11px] uppercase font-bold tracking-[1.5px] text-[var(--color-text-dark)] font-mono leading-none">
-                CS Undergraduate
-              </p>
-              <p className="text-[10px] text-[var(--color-text-light)] font-mono tracking-wider mt-0.5">
-                Crafting Modern Web Apps
-              </p>
-            </div>
-          </div>
+
 
         </div>
 
