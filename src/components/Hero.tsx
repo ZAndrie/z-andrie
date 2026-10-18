@@ -99,20 +99,37 @@ export default function Hero() {
             I craft clean, modern, and user-focused websites that help brands stand out and connect with the right audience.
           </p>
           
-          {/* CTA Buttons ("View my work" / "Contact me") */}
+          {/* CTA Buttons with Driezie Roll & Arrow-Swap */}
           <div className="gsap-hero-cta flex flex-wrap items-center gap-4 mb-[35px]">
             <Link
               href="/works"
-              className="px-6 py-3.5 bg-[var(--color-primary)] text-white text-[12px] uppercase font-bold tracking-[2px] hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 inline-flex items-center gap-2 rounded-sm"
+              className="group px-6 py-3.5 bg-[var(--color-primary)] text-white text-[12px] uppercase font-bold tracking-[2px] hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 inline-flex items-center gap-2.5 rounded-sm"
             >
-              View My Work
-              <span className="text-base leading-none">→</span>
+              <span className="roll">
+                <span className="roll__inner">
+                  <span>View My Work</span>
+                  <span className="roll__ghost" aria-hidden="true">View My Work</span>
+                </span>
+              </span>
+              <span className="arrow-swap w-[11px] h-[11px]" aria-hidden="true">
+                <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </span>
             </Link>
             <Link
               href="/contact"
-              className="px-6 py-3.5 border-2 border-[var(--color-text-dark)] text-[var(--color-text-dark)] text-[12px] uppercase font-bold tracking-[2px] hover:bg-[var(--color-text-dark)] hover:text-white transition-all duration-300 inline-flex items-center gap-2 rounded-sm"
+              className="group px-6 py-3.5 border-2 border-[var(--color-text-dark)] text-[var(--color-text-dark)] text-[12px] uppercase font-bold tracking-[2px] hover:bg-[var(--color-text-dark)] hover:text-white transition-all duration-300 inline-flex items-center gap-2.5 rounded-sm"
             >
-              Contact Me
+              <span className="roll">
+                <span className="roll__inner">
+                  <span>Contact Me</span>
+                  <span className="roll__ghost" aria-hidden="true">Contact Me</span>
+                </span>
+              </span>
+              <span className="arrow-swap w-[11px] h-[11px]" aria-hidden="true">
+                <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </span>
             </Link>
           </div>
 
@@ -122,9 +139,28 @@ export default function Hero() {
           </div>
         </div>
         
-        {/* Right Content - Image */}
+        {/* Right Content - Image with Floating Driezie-Style 3D Cards */}
         <div className="gsap-hero-image flex-1 relative flex justify-center items-center w-full max-w-[500px] mt-[40px] md:mt-0">
           
+          {/* Floating Top-Right Showcase Card */}
+          <div className="absolute -top-3 -right-2 md:-top-4 md:-right-6 z-20 bg-white/95 backdrop-blur-md border border-[var(--color-border)] p-2.5 rounded-sm shadow-xl hidden sm:flex items-center gap-3 animate-float-slow">
+            <div className="w-12 h-12 relative rounded-sm overflow-hidden border border-[var(--color-border)] shrink-0 bg-[var(--color-dark-bg)]">
+              <Image
+                src="/download/Landing page.jpg"
+                alt="GSAP Showcase preview"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="text-left pr-2">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span className="text-[9px] font-mono uppercase tracking-wider text-[var(--color-primary)] font-bold">Featured Q1</span>
+              </div>
+              <p className="text-[11px] font-bold text-[var(--color-text-dark)] leading-tight uppercase font-sans">GSAP Showcase</p>
+            </div>
+          </div>
+
           {/* Profile Image - Circular with Orange Border */}
           <div className="relative z-10 w-[300px] h-[300px] md:w-[400px] md:h-[400px] overflow-hidden rounded-full shadow-2xl border-[15px] border-[var(--color-primary)]">
             <Image
@@ -137,6 +173,31 @@ export default function Hero() {
             />
           </div>
 
+          {/* Floating Bottom-Left Studio Stack Badge */}
+          <div className="absolute -bottom-4 -left-2 md:-bottom-5 md:-left-6 z-20 bg-[var(--color-dark-bg)] text-white p-3 md:px-4 md:py-3 rounded-sm shadow-2xl flex items-center gap-3 border border-[#333] animate-float-slow" style={{ animationDelay: "1.5s" }}>
+            <span className="text-[var(--color-primary)] text-base">✦</span>
+            <div>
+              <p className="text-[9px] font-mono uppercase tracking-[1.5px] text-[#888]">TECH STACK</p>
+              <p className="text-[11px] font-bold text-white tracking-wide font-sans">React 19 • GSAP • Next.js</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Infinite Driezie-Style Marquee Ticker */}
+      <div className="w-full mt-14 pt-4 border-t border-[var(--color-border)] overflow-hidden whitespace-nowrap bg-[var(--color-light-bg)]/80 relative z-10">
+        <div className="animate-marquee flex gap-10 items-center text-[10px] md:text-[11px] uppercase tracking-[3px] text-[var(--color-text-light)] font-mono select-none">
+          <span>✦ CREATIVE FRONTEND ENGINEERING</span>
+          <span>✦ GSAP INTERACTIVE PHYSICS</span>
+          <span>✦ MODERN REACT ARCHITECTURE</span>
+          <span>✦ ACCESSIBLE &amp; PERFORMANCE DRIVEN</span>
+          <span>✦ SCALABLE DESIGN SYSTEMS</span>
+          <span>✦ CREATIVE FRONTEND ENGINEERING</span>
+          <span>✦ GSAP INTERACTIVE PHYSICS</span>
+          <span>✦ MODERN REACT ARCHITECTURE</span>
+          <span>✦ ACCESSIBLE &amp; PERFORMANCE DRIVEN</span>
+          <span>✦ SCALABLE DESIGN SYSTEMS</span>
         </div>
       </div>
     </section>

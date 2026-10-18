@@ -53,9 +53,18 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
             href="https://github.com/ZAndrie" 
             target="_blank" 
             rel="noreferrer"
-            className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-[10px]"
+            className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-[8px]"
           >
-            VIEW ON GITHUB <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
+            <span className="roll">
+              <span className="roll__inner">
+                <span>VIEW ON GITHUB</span>
+                <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">VIEW ON GITHUB</span>
+              </span>
+            </span>
+            <span className="arrow-swap text-[var(--color-primary)] w-[11px] h-[11px]" aria-hidden="true">
+              <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </span>
           </a>
         </div>
       </motion.div>

@@ -74,10 +74,24 @@ export default function RootLayout({
         </Script>
         */}
       </head>
-      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden`}>
+      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden relative`}>
+        {/* Architectural Backdrop Grid (Driezie Blueprint) */}
+        <div className="grid-backdrop pointer-events-none fixed inset-0 z-0 select-none overflow-hidden" aria-hidden="true">
+          <div className="max-w-[1400px] h-full mx-auto px-[5%] md:px-[8%] relative">
+            <span className="absolute top-0 bottom-0 left-[5%] md:left-[8%] w-[1px] bg-[var(--color-border)]/60"></span>
+            <span className="absolute top-0 bottom-0 left-[33.333%] w-[1px] bg-[var(--color-border)]/40 hidden md:block"></span>
+            <span className="absolute top-0 bottom-0 left-[50%] w-[1px] bg-[var(--color-border)]/45"></span>
+            <span className="absolute top-0 bottom-0 left-[66.666%] w-[1px] bg-[var(--color-border)]/40 hidden md:block"></span>
+            <span className="absolute top-0 bottom-0 right-[5%] md:right-[8%] w-[1px] bg-[var(--color-border)]/60"></span>
+          </div>
+        </div>
+
+        {/* Subtle Paper Grain Texture */}
+        <div className="grain-overlay pointer-events-none fixed inset-0 z-[999] opacity-80" aria-hidden="true" />
+
         <ScrollProgress />
         <Navbar />
-        <main className="flex-1 flex flex-col w-full overflow-x-hidden">
+        <main className="flex-1 flex flex-col w-full overflow-x-hidden relative z-10">
           {children}
         </main>
         <Footer />

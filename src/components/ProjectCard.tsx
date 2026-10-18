@@ -110,23 +110,41 @@ export default function ProjectCard({
         </p>
       </div>
 
-      {/* Action Links: GitHub Repo + Live Demo */}
+      {/* Action Links: GitHub Repo + Live Demo with Driezie Roll & Arrow-Swap */}
       <div className="flex items-center justify-between pt-3 border-t border-[var(--color-border)]/70 text-[11px] uppercase font-bold tracking-[1.5px]">
         <a
           href={liveDemoLink}
           target="_blank"
           rel="noreferrer"
-          className="text-[var(--color-primary)] hover:underline inline-flex items-center gap-1 transition-all"
+          className="group/btn text-[var(--color-primary)] hover:opacity-80 inline-flex items-center gap-1.5 transition-all"
         >
-          Live Demo ↗
+          <span className="roll">
+            <span className="roll__inner">
+              <span>Live Demo</span>
+              <span className="roll__ghost" aria-hidden="true">Live Demo</span>
+            </span>
+          </span>
+          <span className="arrow-swap w-[10px] h-[10px]" aria-hidden="true">
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </span>
         </a>
         <a
           href={githubUrl}
           target="_blank"
           rel="noreferrer"
-          className="text-[var(--color-text-dark)] hover:text-[var(--color-primary)] inline-flex items-center gap-1 transition-colors"
+          className="group/btn text-[var(--color-text-dark)] hover:text-[var(--color-primary)] inline-flex items-center gap-1.5 transition-colors"
         >
-          GitHub Repo ↗
+          <span className="roll">
+            <span className="roll__inner">
+              <span>GitHub Repo</span>
+              <span className="roll__ghost" aria-hidden="true">GitHub Repo</span>
+            </span>
+          </span>
+          <span className="arrow-swap w-[10px] h-[10px]" aria-hidden="true">
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </span>
         </a>
       </div>
     </motion.div>

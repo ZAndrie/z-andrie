@@ -46,21 +46,37 @@ export default function About() {
               Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern React architecture</strong>, <strong className="text-[var(--color-text-dark)]">GSAP interactive animations</strong>, Next.js server components, and responsive design systems. My focus is centered on mastering high-performance frontend engineering to build seamless web applications that solve real user needs.
             </p>
 
-            <div className="pt-4 flex flex-wrap gap-4">
+            <div className="pt-4 flex flex-wrap items-center gap-6">
               <Link
                 href="/works"
-                className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2 group"
+                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
-                DISCOVER MY PROJECTS
-                <span className="text-[var(--color-primary)] text-lg leading-none group-hover:translate-x-1 transition-transform">→</span>
+                <span className="roll">
+                  <span className="roll__inner">
+                    <span>DISCOVER MY PROJECTS</span>
+                    <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">DISCOVER MY PROJECTS</span>
+                  </span>
+                </span>
+                <span className="arrow-swap text-[var(--color-primary)] w-[11px] h-[11px]" aria-hidden="true">
+                  <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
               </Link>
               <span className="text-[var(--color-border)]">•</span>
               <Link
                 href="/contact"
-                className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2 group"
+                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
-                GET IN TOUCH
-                <span className="text-[var(--color-primary)] text-lg leading-none group-hover:translate-x-1 transition-transform">→</span>
+                <span className="roll">
+                  <span className="roll__inner">
+                    <span>GET IN TOUCH</span>
+                    <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">GET IN TOUCH</span>
+                  </span>
+                </span>
+                <span className="arrow-swap text-[var(--color-primary)] w-[11px] h-[11px]" aria-hidden="true">
+                  <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
               </Link>
             </div>
           </motion.div>

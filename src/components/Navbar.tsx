@@ -74,11 +74,16 @@ export default function Navbar() {
                 href={link.href}
                 prefetch={true}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`relative font-semibold uppercase text-[11px] md:text-[12px] tracking-[1.5px] transition-all duration-300 hover:text-[var(--color-primary)] ${
+                className={`group relative font-semibold uppercase text-[11px] md:text-[12px] tracking-[1.5px] transition-all duration-300 hover:text-[var(--color-primary)] ${
                   isActive ? "text-[var(--color-primary)]" : "text-[var(--color-text-dark)]"
                 }`}
               >
-                {link.name}
+                <span className="roll">
+                  <span className="roll__inner">
+                    <span>{link.name}</span>
+                    <span className="roll__ghost" aria-hidden="true">{link.name}</span>
+                  </span>
+                </span>
               </Link>
             </li>
           );
@@ -89,10 +94,18 @@ export default function Navbar() {
         <Link
           href="/contact"
           prefetch={true}
-          className="text-[12px] font-bold uppercase tracking-[1.5px] text-[var(--color-text-dark)] transition-all duration-300 hover:text-[var(--color-primary)] flex items-center gap-[10px]"
+          className="group text-[12px] font-bold uppercase tracking-[1.5px] text-[var(--color-text-dark)] transition-all duration-300 hover:text-[var(--color-primary)] flex items-center gap-[8px]"
         >
-          AVAILABLE FOR FREELANCE 
-          <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
+          <span className="roll">
+            <span className="roll__inner">
+              <span>AVAILABLE FOR FREELANCE</span>
+              <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">AVAILABLE FOR FREELANCE</span>
+            </span>
+          </span>
+          <span className="arrow-swap text-[var(--color-primary)] w-[12px] h-[12px]" aria-hidden="true">
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </span>
         </Link>
       </div>
     </nav>
