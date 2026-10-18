@@ -25,13 +25,13 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { name: "HOME", href: "/" },
+    { name: "HOME", href: "/#home" },
     { name: "ABOUT", href: "/#about" },
-    { name: "WORKS", href: "/works" },
-    { name: "EXPERTISE", href: "/expertise" },
-    { name: "CERTIFICATES", href: "/certificates" },
-    { name: "BLOG", href: "/blog" },
-    { name: "CONTACT", href: "/contact" },
+    { name: "WORKS", href: "/#works" },
+    { name: "EXPERTISE", href: "/#expertise" },
+    { name: "CERTIFICATES", href: "/#certificates" },
+    { name: "BLOG", href: "/#blog" },
+    { name: "CONTACT", href: "/#contact" },
   ];
 
   return (
@@ -92,7 +92,7 @@ export default function Navbar() {
 
       <div className="hidden md:flex items-center gap-[15px]">
         <Link
-          href="/contact"
+          href="/#contact"
           prefetch={true}
           className="group text-[12px] font-bold uppercase tracking-[1.5px] text-[var(--color-text-dark)] transition-all duration-300 hover:text-[var(--color-primary)] flex items-center gap-[8px]"
         >

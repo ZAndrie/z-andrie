@@ -25,7 +25,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         );
 
   return (
-    <section id="portfolio" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden min-h-screen">
+    <section id="works" className="pt-[100px] pb-[40px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] flex-1 flex flex-col justify-center overflow-hidden min-h-screen">
       
       {/* Header section */}
       <motion.div 

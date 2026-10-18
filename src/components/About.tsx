@@ -46,15 +46,43 @@ export default function About() {
               Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern React architecture</strong>, <strong className="text-[var(--color-text-dark)]">GSAP interactive animations</strong>, Next.js server components, and responsive design systems. My focus is centered on mastering high-performance frontend engineering to build seamless web applications that solve real user needs.
             </p>
 
-            <div className="pt-4 flex flex-wrap items-center gap-6">
+            {/* Driezie Studio Stats Counters */}
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-[var(--color-border)]">
+              <div>
+                <p className="text-[26px] sm:text-[32px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums">
+                  3+
+                </p>
+                <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[1.5px] text-[var(--color-text-light)] mt-1.5">
+                  Years Dev
+                </p>
+              </div>
+              <div>
+                <p className="text-[26px] sm:text-[32px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums">
+                  10+
+                </p>
+                <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[1.5px] text-[var(--color-text-light)] mt-1.5">
+                  Projects
+                </p>
+              </div>
+              <div>
+                <p className="text-[26px] sm:text-[32px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums">
+                  100%
+                </p>
+                <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[1.5px] text-[var(--color-text-light)] mt-1.5">
+                  Passion
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center gap-6">
               <Link
-                href="/works"
+                href="/#works"
                 className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
                 <span className="roll">
                   <span className="roll__inner">
-                    <span>DISCOVER MY PROJECTS</span>
-                    <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">DISCOVER MY PROJECTS</span>
+                    <span>EXPLORE ALL PROJECTS</span>
+                    <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">EXPLORE ALL PROJECTS</span>
                   </span>
                 </span>
                 <span className="arrow-swap text-[var(--color-primary)] w-[11px] h-[11px]" aria-hidden="true">
@@ -64,7 +92,7 @@ export default function About() {
               </Link>
               <span className="text-[var(--color-border)]">•</span>
               <Link
-                href="/contact"
+                href="/#contact"
                 className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
                 <span className="roll">
