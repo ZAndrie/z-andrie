@@ -16,6 +16,7 @@ export interface ProjectCardProps {
   stars?: number;
   topics?: string[];
   index: number;
+  className?: string;
 }
 
 export default function ProjectCard({
@@ -30,6 +31,7 @@ export default function ProjectCard({
   stars = 0,
   topics = [],
   index,
+  className,
 }: ProjectCardProps) {
   const [imgError, setImgError] = useState(false);
 
@@ -60,7 +62,11 @@ export default function ProjectCard({
       viewport={{ once: true, amount: 0.1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
-      className="group flex flex-col justify-between bg-white/60 hover:bg-white border border-[var(--color-border)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-md transition-all duration-300"
+      className={
+        className
+          ? className
+          : "group flex flex-col justify-between bg-white/70 hover:bg-white border border-[var(--color-border)] p-5 rounded-sm shadow-sm hover:shadow-xl transition-all duration-300"
+      }
     >
       <div>
         {/* Screenshot / GIF */}
