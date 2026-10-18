@@ -34,6 +34,10 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
             (item.category || "").toLowerCase() === filter.toLowerCase()
         );
 
+  // Split items into two rows: even-indexed → top row, odd-indexed → bottom row
+  const topRow = filteredItems.filter((_, i) => i % 2 === 0);
+  const bottomRow = filteredItems.filter((_, i) => i % 2 !== 0);
+
   // GSAP Horizontal Scroll Pinning
   useGSAP(() => {
     const track = trackRef.current;
@@ -45,7 +49,8 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
 
     // Desktop & Tablet (Horizontal Pin)
     mm.add("(min-width: 768px)", () => {
-      const getScrollDistance = () => track.scrollWidth - window.innerWidth + (window.innerWidth * 0.08);
+      const getScrollDistance = () =>
+        track.scrollWidth - window.innerWidth + window.innerWidth * 0.08;
 
       const tween = gsap.to(track, {
         x: () => -getScrollDistance(),
@@ -90,11 +95,11 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
       >
         
         {/* Top Pinned Header: Title, Filters & Controls */}
-        <div className="w-full max-w-[1400px] mx-auto px-[5%] md:px-[8%] mb-6 z-20">
+        <div className="w-full max-w-[1400px] mx-auto px-[5%] md:px-[8%] mb-4 z-20">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-5">
             <div>
               <p className="text-[11px] uppercase tracking-[3px] font-mono text-[var(--color-primary)] font-bold mb-2">
-                HORIZONTAL SHOWCASE • GSAP PINNED
+                HORIZONTAL SHOWCASE • DUAL TRACK
               </p>
               <h2 className="text-[32px] sm:text-[42px] md:text-[50px] font-serif uppercase text-[var(--color-text-dark)] leading-[1.05]">
                 Selected <span className="text-[var(--color-primary)] italic">Works</span>
@@ -158,41 +163,71 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
           </div>
         </div>
 
-        {/* Horizontal Moving Cards Track */}
-        <div className="w-full flex-1 flex items-center overflow-x-auto md:overflow-x-visible scrollbar-none my-auto">
+        {/* ── DUAL-ROW HORIZONTAL MOVING TRACK ── */}
+        <div className="w-full flex-1 flex items-center overflow-x-auto md:overflow-x-visible scrollbar-none">
           <div 
             ref={trackRef}
-            className="flex flex-row items-stretch gap-6 sm:gap-8 px-[5%] md:px-[8%] py-4 will-change-transform"
+            className="flex flex-col gap-4 px-[5%] md:px-[8%] py-2 will-change-transform"
           >
-            {/* Intro Lead Card */}
-            <div className="w-[300px] sm:w-[360px] md:w-[400px] shrink-0 h-[480px] sm:h-[510px] bg-white/40 border border-dashed border-[var(--color-border)] p-8 rounded-sm flex flex-col justify-between">
-              <div>
-                <span className="text-[12px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
-                  01 / CURATED REEL
-                </span>
-                <h3 className="text-[26px] sm:text-[32px] font-serif uppercase text-[var(--color-text-dark)] leading-tight mt-4 mb-4">
-                  Interactive Projects &amp; <span className="italic text-[var(--color-primary)]">Experiments</span>
-                </h3>
-                <p className="text-[13px] text-[var(--color-text-light)] leading-relaxed font-light">
-                  Explore full-stack applications, Quarter 1 React &amp; GSAP mini-projects, interactive components, and system prototypes.
-                </p>
+
+            {/* ── ROW 1 (Top): intro card + even-indexed projects ── */}
+            <div className="flex flex-row items-stretch gap-5 sm:gap-6">
+
+              {/* Intro Lead Card — top row */}
+              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[220px] sm:h-[240px] bg-white/40 border border-dashed border-[var(--color-border)] p-6 rounded-sm flex flex-col justify-between">
+                <div>
+                  <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
+                    CURATED REEL
+                  </span>
+                  <h3 className="text-[20px] sm:text-[24px] font-serif uppercase text-[var(--color-text-dark)] leading-tight mt-3 mb-3">
+                    Interactive Projects &amp; <span className="italic text-[var(--color-primary)]">Experiments</span>
+                  </h3>
+                  <p className="text-[12px] text-[var(--color-text-light)] leading-relaxed font-light">
+                    Quarter 1 React mini-projects, interactive components, and system prototypes.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-[var(--color-border)] flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[var(--color-primary)]">
+                  <span>GLIDE SIDEWAYS</span>
+                  <span className="text-base leading-none">→</span>
+                </div>
               </div>
 
-              <div className="pt-6 border-t border-[var(--color-border)] flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[var(--color-primary)]">
-                <span>GLIDE SIDEWAYS</span>
-                <span className="text-base leading-none">→</span>
-              </div>
+              {/* Top row project cards (even indices: 0, 2, 4…) */}
+              {filteredItems.length === 0 ? (
+                <div className="w-[320px] shrink-0 h-[220px] bg-white/50 border border-[var(--color-border)] rounded-sm p-8 flex flex-col items-center justify-center text-center">
+                  <p className="text-[13px] text-[var(--color-text-light)] italic">
+                    No projects in this category.
+                  </p>
+                </div>
+              ) : (
+                topRow.map((item, i) => (
+                  <ProjectCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    subtitle={item.subtitle}
+                    category={item.category}
+                    language={item.language}
+                    imageUrl={item.imageUrl}
+                    githubUrl={item.githubUrl}
+                    projectUrl={item.projectUrl}
+                    stars={item.stars}
+                    topics={item.topics}
+                    index={i * 2}
+                    className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[220px] sm:h-[240px] flex flex-col justify-between bg-white/90 hover:bg-white border border-[var(--color-border)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
+                  />
+                ))
+              )}
             </div>
 
-            {/* Filtered Project Cards */}
-            {filteredItems.length === 0 ? (
-              <div className="w-[380px] shrink-0 h-[480px] bg-white/50 border border-[var(--color-border)] rounded-sm p-10 flex flex-col items-center justify-center text-center">
-                <p className="text-[14px] text-[var(--color-text-light)] italic">
-                  No projects in this category.
-                </p>
-              </div>
-            ) : (
-              filteredItems.map((item, index) => (
+            {/* ── ROW 2 (Bottom): spacer + odd-indexed projects + outro card ── */}
+            <div className="flex flex-row items-stretch gap-5 sm:gap-6">
+
+              {/* Invisible spacer so bottom row is offset by ~1 card width */}
+              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 pointer-events-none" aria-hidden="true" />
+
+              {/* Bottom row project cards (odd indices: 1, 3, 5…) */}
+              {bottomRow.map((item, i) => (
                 <ProjectCard
                   key={item.id}
                   id={item.id}
@@ -205,45 +240,46 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
                   projectUrl={item.projectUrl}
                   stars={item.stars}
                   topics={item.topics}
-                  index={index}
-                  className="w-[320px] sm:w-[390px] md:w-[440px] shrink-0 h-[480px] sm:h-[510px] flex flex-col justify-between bg-white/90 hover:bg-white border border-[var(--color-border)] p-5 sm:p-6 rounded-sm shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group"
+                  index={i * 2 + 1}
+                  className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 h-[220px] sm:h-[240px] flex flex-col justify-between bg-white/90 hover:bg-white border border-[var(--color-border)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
                 />
-              ))
-            )}
+              ))}
 
-            {/* Outro GitHub Explorer Card */}
-            <div className="w-[300px] sm:w-[360px] md:w-[400px] shrink-0 h-[480px] sm:h-[510px] bg-[var(--color-dark-bg)] text-white p-8 rounded-sm flex flex-col justify-between border border-[#333]">
-              <div>
-                <span className="text-[12px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
-                  EXPLORE ARCHIVE
-                </span>
-                <h3 className="text-[26px] sm:text-[32px] font-serif uppercase text-white leading-tight mt-4 mb-4">
-                  Want to see more <span className="italic text-[var(--color-primary)]">code?</span>
-                </h3>
-                <p className="text-[13px] text-[#aaa] leading-relaxed font-light">
-                  Browse over 30+ open-source repositories, system architectures, and experiment repositories directly on my GitHub profile.
-                </p>
-              </div>
+              {/* Outro GitHub Explorer Card — bottom row */}
+              <div className="w-[260px] sm:w-[300px] md:w-[340px] shrink-0 h-[220px] sm:h-[240px] bg-[var(--color-dark-bg)] text-white p-6 rounded-sm flex flex-col justify-between border border-[#333]">
+                <div>
+                  <span className="text-[11px] font-mono text-[var(--color-primary)] font-bold uppercase tracking-widest">
+                    EXPLORE ARCHIVE
+                  </span>
+                  <h3 className="text-[20px] sm:text-[24px] font-serif uppercase text-white leading-tight mt-3 mb-2">
+                    Want to see more <span className="italic text-[var(--color-primary)]">code?</span>
+                  </h3>
+                  <p className="text-[12px] text-[#aaa] leading-relaxed font-light">
+                    Browse 30+ open-source repositories directly on my GitHub profile.
+                  </p>
+                </div>
 
-              <div className="pt-6 border-t border-[#333]">
-                <a
-                  href="https://github.com/ZAndrie"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group text-[12px] font-bold uppercase tracking-[2px] text-white hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-3"
-                >
-                  <span className="roll">
-                    <span className="roll__inner">
-                      <span>VISIT GITHUB REPOSITORY</span>
-                      <span className="roll__ghost text-[var(--color-primary)]">VISIT GITHUB REPOSITORY</span>
+                <div className="pt-4 border-t border-[#333]">
+                  <a
+                    href="https://github.com/ZAndrie"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group text-[11px] font-bold uppercase tracking-[2px] text-white hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
+                  >
+                    <span className="roll">
+                      <span className="roll__inner">
+                        <span>VISIT GITHUB</span>
+                        <span className="roll__ghost text-[var(--color-primary)]">VISIT GITHUB</span>
+                      </span>
                     </span>
-                  </span>
-                  <span className="arrow-swap text-[var(--color-primary)] w-[12px] h-[12px]">
-                    <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </span>
-                </a>
+                    <span className="arrow-swap text-[var(--color-primary)] w-[12px] h-[12px]">
+                      <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                  </a>
+                </div>
               </div>
+
             </div>
 
           </div>
@@ -252,7 +288,7 @@ export default function Portfolio({ projects = [] }: { projects?: any[] }) {
         {/* Pinned Bottom Label */}
         <div className="w-full max-w-[1400px] mx-auto px-[5%] md:px-[8%] pt-2 text-right hidden md:block">
           <p className="text-[10px] font-mono uppercase tracking-[2px] text-[var(--color-text-light)] opacity-70">
-            [ PINNED WORK REEL — SCROLL VERTICALLY TO NAVIGATE ]
+            [ DUAL-TRACK REEL — SCROLL VERTICALLY TO NAVIGATE ]
           </p>
         </div>
 
