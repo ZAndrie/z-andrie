@@ -12,8 +12,6 @@ export default function Hero() {
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const cardMainRef = useRef<HTMLDivElement>(null);
   const cardBackRef = useRef<HTMLDivElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
-  const stampRef = useRef<HTMLDivElement>(null);
 
   // GSAP Entrance & Physics Animations
   useGSAP(() => {
@@ -54,48 +52,22 @@ export default function Hero() {
       duration: 1.2,
       ease: "power3.out",
     }, "-=1.0")
-    .from(stampRef.current, {
-      opacity: 0,
-      scale: 0,
-      rotation: -120,
-      duration: 0.9,
-      ease: "back.out(1.8)",
-    }, "-=0.6")
-    .from(badgeRef.current, {
-      opacity: 0,
-      y: 20,
-      duration: 0.7,
-      ease: "power2.out",
-    }, "-=0.4")
     .from(".gsap-hero-ticker", {
       opacity: 0,
       y: 15,
       duration: 0.8,
     }, "-=0.6");
 
-    // 2. Continuous Rotating Typographic Seal
-    if (stampRef.current) {
-      gsap.to(stampRef.current, {
-        rotation: 360,
-        repeat: -1,
-        ease: "none",
-        duration: 22,
-      });
-    }
-
-    // 3. GSAP Interactive 3D Parallax Tilt (Desktop / Pointer)
+    // 2. GSAP Interactive 3D Parallax Tilt (Desktop / Pointer)
     const container = cardContainerRef.current;
     const mainCard = cardMainRef.current;
     const backCard = cardBackRef.current;
-    const pill = badgeRef.current;
 
     if (container && mainCard && window.matchMedia("(hover: hover)").matches) {
       const rotX = gsap.quickTo(mainCard, "rotationX", { duration: 0.6, ease: "power2.out" });
       const rotY = gsap.quickTo(mainCard, "rotationY", { duration: 0.6, ease: "power2.out" });
       const backX = backCard ? gsap.quickTo(backCard, "x", { duration: 0.7, ease: "power2.out" }) : null;
       const backY = backCard ? gsap.quickTo(backCard, "y", { duration: 0.7, ease: "power2.out" }) : null;
-      const pillX = pill ? gsap.quickTo(pill, "x", { duration: 0.5, ease: "power2.out" }) : null;
-      const pillY = pill ? gsap.quickTo(pill, "y", { duration: 0.5, ease: "power2.out" }) : null;
 
       const onMouseMove = (e: MouseEvent) => {
         const rect = container.getBoundingClientRect();
@@ -109,10 +81,6 @@ export default function Hero() {
           backX(-relX * 18);
           backY(-relY * 18);
         }
-        if (pillX && pillY) {
-          pillX(relX * 16);
-          pillY(relY * 16);
-        }
       };
 
       const onMouseLeave = () => {
@@ -121,10 +89,6 @@ export default function Hero() {
         if (backX && backY) {
           backX(0);
           backY(0);
-        }
-        if (pillX && pillY) {
-          pillX(0);
-          pillY(0);
         }
       };
 
@@ -259,30 +223,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Floating GSAP Circular Rotating Stamp */}
-          <div
-            ref={stampRef}
-            className="absolute -top-5 -right-4 sm:-top-6 sm:-right-6 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[var(--color-primary)] text-white shadow-xl flex items-center justify-center p-1 pointer-events-none"
-            style={{ transformOrigin: "center center" }}
-          >
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <path
-                id="heroStampPath"
-                d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0"
-                fill="none"
-              />
-              <text className="text-[9px] uppercase font-mono tracking-[2.2px] fill-white font-bold">
-                <textPath href="#heroStampPath" startOffset="0%">
-                  ✦ STUDENT DEVELOPER ✦ CREATIVE CRAFT ✦
-                </textPath>
-              </text>
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[12px] font-serif font-bold text-white tracking-widest">
-                ZA
-              </span>
-            </div>
-          </div>
+
 
 
 
