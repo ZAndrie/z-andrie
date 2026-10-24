@@ -121,7 +121,7 @@ export default function Hero() {
           <div className="gsap-hero-eyebrow flex items-center gap-2.5 mb-6 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
             <span className="text-[11px] md:text-[12px] uppercase font-mono tracking-[2px] text-[var(--color-text-dark)] font-semibold">
-              Information Technology Student &amp; Full-Stack Developer
+              Information Technology &amp; Full-Stack Developer
             </span>
             <span className="text-[var(--color-text-light)] opacity-60">•</span>
             <span className="text-[11px] md:text-[12px] uppercase font-mono tracking-[1.5px] text-[var(--color-text-light)]">
