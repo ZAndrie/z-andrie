@@ -131,7 +131,7 @@ export default function Hero() {
 
           {/* Driezie-Style Giant Statement */}
           <h1 className="gsap-hero-headline text-[38px] sm:text-[50px] md:text-[62px] lg:text-[72px] font-serif uppercase text-[var(--color-text-dark)] leading-[1.04] tracking-[-0.01em] mb-7">
-            Crafting digital experiences that are{" "}
+            Crafting digital spaces that are{" "}
             <span className="italic text-[var(--color-primary)] font-serif font-normal lowercase">
               intuitive
             </span>
