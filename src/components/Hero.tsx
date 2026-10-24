@@ -121,7 +121,7 @@ export default function Hero() {
           <div className="gsap-hero-eyebrow flex items-center gap-2.5 mb-6 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
             <span className="text-[11px] md:text-[12px] uppercase font-mono tracking-[2px] text-[var(--color-text-dark)] font-semibold">
-              Computer Science Student &amp; Frontend Developer
+              Information Technology Student &amp; Full-Stack Developer
             </span>
             <span className="text-[var(--color-text-light)] opacity-60">•</span>
             <span className="text-[11px] md:text-[12px] uppercase font-mono tracking-[1.5px] text-[var(--color-text-light)]">
@@ -140,7 +140,7 @@ export default function Hero() {
 
           {/* Subtitle / Lead Paragraph: Student identity with professional developer polish */}
           <p className="gsap-hero-lead text-[15px] sm:text-[16px] md:text-[17px] text-[var(--color-text-light)] max-w-[560px] leading-[1.8] mb-9 font-normal">
-            Hello, I am <strong className="font-semibold text-[var(--color-text-dark)]">Z Andrie</strong>. A computer science student and aspiring software engineer focused on modern React architecture, clean code principles, and engineering high-performance digital experiences built for real users.
+            Hello, I am <strong className="font-semibold text-[var(--color-text-dark)]">Z Andrie</strong>. A information technology student and aspiring full-stack developer focused on modern tech architecture, clean code principles, and engineering high-performance digital experiences built for real users.
           </p>
 
           {/* Action Buttons: Driezie-Style Roll & Arrow-Swap */}
@@ -151,8 +151,8 @@ export default function Hero() {
             >
               <span className="roll">
                 <span className="roll__inner">
-                  <span>Explore Selected Work</span>
-                  <span className="roll__ghost" aria-hidden="true">Explore Selected Work</span>
+                  <span>Explore My Work</span>
+                  <span className="roll__ghost" aria-hidden="true">Explore My Work</span>
                 </span>
               </span>
               <span className="arrow-swap w-[11px] h-[11px]" aria-hidden="true">
@@ -212,7 +212,7 @@ export default function Hero() {
             <div className="relative w-full h-full overflow-hidden rounded-[2px] bg-[var(--color-dark-bg)]">
               <Image
                 src="/profile.png"
-                alt="Z Andrie — Computer Science Student & Frontend Developer"
+                alt="Z Andrie — Information Technology Student & Frontend Developer"
                 fill
                 sizes="(max-width: 768px) 340px, 440px"
                 className="object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 scale-[1.02] hover:scale-105"
