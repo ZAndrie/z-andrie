@@ -39,11 +39,11 @@ export default function About() {
             transition={{ duration: 0.8, delay: 0.1 }}
           >
             <p className="text-[17px] md:text-[19px] text-[var(--color-text-dark)] leading-[1.8] font-serif font-normal">
-              I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and full-stack developer based in the <strong className="font-semibold">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
+              I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and a aspiring full-stack developer based in the <strong className="font-semibold">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
             </p>
 
             <p className="text-[15px] md:text-[16px] text-[var(--color-text-light)] leading-[1.8]">
-              Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern tech architecture</strong>, <strong className="text-[var(--color-text-dark)]">interactive animations</strong>, Next.js server components, and responsive design systems. My focus is centered on mastering high-performance full-stack engineering to build seamless web applications that solve real user needs.
+              Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern tech architecture</strong>, <strong className="text-[var(--color-text-dark)]">interactive animations</strong>, server components, and responsive design systems. My focus is centered on mastering high-performance full-stack engineering to build seamless web applications that solve real user needs.
             </p>
 
             {/* Driezie Studio Stats Counters */}
