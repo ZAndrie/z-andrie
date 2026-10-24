@@ -140,7 +140,7 @@ export default function Hero() {
 
           {/* Subtitle / Lead Paragraph: Student identity with professional developer polish */}
           <p className="gsap-hero-lead text-[15px] sm:text-[16px] md:text-[17px] text-[var(--color-text-light)] max-w-[560px] leading-[1.8] mb-9 font-normal">
-            Hello, I am <strong className="font-semibold text-[var(--color-text-dark)]">Z Andrie</strong>. A information technology student and aspiring full-stack developer focused on modern tech architecture, clean code principles, and engineering high-performance digital experiences built for real users.
+            Hello, I am <strong className="font-semibold text-[var(--color-text-dark)]">Z Andrie</strong>. A information technology student and aspiring full-stack developer focused on modern tech architecture, clean code principles, and engineering high-performance digital experiences built for users.
           </p>
 
           {/* Action Buttons: Driezie-Style Roll & Arrow-Swap */}
