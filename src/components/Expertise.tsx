@@ -81,7 +81,6 @@ export default function Expertise({ initialItems = [] }: { initialItems?: any[] 
             rel="noreferrer"
             className="text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-[10px]"
           >
-            VIEW REPOSITORY <span className="text-[var(--color-primary)] text-lg leading-none font-light">→</span>
           </a>
         </div>
       </motion.div>
