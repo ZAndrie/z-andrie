@@ -39,21 +39,21 @@ export default function About() {
             transition={{ duration: 0.8, delay: 0.1 }}
           >
             <p className="text-[17px] md:text-[19px] text-[var(--color-text-dark)] leading-[1.8] font-serif font-normal">
-              I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and front-end developer based in the <strong className="font-semibold">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
+              I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and full-stack developer based in the <strong className="font-semibold">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
             </p>
 
             <p className="text-[15px] md:text-[16px] text-[var(--color-text-light)] leading-[1.8]">
-              Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern React architecture</strong>, <strong className="text-[var(--color-text-dark)]">GSAP interactive animations</strong>, Next.js server components, and responsive design systems. My focus is centered on mastering high-performance frontend engineering to build seamless web applications that solve real user needs.
+              Currently, I am deepening my expertise in <strong className="text-[var(--color-text-dark)]">modern tech architecture</strong>, <strong className="text-[var(--color-text-dark)]">interactive animations</strong>, Next.js server components, and responsive design systems. My focus is centered on mastering high-performance full-stack engineering to build seamless web applications that solve real user needs.
             </p>
 
             {/* Driezie Studio Stats Counters */}
             <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-[var(--color-border)]">
               <div>
                 <p className="text-[26px] sm:text-[32px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums">
-                  3+
+                  1
                 </p>
                 <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[1.5px] text-[var(--color-text-light)] mt-1.5">
-                  Years Dev
+                  Year Dev
                 </p>
               </div>
               <div>
@@ -133,7 +133,7 @@ export default function About() {
                 CURRENT FOCUS & LEARNING
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
-                {["React & Next.js", "GSAP Animations", "Tailwind CSS", "TypeScript", "UI/UX Design"].map((skill) => (
+                {["React & Next.js", "PHP", "Tailwind CSS", "TypeScript", "UI/UX Design","Laravel","Cybersecurity"].map((skill) => (
                   <span
                     key={skill}
                     className="text-[11px] font-mono px-3 py-1 rounded bg-[var(--color-light-bg)] border border-[var(--color-border)] text-[var(--color-text-dark)] font-medium"
