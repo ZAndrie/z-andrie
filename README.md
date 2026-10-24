@@ -16,11 +16,6 @@ An editorial, responsive, component-driven web portfolio designed and developed 
 
 ---
 
-## 📸 Portfolio Preview
-![Portfolio Preview](./public/image.jpg)
-
----
-
 ## 📖 Project Overview
 
 This portfolio fulfills the requirements for **Q2 — Portfolio v1: The Foundation**, prioritizing clean code architecture, smooth entrance animations, mobile-first responsiveness, and modular component design.
