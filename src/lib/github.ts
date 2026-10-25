@@ -1,3 +1,5 @@
+import { certificatesData } from "@/data/certificates";
+
 export interface GitHubProject {
   id: string;
   title: string;
@@ -458,7 +460,7 @@ export async function fetchGitHubCertificates(customUsername?: string, bypassCac
     }
   }
 
-  return [];
+  return certificatesData;
 }
 
 // ==========================================
