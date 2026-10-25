@@ -183,7 +183,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 75%",
+        start: "top 80%",
         toggleActions: "play none none reverse",
       },
     });
@@ -200,20 +200,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       duration: 0.6,
       ease: "power2.out",
     }, "-=0.4")
-    .from(".gsap-exp-card", {
-      opacity: 0,
-      y: 25,
-      stagger: 0.08,
-      duration: 0.6,
-      ease: "power2.out",
-    }, "-=0.3")
     .from(".gsap-pillar-card", {
       opacity: 0,
       x: 30,
       stagger: 0.1,
       duration: 0.7,
       ease: "power3.out",
-    }, "-=0.5")
+    }, "-=0.3")
     .from(".gsap-quote-card", {
       opacity: 0,
       scale: 0.96,
@@ -221,24 +214,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       ease: "power2.out",
     }, "-=0.4");
 
-    // 2. Dynamic Progress Accent Lines
-    gsap.fromTo(
-      ".gsap-exp-progress",
-      { scaleX: 0 },
-      {
-        scaleX: 1,
-        duration: 1.2,
-        stagger: 0.08,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 70%",
-          once: true,
-        },
-      }
-    );
-
-    // 3. 3D Hover Tilt Physics on Architectural Pillar Cards (Desktop pointer only)
+    // 2. 3D Hover Tilt Physics on Architectural Pillar Cards (Desktop pointer only)
     const pillarElements = gsap.utils.toArray<HTMLElement>(".gsap-pillar-card");
     if (window.matchMedia("(hover: hover)").matches) {
       pillarElements.forEach((card) => {
@@ -265,24 +241,40 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         card.addEventListener("mouseleave", onMouseLeave);
       });
     }
+
+    ScrollTrigger.refresh();
   }, { scope: containerRef });
 
-  // Handle Tab Switch Animation with GSAP
+  // Dedicated Card Stagger Animation on Initial Mount and whenever activeTab changes
+  useGSAP(() => {
+    gsap.fromTo(
+      ".gsap-exp-card",
+      { opacity: 0, y: 15 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.05,
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: "auto",
+      }
+    );
+    gsap.fromTo(
+      ".gsap-exp-progress",
+      { scaleX: 0 },
+      {
+        scaleX: 1,
+        stagger: 0.05,
+        duration: 0.7,
+        ease: "power2.out",
+        overwrite: "auto",
+      }
+    );
+  }, { scope: cardsContainerRef, dependencies: [activeTab] });
+
+  // Handle Tab Switch
   const handleTabChange = (newTab: ResumeCategory) => {
     setActiveTab(newTab);
-    // Smoothly stagger in the cards on tab change
-    setTimeout(() => {
-      gsap.fromTo(
-        ".gsap-exp-card",
-        { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, stagger: 0.06, duration: 0.4, ease: "power2.out" }
-      );
-      gsap.fromTo(
-        ".gsap-exp-progress",
-        { scaleX: 0 },
-        { scaleX: 1, stagger: 0.06, duration: 0.8, ease: "power2.out" }
-      );
-    }, 10);
   };
 
   return (
