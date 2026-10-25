@@ -377,6 +377,20 @@ export async function fetchGitHubCertificates(customUsername?: string, bypassCac
   const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
   const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
+  // Fast direct raw fetch without GitHub API rate limits
+  try {
+    const rawRes = await fetch(
+      `https://raw.githubusercontent.com/${username}/portfolio-contents/main/certificates/certificates.json`,
+      cacheOption
+    );
+    if (rawRes.ok) {
+      const data = await rawRes.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {
+    // continue
+  }
+
   for (const repoName of repoCandidates) {
     try {
       // 1. First check if certificates/ subfolder exists (in unified repo)
