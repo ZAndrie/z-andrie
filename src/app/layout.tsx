@@ -43,6 +43,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CustomCursor from "@/components/CustomCursor";
 import { ScrollProgress, BackToTop } from "@/components/ClientUtilities";
 
 export default function RootLayout({
@@ -89,6 +90,7 @@ export default function RootLayout({
         {/* Subtle Paper Grain Texture */}
         <div className="grain-overlay pointer-events-none fixed inset-0 z-[999] opacity-80" aria-hidden="true" />
 
+        <CustomCursor />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1 flex flex-col w-full overflow-x-hidden relative z-10">
