@@ -731,6 +731,20 @@ export async function fetchGitHubExpertise(customUsername?: string, bypassCache:
   const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
   const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
+  // Fast direct raw fetch without GitHub API rate limits
+  try {
+    const rawRes = await fetch(
+      `https://raw.githubusercontent.com/${username}/portfolio-contents/main/expertise/expertise.json`,
+      cacheOption
+    );
+    if (rawRes.ok) {
+      const data = await rawRes.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {
+    // continue
+  }
+
   for (const repoName of repoCandidates) {
     try {
       // 1. Check expertise/ subfolder first
@@ -794,6 +808,101 @@ export async function fetchGitHubExpertise(customUsername?: string, bypassCache:
     }
   }
 
-  return [];
+  return getDefaultExpertiseItems();
+}
+
+function getDefaultExpertiseItems(): GitHubExpertiseItem[] {
+  return [
+    {
+      id: "exp-1",
+      category: "skills",
+      title: "UI/UX Design & Prototyping",
+      subtitle: "Figma, User Flows, Design Systems & High-Fidelity Wireframes",
+      year: "Specialized",
+      percentage: "100%",
+      order: 1,
+    },
+    {
+      id: "exp-2",
+      category: "skills",
+      title: "Quality Assurance & Systems Testing",
+      subtitle: "Test Case Design, Functionality Testing, UI Auditing & QA",
+      year: "Proficient",
+      percentage: "95%",
+      order: 2,
+    },
+    {
+      id: "exp-3",
+      category: "skills",
+      title: "React 19 & Next.js 16 (App Router)",
+      subtitle: "Modern Component Architecture, Server Components & Hooks",
+      year: "Current Focus",
+      percentage: "95%",
+      order: 3,
+    },
+    {
+      id: "exp-4",
+      category: "skills",
+      title: "Tailwind CSS v4 & GSAP Animations",
+      subtitle: "ScrollTrigger, Timeline Choreography & Micro-Interactions",
+      year: "Core Stack",
+      percentage: "90%",
+      order: 4,
+    },
+    {
+      id: "exp-5",
+      category: "skills",
+      title: "PHP & Laravel Web Framework",
+      subtitle: "MVC Architecture, Blade Templates, Database Migrations",
+      year: "Backend",
+      percentage: "85%",
+      order: 5,
+    },
+    {
+      id: "exp-6",
+      category: "skills",
+      title: "Cybersecurity & Cisco Network Defense",
+      subtitle: "Endpoint Security, Threat Management, Device Configuration",
+      year: "Certified",
+      percentage: "90%",
+      order: 6,
+    },
+    {
+      id: "exp-7",
+      category: "education",
+      title: "BS Information Technology",
+      subtitle: "Cor Jesu College • Specializing in Software & Full-Stack Systems",
+      year: "2023 — 2027",
+      percentage: "100%",
+      order: 7,
+    },
+    {
+      id: "exp-8",
+      category: "education",
+      title: "Senior High School (TVL / ICT)",
+      subtitle: "Cor Jesu College • Information and Communications Technology",
+      year: "2021 — 2023",
+      percentage: "100%",
+      order: 8,
+    },
+    {
+      id: "exp-9",
+      category: "education",
+      title: "Junior High School",
+      subtitle: "Digos City National High School",
+      year: "2017 — 2021",
+      percentage: "100%",
+      order: 9,
+    },
+    {
+      id: "exp-10",
+      category: "experience",
+      title: "Student Assistant",
+      subtitle: "Cor Jesu College • IT Facilities, Lab Support & Digital Inventory",
+      year: "2023 — 2027",
+      percentage: "100%",
+      order: 10,
+    },
+  ];
 }
 
