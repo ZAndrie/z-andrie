@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://website-portfolio-murex-eight.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://z-andrie.vercel.app"),
   title: "Z Andrie | Professional Web Developer & Designer",
   description: "I design and build digital experiences that are not only beautiful but also functional, intuitive, and impactful. View my portfolio.",
   keywords: ["web developer", "portfolio", "web design", "full stack developer", "Z Andrie", "UI/UX", "frontend developer"],

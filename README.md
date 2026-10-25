@@ -1,6 +1,6 @@
 # Z Andrie — Portfolio v1: The Foundation
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://website-portfolio-murex-eight.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://z-andrie.vercel.app)
 [![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![GSAP](https://img.shields.io/badge/GSAP-3.15-green?style=for-the-badge&logo=greensock)](https://greensock.com/gsap/)
@@ -11,8 +11,14 @@ An editorial, responsive, component-driven web portfolio designed and developed 
 ---
 
 ## 🌐 Live URL
-- **Production URL:** [https://website-portfolio-murex-eight.vercel.app](https://website-portfolio-murex-eight.vercel.app)
+- **Production URL:** [https://z-andrie.vercel.app](https://z-andrie.vercel.app)
 - **GitHub Repository:** [https://github.com/ZAndrie/z-andrie](https://github.com/ZAndrie/z-andrie)
+
+---
+
+## 📸 Preview
+
+![Z Andrie Portfolio Preview](./public/screenshot.png)
 
 ---
 
