@@ -151,8 +151,8 @@ export default function Hero() {
             >
               <span className="roll">
                 <span className="roll__inner">
-                  <span>Explore My Work</span>
-                  <span className="roll__ghost" aria-hidden="true">Explore My Work</span>
+                  <span>View My Work</span>
+                  <span className="roll__ghost" aria-hidden="true">View My Work</span>
                 </span>
               </span>
               <span className="arrow-swap w-[11px] h-[11px]" aria-hidden="true">

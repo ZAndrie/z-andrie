@@ -52,7 +52,7 @@ export default function ProjectCard({
     ? topics.slice(0, 3)
     : [language || category || "React", "CSS"].filter(Boolean);
 
-  const liveDemoLink = projectUrl || githubUrl;
+  const liveDemoLink = githubUrl || projectUrl;
 
   // Detect compact mode: explicit prop OR className contains small/medium height
   const isCompact =
@@ -132,18 +132,18 @@ export default function ProjectCard({
             </p>
           </div>
 
-          {/* Action links — GitHub Repo only */}
+          {/* Action links — Live Demo pointing to projectUrl/githubUrl */}
           <div className="flex items-center pt-2 border-t border-[var(--color-border)]/60 text-[10px] uppercase font-bold tracking-[1px] mt-2">
             <a
-              href={githubUrl}
+              href={liveDemoLink}
               target="_blank"
               rel="noreferrer"
-              className="group/btn text-[var(--color-text-dark)] hover:text-[var(--color-primary)] inline-flex items-center gap-1 transition-colors"
+              className="group/btn text-[var(--color-primary)] hover:opacity-80 inline-flex items-center gap-1 transition-colors"
             >
               <span className="roll">
                 <span className="roll__inner">
-                  <span>GitHub Repo</span>
-                  <span className="roll__ghost" aria-hidden="true">GitHub Repo</span>
+                  <span>Live Demo</span>
+                  <span className="roll__ghost" aria-hidden="true">Live Demo</span>
                 </span>
               </span>
               <span className="arrow-swap w-[9px] h-[9px]" aria-hidden="true">
@@ -221,7 +221,7 @@ export default function ProjectCard({
       </div>
 
       {/* Action Links */}
-      <div className="flex items-center justify-between pt-3 border-t border-[var(--color-border)]/70 text-[11px] uppercase font-bold tracking-[1.5px]">
+      <div className="flex items-center pt-3 border-t border-[var(--color-border)]/70 text-[11px] uppercase font-bold tracking-[1.5px]">
         <a
           href={liveDemoLink}
           target="_blank"
@@ -232,23 +232,6 @@ export default function ProjectCard({
             <span className="roll__inner">
               <span>Live Demo</span>
               <span className="roll__ghost" aria-hidden="true">Live Demo</span>
-            </span>
-          </span>
-          <span className="arrow-swap w-[10px] h-[10px]" aria-hidden="true">
-            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </span>
-        </a>
-        <a
-          href={githubUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="group/btn text-[var(--color-text-dark)] hover:text-[var(--color-primary)] inline-flex items-center gap-1.5 transition-colors"
-        >
-          <span className="roll">
-            <span className="roll__inner">
-              <span>GitHub Repo</span>
-              <span className="roll__ghost" aria-hidden="true">GitHub Repo</span>
             </span>
           </span>
           <span className="arrow-swap w-[10px] h-[10px]" aria-hidden="true">
