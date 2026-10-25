@@ -96,12 +96,6 @@ export default function Navbar() {
           prefetch={true}
           className="group text-[12px] font-bold uppercase tracking-[1.5px] text-[var(--color-text-dark)] transition-all duration-300 hover:text-[var(--color-primary)] flex items-center gap-[8px]"
         >
-          <span className="roll">
-            <span className="roll__inner">
-              <span>AVAILABLE FOR FREELANCE</span>
-              <span className="roll__ghost text-[var(--color-primary)]" aria-hidden="true">AVAILABLE FOR FREELANCE</span>
-            </span>
-          </span>
           <span className="arrow-swap text-[var(--color-primary)] w-[12px] h-[12px]" aria-hidden="true">
             <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             <svg viewBox="0 0 12 12" fill="none" className="w-full h-full"><path d="M2.5 9.5 9.5 2.5M4.5 2.5h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
