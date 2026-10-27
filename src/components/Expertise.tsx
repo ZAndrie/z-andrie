@@ -185,39 +185,23 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     [totalMilestones]
   );
 
-  // GSAP Entrance for Skills Section
+  // Smooth reveal for Skills Section (without hiding cards behind zero opacity)
   useGSAP(
     () => {
       const el = skillsContainerRef.current;
       if (!el) return;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: el,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      tl.from(".gsap-skills-head", {
+      gsap.from(".gsap-skills-head", {
         opacity: 0,
-        y: 30,
-        duration: 0.8,
-        ease: "power3.out",
-      })
-      .from(".gsap-pillar-box", {
-        opacity: 0,
-        y: 25,
-        stagger: 0.12,
-        duration: 0.7,
-        ease: "power2.out",
-      }, "-=0.4")
-      .from(".gsap-skills-cloud", {
-        opacity: 0,
-        scale: 0.98,
+        y: 20,
         duration: 0.6,
         ease: "power2.out",
-      }, "-=0.3");
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          once: true,
+        },
+      });
     },
     { scope: skillsContainerRef }
   );
@@ -276,7 +260,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       <section
         id="skills"
         ref={skillsContainerRef}
-        className="relative w-full py-[85px] md:py-[115px] px-6 md:px-12 bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
+        className="relative w-full pt-16 pb-12 px-6 md:px-12 bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
       >
         <div className="max-w-[1500px] mx-auto">
           {/* Section Header */}
