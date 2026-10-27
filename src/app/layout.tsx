@@ -44,6 +44,7 @@ export const metadata: Metadata = {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CustomCursor from "@/components/CustomCursor";
+import SmoothScroll from "@/components/SmoothScroll";
 import { ScrollProgress, BackToTop } from "@/components/ClientUtilities";
 
 export default function RootLayout({
@@ -52,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en">
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         
@@ -90,6 +91,7 @@ export default function RootLayout({
         {/* Subtle Paper Grain Texture */}
         <div className="grain-overlay pointer-events-none fixed inset-0 z-[999] opacity-80" aria-hidden="true" />
 
+        <SmoothScroll />
         <CustomCursor />
         <ScrollProgress />
         <Navbar />

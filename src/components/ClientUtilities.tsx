@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { scrollToTarget } from "@/lib/smoothScroll";
 
 export function Preloader() {
   const [loading, setLoading] = useState(true);
@@ -99,7 +100,7 @@ export function BackToTop() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTarget(0, { duration: 1.4 });
   };
 
   return (
