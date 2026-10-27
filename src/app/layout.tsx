@@ -45,6 +45,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CustomCursor from "@/components/CustomCursor";
 import SmoothScroll from "@/components/SmoothScroll";
+import SitePreloader from "@/components/SitePreloader";
+import { preloaderInitScript } from "@/lib/preloader";
 import { ScrollProgress, BackToTop } from "@/components/ClientUtilities";
 
 export default function RootLayout({
@@ -53,8 +55,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Decides before first paint whether the intro plays (once per session). */}
+        <script dangerouslySetInnerHTML={{ __html: preloaderInitScript }} />
+        <noscript>
+          <style>{`.site-preloader{display:none!important}html{overflow:auto!important}`}</style>
+        </noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         
         {/* Google Analytics Placeholder - Replace G-XXXXXXXXXX with your actual Measurement ID when ready */}
@@ -91,6 +98,7 @@ export default function RootLayout({
         {/* Subtle Paper Grain Texture */}
         <div className="grain-overlay pointer-events-none fixed inset-0 z-[999] opacity-80" aria-hidden="true" />
 
+        <SitePreloader />
         <SmoothScroll />
         <CustomCursor />
         <ScrollProgress />

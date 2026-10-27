@@ -6,6 +6,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import TechParticles from "./TechParticles";
+import { whenRevealed } from "@/lib/preloader";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -16,7 +17,9 @@ export default function Hero() {
   // GSAP Entrance & Physics Animations
   useGSAP(() => {
     // 1. Entrance Choreography
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    // Entrance waits for the preloader reveal (plays immediately if it's skipped).
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" }, paused: true });
+    const offReveal = whenRevealed(() => tl.play());
 
     tl.from(".gsap-hero-eyebrow", {
       opacity: 0,
@@ -96,10 +99,13 @@ export default function Hero() {
       container.addEventListener("mouseleave", onMouseLeave);
 
       return () => {
+        offReveal();
         container.removeEventListener("mousemove", onMouseMove);
         container.removeEventListener("mouseleave", onMouseLeave);
       };
     }
+
+    return () => offReveal();
   }, { scope: containerRef });
 
   return (

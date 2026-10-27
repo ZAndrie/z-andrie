@@ -154,3 +154,64 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: clip; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* ---------- Site preloader ---------- */
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: var(--color-light-bg);
+  color: var(--color-text-dark);
+  will-change: transform;
+}
+/* Returning visitors: never render it (script in <head> sets data-preloader="skip"). */
+html[data-preloader="skip"] .site-preloader { display: none; }
+/* Scroll is locked only while the intro is up. */
+html[data-preloader="loading"] { overflow: hidden; }
+/* Failsafe: if JS never runs/hydrates, the overlay hides itself after a few seconds. */
+@keyframes site-preloader-failsafe { to { visibility: hidden; opacity: 0; } }
+.site-preloader { animation: site-preloader-failsafe 0.01s linear 7s forwards; }
+.site-preloader__content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px 5% 36px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) { .site-preloader__content { padding: 40px 8% 48px; } }
+.site-preloader__top,
+.site-preloader__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+.site-preloader__center { text-align: left; }
+.site-preloader__name {
+  font-size: clamp(56px, 12vw, 160px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.site-preloader__name span { color: var(--color-primary); }
+.site-preloader__role {
+  margin-top: 18px;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: var(--color-text-light);
+}
+.site-preloader__track {
+  height: 2px;
+  background: var(--color-border);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.site-preloader__bar {
+  height: 100%;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.site-preloader__meta { font-variant-numeric: tabular-nums; }
