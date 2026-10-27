@@ -1,44 +1,89 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
+export const viewport: Viewport = {
+  themeColor: "#070707",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://z-andrie.vercel.app"),
-  title: "Z Andrie | Professional Web Developer & Designer",
-  description: "I design and build digital experiences that are not only beautiful but also functional, intuitive, and impactful. View my portfolio.",
-  keywords: ["web developer", "portfolio", "web design", "full stack developer", "Z Andrie", "UI/UX", "frontend developer"],
-  authors: [{ name: "Z Andrie" }],
+  title: "Z Andrie | Creative Developer & Full-Stack Technologist",
+  description: "Portfolio of Z Andrie, a creative developer from the Philippines building immersive WebGL experiences, 3D websites, and modern web applications.",
+  keywords: [
+    "Z Andrie",
+    "Creative Developer",
+    "Full-Stack Developer",
+    "Three.js",
+    "WebGL",
+    "GSAP",
+    "React 19",
+    "Next.js",
+    "Philippines",
+    "Interactive Portfolio",
+  ],
+  authors: [{ name: "Z Andrie", url: "https://z-andrie.vercel.app" }],
   creator: "Z Andrie",
   openGraph: {
-    title: "Z Andrie | Professional Web Developer & Designer",
-    description: "I design and build digital experiences that are not only beautiful but also functional, intuitive, and impactful.",
+    title: "Z Andrie | Creative Developer & Full-Stack Technologist",
+    description: "Immersive WebGL room with aiming spotlight physics, vertical scrub showcase, dynamic odometer rolls, and high-velocity systems.",
     type: "website",
     url: "/",
     siteName: "Z Andrie Portfolio",
-    images: [{
-      url: "/image.jpg", // Update this to a real 1200x630 banner later
-      width: 1200,
-      height: 630,
-      alt: "Z Andrie Portfolio",
-    }],
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z Andrie | Professional Web Developer & Designer",
-    description: "I design and build digital experiences that are not only beautiful but also functional, intuitive, and impactful.",
-    images: ["/image.jpg"],
+    title: "Z Andrie | Creative Developer & Full-Stack Technologist",
+    description: "Immersive WebGL room with aiming spotlight physics, vertical scrub showcase, dynamic odometer rolls, and high-velocity systems.",
+    creator: "@ZAndrie",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   icons: {
     icon: "/favicon.ico",
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Z Andrie",
+  jobTitle: "Creative Developer & Full-Stack Technologist",
+  url: "https://z-andrie.vercel.app",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "Philippines",
+  },
+  sameAs: [
+    "https://github.com/ZAndrie",
+  ],
+  knowsAbout: [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Three.js",
+    "WebGL",
+    "GSAP",
+    "Tailwind CSS",
+    "PHP",
+  ],
 };
 
 import Navbar from "@/components/Navbar";
@@ -57,6 +102,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* JSON-LD Person Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {/* Decides before first paint whether the intro plays (once per session). */}
         <script dangerouslySetInnerHTML={{ __html: preloaderInitScript }} />
         <noscript>
@@ -64,27 +114,9 @@ export default function RootLayout({
         </noscript>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-        
-        {/* Google Analytics Placeholder - Replace G-XXXXXXXXXX with your actual Measurement ID when ready */}
-        {/*
-        <Script
-          strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX`}
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-        >
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XXXXXXXXXX');
-          `}
-        </Script>
-        */}
       </head>
       <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden relative`}>
         {/* Architectural Backdrop Grid (Driezie Blueprint) */}
