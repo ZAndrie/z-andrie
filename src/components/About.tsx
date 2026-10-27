@@ -204,7 +204,7 @@ export default function About() {
           </div>
 
           {/* Right Column: Architectural Badges Card */}
-          <div className="gsap-about-card lg:col-span-5 bg-white/70 backdrop-blur-sm border border-[var(--color-border)] p-8 sm:p-10 rounded-sm shadow-sm flex flex-col gap-6 relative group">
+          <div className="gsap-about-card lg:col-span-5 bg-[#100f0d]/80 backdrop-blur-sm border border-[var(--color-border)] p-8 sm:p-10 rounded-sm shadow-sm flex flex-col gap-6 relative group">
             {/* Viewfinder crosshairs */}
             <span className="absolute -top-1 -left-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
             <span className="absolute -top-1 -right-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
