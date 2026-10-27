@@ -91,6 +91,7 @@ export default function Navbar() {
           {/* Sound Toggle */}
           <button
             type="button"
+            data-magnetic
             onClick={() => setSoundActive(!soundActive)}
             className="hidden sm:flex items-center gap-1.5 hover:text-[#e7e5df] transition-colors cursor-pointer"
             title="Toggle Ambient Audio"
@@ -106,6 +107,7 @@ export default function Navbar() {
           {/* UV Mode Toggle */}
           <button
             type="button"
+            data-magnetic
             onClick={() => setUvActive(!uvActive)}
             className={`px-2 py-0.5 border text-[10px] tracking-[1px] rounded-[2px] transition-colors cursor-pointer ${
               uvActive ? "border-[#9333ea] text-[#c084fc] bg-[#581c87]/30" : "border-[#e7e5df]/20 text-[#a8a59d] hover:border-[#e7e5df]"

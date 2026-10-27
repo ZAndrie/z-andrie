@@ -103,7 +103,8 @@ export default function Hero() {
             </span>
             <Link
               href="/#contact"
-              className="px-6 py-3 border border-[#e7e5df]/30 text-[#e7e5df] text-[12px] font-mono tracking-[2px] uppercase hover:border-[#d36b54] hover:text-[#d36b54] transition-all duration-300 rounded-[2px] bg-[#0c0c0c]/60 backdrop-blur-sm shadow-lg"
+              data-magnetic
+              className="px-6 py-3 border border-[#e7e5df]/30 text-[#e7e5df] text-[12px] font-mono tracking-[2px] uppercase hover:border-[#d36b54] hover:text-[#d36b54] transition-all duration-300 rounded-[2px] bg-[#0c0c0c]/60 backdrop-blur-sm shadow-lg inline-block"
             >
               Start a project
             </Link>

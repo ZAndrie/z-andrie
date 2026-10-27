@@ -170,6 +170,7 @@ export default function About() {
               <Link
                 ref={btn1Ref}
                 href="/#works"
+                data-magnetic
                 className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
                 <span className="roll">
@@ -187,6 +188,7 @@ export default function About() {
               <Link
                 ref={btn2Ref}
                 href="/#contact"
+                data-magnetic
                 className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
               >
                 <span className="roll">
