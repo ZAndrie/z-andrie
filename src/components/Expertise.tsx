@@ -1,447 +1,646 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { scrollToTarget } from "@/lib/smoothScroll";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
-
-type ResumeCategory = "skills" | "education" | "experience";
 
 export type ResumeItem = {
   id: string;
   year: string;
   title: string;
   subtitle?: string;
-  percentage: string;
+  percentage?: string;
   category?: string;
+  institution?: string;
+  roleType?: string;
+  bullets?: string[];
+  spotlightWord?: string;
 };
 
-// Curated architectural skills data to ensure a balanced, full-featured showcase
-const enrichedSkills: ResumeItem[] = [
+// ── Z ANDRIE'S AUTHENTIC MILESTONES (STRICTLY PRESERVING USER CREDENTIALS) ──
+const DEFAULT_TRAJECTORY_MILESTONES: ResumeItem[] = [
   {
-    id: "sk-1",
-    category: "skills",
-    title: "UI/UX Design & Prototyping",
-    subtitle: "Figma, High-Fidelity Wireframes, User Flows & Design Systems",
-    year: "Specialized",
-    percentage: "100%",
+    id: "traj-1",
+    year: "2023 — Present",
+    title: "STUDENT ASSISTANT",
+    roleType: "IT FACILITIES & LAB OPERATIONS",
+    institution: "at Cor Jesu College • IT Department",
+    subtitle: "Hardware diagnostics, workstation maintenance, and digital laboratory management.",
+    spotlightWord: "COR JESU",
+    bullets: [
+      "Facilitating campus computing operations, workstation deployment, and hardware diagnostics across college computer laboratories.",
+      "Managing institutional digital inventory and hardware asset tracking for campus computing infrastructure.",
+      "Engineered automated reservation web prototypes (Library Booking, Laptop Borrowing) with role-based auth and automated cataloging.",
+      "Applied structured quality assurance testing, user feedback verification, and regression audits across academic systems.",
+    ],
   },
   {
-    id: "sk-2",
-    category: "skills",
-    title: "Quality Assurance & System Auditing",
-    subtitle: "Test Case Design, Usability Verification & Regression QA",
-    year: "Proficient",
-    percentage: "95%",
+    id: "traj-2",
+    year: "2023 — 2027",
+    title: "BS INFORMATION TECH",
+    roleType: "SOFTWARE & WEB SYSTEMS SPECIALIZATION",
+    institution: "at Cor Jesu College",
+    subtitle: "Specializing in modern full-stack development, distributed architecture, and software design.",
+    spotlightWord: "BSIT",
+    bullets: [
+      "Rigorous academic curriculum covering advanced database architecture, software engineering, algorithms, and cybersecurity fundamentals.",
+      "Focusing on high-performance full-stack web engineering, Next.js server components, React 19, and interactive WebGL experiences.",
+      "Maintaining consistent high-standing performance across specialized computer science and IT laboratory courses.",
+      "Collaborating on full-lifecycle software prototypes solving campus-wide operational challenges.",
+    ],
   },
   {
-    id: "sk-3",
-    category: "skills",
-    title: "React 19 & Next.js 16 (App Router)",
-    subtitle: "Server Components, Client Hooks, Multi-Page Routing & SSR",
-    year: "Current Focus",
-    percentage: "95%",
+    id: "traj-3",
+    year: "2021 — 2023",
+    title: "TVL / ICT SPECIALIST",
+    roleType: "TECHNICAL-VOCATIONAL-LIVELIHOOD",
+    institution: "at Cor Jesu College (SHS)",
+    subtitle: "Information and Communications Technology specialization with foundational networking and systems training.",
+    spotlightWord: "TVL ICT",
+    bullets: [
+      "Comprehensive foundational training in computer programming, database administration, and hardware servicing.",
+      "Developed first-principles mastery of networking topologies, computer hardware assembly, and digital media design.",
+      "Graduated with specialized competency in software troubleshooting and technical workplace preparation.",
+    ],
   },
   {
-    id: "sk-4",
-    category: "skills",
-    title: "Tailwind CSS v4 & GSAP Motion",
-    subtitle: "ScrollTrigger Pinning, 60fps Choreography & Micro-Interactions",
-    year: "Core Stack",
-    percentage: "90%",
-  },
-  {
-    id: "sk-5",
-    category: "skills",
-    title: "PHP & Laravel Web Framework",
-    subtitle: "MVC Architecture, Blade Templates, Migrations & REST APIs",
-    year: "Backend",
-    percentage: "85%",
-  },
-  {
-    id: "sk-6",
-    category: "skills",
-    title: "Cybersecurity & Cisco Defense",
-    subtitle: "Endpoint Security, Network Protection & Device Configuration",
-    year: "Certified",
-    percentage: "90%",
+    id: "traj-4",
+    year: "2017 — 2021",
+    title: "FOUNDATIONAL EDUCATION",
+    roleType: "SECONDARY EDUCATION & SCIENCE",
+    institution: "at Digos City National High School",
+    subtitle: "Early academic foundation fostering a passion for software development and computer technologies.",
+    spotlightWord: "DCNHS",
+    bullets: [
+      "Built a strong mathematical, analytical, and logical foundation that seeded interest in computer science.",
+      "Participated in technology and science exhibitions, exploring computer software fundamentals.",
+    ],
   },
 ];
 
+// ── CORE ARCHITECTURAL PILLARS (SKILLS STACK) ──
+const ARCHITECTURAL_PILLARS = [
+  {
+    code: "01",
+    title: "User-Centered Interaction",
+    discipline: "UI/UX DESIGN & PROTOTYPING",
+    desc: "Crafting purposeful digital spaces in Figma with seamless navigation, accessibility, and high-fidelity user flows.",
+    tags: ["Figma", "Design Systems", "Wireframing", "User Flows"],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+    ),
+  },
+  {
+    code: "02",
+    title: "Clean Code Architecture",
+    discipline: "REACT 19 & NEXT.js 16 (APP ROUTER)",
+    desc: "Scalable server components, strict TypeScript typing, Turbopack bundling, and robust component hierarchies.",
+    tags: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    ),
+  },
+  {
+    code: "03",
+    title: "Modern Full-Stack",
+    discipline: "PHP & LARAVEL WEB FRAMEWORK",
+    desc: "MVC architecture, Blade templates, relational MySQL databases, and secure RESTful API endpoints.",
+    tags: ["PHP", "Laravel", "Blade", "MySQL", "REST APIs"],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <path d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7" />
+        <path d="M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4" />
+        <path d="M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4" />
+      </svg>
+    ),
+  },
+  {
+    code: "04",
+    title: "Performance & Defense",
+    discipline: "GSAP MOTION & CISCO CYBERSECURITY",
+    desc: "60fps ScrollTrigger timeline scrubbing, WebGL particle physics, regression QA auditing, and Cisco security practices.",
+    tags: ["GSAP ScrollTrigger", "Three.js", "QA Auditing", "Cisco Defense"],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    ),
+  },
+];
+
+const COMPANION_MILESTONE_TIPS = [
+  "BIT  student assistant post at CJC. active hardware support & systems QA.",
+  "BIT  BSIT degree track specializing in full-stack software architecture.",
+  "BIT  technical-vocational ICT training in networking and system design.",
+  "BIT  foundational science & mathematics milestones shaping early logic.",
+];
+
 export default function Expertise({ initialItems = [] }: { initialItems?: ResumeItem[] }) {
-  const [activeTab, setActiveTab] = useState<ResumeCategory>("skills");
-  const containerRef = useRef<HTMLElement>(null);
-  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  // Merge live items with curated trajectory if provided
+  const milestones =
+    initialItems && initialItems.filter((i) => i.category === "experience" || i.category === "education").length >= 3
+      ? initialItems
+      : DEFAULT_TRAJECTORY_MILESTONES;
 
-  // Fallback to enriched items if GitHub list is sparse
-  const dbEducation = initialItems?.filter((i) => i.category === "education") || [];
-  const dbSkills = initialItems?.filter((i) => i.category === "skills") || [];
-  const dbExperience = initialItems?.filter((i) => i.category === "experience") || [];
+  const totalMilestones = milestones.length;
 
-  const displaySkills = dbSkills.length >= 4 ? dbSkills : enrichedSkills;
+  const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
+  const [timelineProgress, setTimelineProgress] = useState(0);
 
-  const resumeData: Record<ResumeCategory, ResumeItem[]> = {
-    skills: displaySkills,
-    education: dbEducation.length > 0 ? dbEducation : [
-      {
-        id: "ed-1",
-        category: "education",
-        title: "BS Information Technology",
-        subtitle: "Cor Jesu College • Specializing in Software & Full-Stack Systems",
-        year: "2023 — 2027",
-        percentage: "100%",
-      },
-      {
-        id: "ed-2",
-        category: "education",
-        title: "Senior High School (TVL / ICT)",
-        subtitle: "Cor Jesu College • Information and Communications Technology",
-        year: "2021 — 2023",
-        percentage: "100%",
-      },
-      {
-        id: "ed-3",
-        category: "education",
-        title: "Junior High School",
-        subtitle: "Digos City National High School",
-        year: "2017 — 2021",
-        percentage: "100%",
-      },
-    ],
-    experience: dbExperience.length > 0 ? dbExperience : [
-      {
-        id: "ex-1",
-        category: "experience",
-        title: "Student Assistant",
-        subtitle: "Cor Jesu College • IT Facilities, Lab Support & Digital Inventory Management",
-        year: "2023 — 2027",
-        percentage: "100%",
-      },
-    ],
-  };
+  const skillsContainerRef = useRef<HTMLElement>(null);
+  const pathContainerRef = useRef<HTMLDivElement>(null);
+  const pathStageRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
 
-  const tabs: { label: string; value: ResumeCategory; tag: string }[] = [
-    { label: "Skills & Stack", value: "skills", tag: "TECH CORE" },
-    { label: "Education & Training", value: "education", tag: "ACADEMIC" },
-    { label: "Experience", value: "experience", tag: "APPOINTMENTS" },
-  ];
+  const activeMilestone = milestones[activeMilestoneIndex] || milestones[0];
 
-  const pillars = [
-    {
-      code: "01",
-      title: "User-Centered Interaction",
-      desc: "Creating purposeful digital spaces with seamless navigation and empathy for user workflows.",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-          <rect x="2" y="3" width="20" height="14" rx="2" />
-          <line x1="8" y1="21" x2="16" y2="21" />
-          <line x1="12" y1="17" x2="12" y2="21" />
-        </svg>
-      ),
-    },
-    {
-      code: "02",
-      title: "Clean Code Architecture",
-      desc: "Scalable Next.js and React components built on clean design patterns and strict type safety.",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
-      ),
-    },
-    {
-      code: "03",
-      title: "Mobile-First & Adaptive",
-      desc: "Responsive fluid grids designed to preserve clarity and functionality across every screen.",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      ),
-    },
-    {
-      code: "04",
-      title: "Performance & GSAP Motion",
-      desc: "Smooth 60fps timeline animations, SEO optimization, and hardware-accelerated interactions.",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-      ),
-    },
-  ];
+  // Jump smoothly to a specific milestone
+  const goToMilestone = useCallback(
+    (index: number) => {
+      const clamped = Math.max(0, Math.min(totalMilestones - 1, index));
+      setActiveMilestoneIndex(clamped);
 
-  // GSAP ScrollTrigger Entrance & Tab Cascade
-  useGSAP(() => {
-    // 1. Initial ScrollTrigger Section Reveal
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-    });
-
-    tl.from(".gsap-exp-header", {
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power3.out",
-    })
-    .from(".gsap-exp-tabbar", {
-      opacity: 0,
-      y: 20,
-      duration: 0.6,
-      ease: "power2.out",
-    }, "-=0.4")
-    .from(".gsap-pillar-card", {
-      opacity: 0,
-      x: 30,
-      stagger: 0.1,
-      duration: 0.7,
-      ease: "power3.out",
-    }, "-=0.3")
-    .from(".gsap-quote-card", {
-      opacity: 0,
-      scale: 0.96,
-      duration: 0.8,
-      ease: "power2.out",
-    }, "-=0.4");
-
-    // 2. 3D Hover Tilt Physics on Architectural Pillar Cards (Desktop pointer only)
-    const pillarElements = gsap.utils.toArray<HTMLElement>(".gsap-pillar-card");
-    if (window.matchMedia("(hover: hover)").matches) {
-      pillarElements.forEach((card) => {
-        const rotX = gsap.quickTo(card, "rotationX", { duration: 0.4, ease: "power2.out" });
-        const rotY = gsap.quickTo(card, "rotationY", { duration: 0.4, ease: "power2.out" });
-        const liftY = gsap.quickTo(card, "y", { duration: 0.4, ease: "power2.out" });
-
-        const onMouseMove = (e: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          const relX = (e.clientX - rect.left) / rect.width - 0.5;
-          const relY = (e.clientY - rect.top) / rect.height - 0.5;
-          rotY(relX * 10);
-          rotX(-relY * 10);
-          liftY(-4);
-        };
-
-        const onMouseLeave = () => {
-          rotX(0);
-          rotY(0);
-          liftY(0);
-        };
-
-        card.addEventListener("mousemove", onMouseMove);
-        card.addEventListener("mouseleave", onMouseLeave);
-      });
-    }
-
-    ScrollTrigger.refresh();
-  }, { scope: containerRef });
-
-  // Dedicated Card Stagger Animation on Initial Mount and whenever activeTab changes
-  useGSAP(() => {
-    gsap.fromTo(
-      ".gsap-exp-card",
-      { opacity: 0, y: 15 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.05,
-        duration: 0.4,
-        ease: "power2.out",
-        overwrite: "auto",
+      const trig = triggerRef.current;
+      if (trig && window.innerWidth >= 768) {
+        const start = trig.start;
+        const end = trig.end;
+        const targetProgress = (clamped + 0.5) / totalMilestones;
+        const targetScroll = start + targetProgress * (end - start);
+        scrollToTarget(targetScroll, { duration: 0.8 });
       }
-    );
-    gsap.fromTo(
-      ".gsap-exp-progress",
-      { scaleX: 0 },
-      {
-        scaleX: 1,
-        stagger: 0.05,
+    },
+    [totalMilestones]
+  );
+
+  // GSAP Entrance for Skills Section
+  useGSAP(
+    () => {
+      const el = skillsContainerRef.current;
+      if (!el) return;
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: "top 80%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.from(".gsap-skills-head", {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        ease: "power3.out",
+      })
+      .from(".gsap-pillar-box", {
+        opacity: 0,
+        y: 25,
+        stagger: 0.12,
         duration: 0.7,
         ease: "power2.out",
-        overwrite: "auto",
-      }
-    );
-  }, { scope: cardsContainerRef, dependencies: [activeTab] });
+      }, "-=0.4")
+      .from(".gsap-skills-cloud", {
+        opacity: 0,
+        scale: 0.98,
+        duration: 0.6,
+        ease: "power2.out",
+      }, "-=0.3");
+    },
+    { scope: skillsContainerRef }
+  );
 
-  // Handle Tab Switch
-  const handleTabChange = (newTab: ResumeCategory) => {
-    setActiveTab(newTab);
-  };
+  // GSAP ScrollTrigger Pinned Scrub for Trajectory / Path Showcase (Matching Image 2)
+  useGSAP(
+    () => {
+      const container = pathContainerRef.current;
+      const stage = pathStageRef.current;
+      if (!container || !stage) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 768px)", () => {
+        const scrollDistance = Math.max(1, totalMilestones - 1) * Math.max(window.innerHeight * 0.7, 540);
+
+        const trig = ScrollTrigger.create({
+          trigger: container,
+          pin: stage,
+          pinSpacing: true,
+          start: "top top",
+          end: () => `+=${scrollDistance}`,
+          scrub: 0.4,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const p = self.progress;
+            setTimelineProgress(p);
+            const idx = Math.min(totalMilestones - 1, Math.floor(p * totalMilestones));
+            setActiveMilestoneIndex(idx);
+          },
+        });
+
+        triggerRef.current = trig;
+        ScrollTrigger.refresh();
+
+        return () => {
+          trig.kill();
+          triggerRef.current = null;
+        };
+      });
+
+      return () => mm.revert();
+    },
+    { scope: pathContainerRef, dependencies: [totalMilestones] }
+  );
+
+  const companionTip =
+    COMPANION_MILESTONE_TIPS[activeMilestoneIndex % COMPANION_MILESTONE_TIPS.length];
 
   return (
-    <section
-      ref={containerRef}
-      id="expertise"
-      className="py-[90px] md:py-[120px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] relative overflow-hidden"
-    >
-      <div className="max-w-[1400px] mx-auto">
-        
-        {/* Section Header */}
-        <div className="gsap-exp-header flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-[50px] md:mb-[70px]">
-          <div>
-            <p className="text-[11px] uppercase tracking-[3px] font-mono text-[var(--color-primary)] font-bold mb-2 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
-              CAPABILITIES &amp; TRAJECTORY
+    <>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          PART 1: SKILLS & ARCHITECTURAL STACK SHOWCASE
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section
+        id="skills"
+        ref={skillsContainerRef}
+        className="relative w-full py-[85px] md:py-[115px] px-6 md:px-12 bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
+      >
+        <div className="max-w-[1500px] mx-auto">
+          {/* Section Header */}
+          <div className="gsap-skills-head flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 md:mb-16">
+            <div>
+              <p className="text-[11px] uppercase tracking-[3px] font-mono text-[#d36b54] font-bold mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-pulse" />
+                [ 01 // CAPABILITIES &amp; DISCIPLINES ]
+              </p>
+              <h2 className="text-[34px] sm:text-[44px] md:text-[54px] font-stencil uppercase text-[#e7e5df] leading-[0.98] tracking-tight">
+                Skills &amp; <span className="text-[#f4ddb8]">Architectural Stack</span>
+              </h2>
+            </div>
+
+            <p className="text-[13px] md:text-[14px] text-[#a8a59d] max-w-[500px] leading-relaxed font-sans">
+              A comprehensive breakdown of engineering disciplines, practical competencies, and specialized technologies shaping my development workflow.
             </p>
-            <h2 className="text-[36px] sm:text-[46px] md:text-[56px] font-serif uppercase text-[var(--color-text-dark)] leading-[1.05]">
-              Skills &amp; <span className="text-[var(--color-primary)] italic">Expertise</span>
-            </h2>
           </div>
 
-          <p className="text-[13px] md:text-[14px] text-[var(--color-text-light)] max-w-[460px] leading-relaxed">
-            A comprehensive breakdown of engineering disciplines, practical competencies, and academic milestones shaping my development journey.
-          </p>
-        </div>
+          {/* 4 Architectural Discipline Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 mb-10">
+            {ARCHITECTURAL_PILLARS.map((pillar) => (
+              <div
+                key={pillar.code}
+                className="gsap-pillar-box group bg-[#0e0d0c] hover:bg-[#12110f] border border-[#232220] hover:border-[#d36b54]/60 p-6 md:p-7 rounded-sm transition-all duration-300 relative flex flex-col justify-between"
+              >
+                {/* Viewfinder crosshairs */}
+                <span className="absolute -top-1 -left-1 text-[11px] font-mono text-[#d36b54] font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
+                <span className="absolute -top-1 -right-1 text-[11px] font-mono text-[#d36b54] font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
 
-        {/* Main Content Grid: 12 Columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-          
-          {/* ── LEFT COLUMN (7 cols): Interactive Tabbed Trajectory ── */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            {/* Architectural Tab Switcher */}
-            <div className="gsap-exp-tabbar flex gap-2 sm:gap-3 p-1.5 bg-white/70 backdrop-blur-sm border border-[var(--color-border)] rounded-sm">
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => handleTabChange(tab.value)}
-                    className={`flex-1 py-3 px-3 sm:px-4 rounded-sm text-[11px] uppercase font-mono tracking-[1.5px] font-bold transition-all duration-300 relative text-center cursor-pointer
-                      ${isActive
-                        ? "text-white bg-[var(--color-text-dark)] shadow-md"
-                        : "text-[var(--color-text-light)] hover:text-[var(--color-text-dark)] hover:bg-white/50"
-                      }
-                    `}
-                  >
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Tab Content Display */}
-            <div ref={cardsContainerRef} className="min-h-[420px] flex flex-col justify-between">
-              <div className="flex flex-col gap-3.5">
-                {/* Category Header Label */}
-                <div className="flex justify-between items-center pb-2 border-b border-[var(--color-border)] text-[10px] font-mono uppercase tracking-[2px] text-[var(--color-text-light)]">
-                  <span>RECORD / COMPETENCY</span>
-                  <span>STATUS</span>
-                </div>
-
-                {resumeData[activeTab].map((item, index) => (
-                  <div
-                    key={item.id || index}
-                    className="gsap-exp-card group bg-white/80 hover:bg-white border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-md transition-all duration-300 relative"
-                  >
-                    {/* Corner Accents on Hover */}
-                    <span className="absolute -top-1 -left-1 text-[11px] font-mono text-[var(--color-primary)] font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-                    <span className="absolute -top-1 -right-1 text-[11px] font-mono text-[var(--color-primary)] font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[11px] font-serif font-bold text-[var(--color-primary)] tabular-nums">
-                          {String(index + 1).padStart(2, "0")}.
-                        </span>
-                        <h3 className="text-[13px] sm:text-[14px] font-bold text-[var(--color-text-dark)] uppercase tracking-[0.8px] group-hover:text-[var(--color-primary)] transition-colors">
-                          {item.title}
-                        </h3>
-                      </div>
-
-                      {item.year && (
-                        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-[var(--color-light-bg)] border border-[var(--color-border)] text-[var(--color-primary)] self-start sm:self-auto">
-                          {item.year}
-                        </span>
-                      )}
-                    </div>
-
-                    {item.subtitle && (
-                      <p className="text-[12px] text-[var(--color-text-light)] leading-relaxed pl-5">
-                        {item.subtitle}
-                      </p>
-                    )}
-
-                    {/* GSAP Animated Bottom Progress Accent */}
-                    <div className="w-full h-[1.5px] bg-[var(--color-border)]/50 mt-3 relative overflow-hidden">
-                      <div
-                        className="gsap-exp-progress absolute top-0 left-0 bottom-0 w-full bg-gradient-to-r from-[var(--color-primary)]/40 to-[var(--color-primary)] origin-left"
-                      />
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[11px] font-mono text-[#d36b54] font-bold tracking-widest">
+                      [{pillar.code}]
+                    </span>
+                    <div className="w-8 h-8 rounded-sm bg-[#161513] border border-[#262523] flex items-center justify-center text-[#f4ddb8] group-hover:text-[#d36b54] transition-colors">
+                      {pillar.icon}
                     </div>
                   </div>
-                ))}
+
+                  <span className="text-[10px] font-mono uppercase tracking-[2px] text-[#888] block mb-1">
+                    {pillar.discipline}
+                  </span>
+                  <h3 className="text-[18px] sm:text-[20px] font-stencil uppercase text-[#e7e5df] tracking-wide mb-2.5">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-[13px] text-[#a8a59d] leading-relaxed font-sans">
+                    {pillar.desc}
+                  </p>
+                </div>
+
+                {/* Tech Tags */}
+                <div className="flex flex-wrap gap-2 pt-5 mt-5 border-t border-[#1c1b19]">
+                  {pillar.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[10px] font-mono px-2.5 py-1 rounded-sm bg-[#141312] border border-[#242321] text-[#e7e5df]/80 group-hover:border-[#d36b54]/40 transition-colors"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
 
-          {/* ── RIGHT COLUMN (5 cols): Engineering Pillars & Studio Quote ── */}
-          <div className="lg:col-span-5 flex flex-col gap-6" style={{ perspective: 1000 }}>
-            {/* Top Eyebrow */}
-            <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border)] text-[10px] font-mono uppercase tracking-[2px] text-[var(--color-text-light)]">
-              <span>CORE ARCHITECTURAL PILLARS</span>
-              <span>[ 04 ]</span>
+          {/* Interactive Stack Badges Matrix */}
+          <div className="gsap-skills-cloud p-6 md:p-8 bg-[#0c0c0b] border border-[#232220] rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-[2.5px] text-[#888] block mb-1">
+                TECHNOLOGY MATRIX
+              </span>
+              <h4 className="text-[14px] font-mono text-[#e7e5df] uppercase tracking-[1.5px]">
+                Active Production &amp; Research Stack
+              </h4>
             </div>
 
-            {/* 4 Architectural Cards with 3D Tilt */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3.5">
-              {pillars.map((pillar) => (
-                <div
-                  key={pillar.code}
-                  className="gsap-pillar-card group bg-white/70 hover:bg-white border border-[var(--color-border)] hover:border-[var(--color-primary)] p-4 sm:p-5 rounded-sm shadow-sm hover:shadow-lg transition-colors flex items-start gap-4 select-none cursor-pointer"
-                  style={{ transformStyle: "preserve-3d" }}
+            <div className="flex flex-wrap gap-2 sm:max-w-[700px]">
+              {[
+                "Next.js 16",
+                "React 19",
+                "TypeScript",
+                "GSAP 3",
+                "Tailwind v4",
+                "Three.js",
+                "PHP",
+                "Laravel",
+                "MySQL",
+                "Blade",
+                "Figma",
+                "Cisco Defense",
+                "REST APIs",
+                "Git & GitHub",
+                "System Auditing",
+              ].map((tech) => (
+                <span
+                  key={tech}
+                  className="px-3 py-1 bg-[#141413] hover:bg-[#1a1917] border border-[#262523] hover:border-[#f4ddb8] text-[11px] font-mono text-[#e7e5df] rounded-sm transition-colors cursor-default"
                 >
-                  <div className="w-10 h-10 rounded-sm bg-[var(--color-light-bg)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-primary)] shrink-0 group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors">
-                    {pillar.icon}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-mono text-[var(--color-primary)] font-bold">
-                        [{pillar.code}]
-                      </span>
-                      <h4 className="text-[12px] font-bold text-[var(--color-text-dark)] uppercase tracking-[0.8px]">
-                        {pillar.title}
-                      </h4>
-                    </div>
-                    <p className="text-[11px] text-[var(--color-text-light)] leading-relaxed">
-                      {pillar.desc}
-                    </p>
-                  </div>
-                </div>
+                  #{tech.replace(/\s+/g, "")}
+                </span>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Studio Philosophy Quotation Card with Dashed Offset Frame */}
-            <div className="gsap-quote-card relative mt-2 p-6 sm:p-7 bg-white/95 border border-[var(--color-border)] rounded-sm shadow-sm overflow-hidden group">
-              {/* Corner crosshairs */}
-              <span className="absolute -top-1 -left-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
-              <span className="absolute -top-1 -right-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
-              <span className="absolute -bottom-1 -left-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
-              <span className="absolute -bottom-1 -right-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
+      {/* ═══════════════════════════════════════════════════════════════════════
+          PART 2: PINNED THEATRICAL EXPERTISE & TRAJECTORY SHOWCASE
+          (MATCHING DIALLO'S EXPERIENCE SECTION: media_1793080825952_6696c651.png)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section
+        id="expertise"
+        ref={pathContainerRef}
+        className="relative w-full bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
+      >
+        {/* ── PINNED THEATRICAL STAGE ── */}
+        <div
+          ref={pathStageRef}
+          className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]"
+        >
+          {/* Subtle theatrical background atmosphere */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-40"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 50% 35%, rgba(244, 221, 184, 0.08) 0%, rgba(7, 7, 7, 0.95) 75%)",
+            }}
+          />
 
-              <div className="text-[50px] font-serif text-[var(--color-primary)] opacity-25 leading-none h-[30px] select-none">
-                “
+          {/* ── MAIN 3-COLUMN THEATRICAL TRAJECTORY GRID ── */}
+          <div className="relative z-10 w-full max-w-[1550px] mx-auto flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-center min-h-0">
+            
+            {/* ── LEFT COLUMN: ROLE, CREDENTIALS & ACCOMPLISHMENTS ── */}
+            <div className="md:col-span-6 lg:col-span-6 flex flex-col justify-between h-full py-2 max-w-[620px]">
+              {/* Top: Section Eyebrow & Date Range */}
+              <div>
+                <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#888] mb-1">
+                  Experience
+                </span>
+                <span className="text-[12px] font-mono text-[#f4ddb8] tracking-wider block">
+                  {activeMilestone.year}
+                </span>
               </div>
-              <p className="text-[15px] sm:text-[16px] font-serif italic text-[var(--color-text-dark)] leading-[1.7] relative z-10 mb-4">
-                I design and build digital experiences that are not only beautiful but also functional, intuitive, and impactful.
-              </p>
-              <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between text-[10px] font-mono uppercase tracking-[1.5px] text-[var(--color-text-light)]">
-                <span>PHILOSOPHY</span>
-                <span className="text-[var(--color-primary)] font-semibold">Z ANDRIE BARRABA</span>
+
+              {/* Middle: Giant Stencil Role Title & Bullets */}
+              <div className="my-auto py-3">
+                <h2
+                  key={`title-${activeMilestone.id}`}
+                  className="font-stencil text-[36px] sm:text-[48px] md:text-[56px] lg:text-[68px] font-black uppercase text-[#e7e5df] leading-[0.92] tracking-tight transition-opacity duration-300"
+                >
+                  {activeMilestone.title}
+                </h2>
+
+                <div className="text-[12px] md:text-[13px] font-mono uppercase tracking-[2px] text-[#d36b54] font-bold mt-2">
+                  {activeMilestone.roleType || "SPECIALIZATION"}
+                </div>
+
+                <div className="text-[13px] md:text-[14px] font-sans text-[#e7e5df] italic mt-1 mb-5">
+                  {activeMilestone.institution}
+                </div>
+
+                {/* Accomplishment Bullet Points */}
+                <ul className="flex flex-col gap-2.5 text-[12px] sm:text-[13px] text-[#a8a59d] font-sans leading-relaxed pl-1">
+                  {(activeMilestone.bullets && activeMilestone.bullets.length > 0
+                    ? activeMilestone.bullets
+                    : [
+                        activeMilestone.subtitle ||
+                          "Directly contributing to technical systems, software architecture, and practical operational engineering.",
+                      ]
+                  ).map((bullet, bIdx) => (
+                    <li key={bIdx} className="flex items-start gap-3">
+                      <span className="text-[#d36b54] text-[14px] leading-none shrink-0 mt-0.5">•</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              {/* Bottom: Milestone ID Tag */}
+              <div className="pt-2 text-[11px] font-mono uppercase tracking-[2px] text-[#666]">
+                <span>TRAJECTORY MILESTONE {String(activeMilestoneIndex + 1).padStart(2, "0")} / {String(totalMilestones).padStart(2, "0")}</span>
+              </div>
+            </div>
+
+            {/* ── CENTER COLUMN: SPOTLIGHT CIRCLE ON WALL WITH SHADOW PARTICLES ── */}
+            <div className="md:col-span-4 lg:col-span-4 flex flex-col items-center justify-center relative h-full py-2">
+              
+              {/* Overhead Pendant Lamp Mount */}
+              <div className="w-[140px] sm:w-[180px] h-[16px] relative flex flex-col items-center -mb-1 z-10">
+                <div className="w-[2px] h-[10px] bg-[#2a2a2a]" />
+                <div className="w-full h-[3px] bg-[#232220] rounded-full border-t border-[#3a3937]" />
+              </div>
+
+              {/* Theatrical Spotlight Puddle on Wall */}
+              <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[440px] aspect-square rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_80px_rgba(244,221,184,0.12)]">
+                {/* Concentrated Warm Incandescent Light Pool (Matching Diallo Image 2) */}
+                <div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 50%, rgba(244, 221, 184, 0.42) 0%, rgba(244, 221, 184, 0.18) 45%, rgba(244, 221, 184, 0.04) 70%, transparent 80%)",
+                  }}
+                />
+
+                {/* Floating Volumetric Dust Motes Simulation */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-25"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(rgba(244, 221, 184, 0.9) 1px, transparent 1px)",
+                    backgroundSize: "24px 24px",
+                  }}
+                />
+
+                {/* Milestone Particle Shadow Word (e.g. COR JESU, BSIT) in Center of Spotlight */}
+                <div className="relative z-10 flex flex-col items-center justify-center text-center p-4">
+                  <span
+                    key={`word-${activeMilestone.id}`}
+                    className="font-stencil text-[44px] sm:text-[56px] md:text-[68px] font-black uppercase text-[#1a1714] tracking-wider leading-none drop-shadow-[0_2px_8px_rgba(244,221,184,0.4)] select-none transition-all duration-500 animate-in fade-in"
+                  >
+                    {activeMilestone.spotlightWord || "COR JESU"}
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-[3px] text-[#42392f] mt-1">
+                    {activeMilestone.year}
+                  </span>
+                </div>
+              </div>
+
+              {/* Beneath Spotlight: Retro Desk, CRT Terminal & BIT Companion */}
+              <div className="w-full max-w-[420px] flex items-end justify-between mt-3 px-2">
+                
+                {/* CRT Terminal */}
+                <div className="w-[120px] p-2 bg-[#101010] border border-[#232220] rounded-sm font-mono text-[9px] text-[#4af626] leading-snug select-none hidden sm:block">
+                  <div className="text-[#888] text-[8px] mb-1">TERMINAL // PATH</div>
+                  <div className="truncate">&gt; YEAR: {activeMilestone.year.split("—")[0].trim()}</div>
+                  <div className="truncate">&gt; VERIFIED: CJC</div>
+                </div>
+
+                {/* Robot Companion BIT */}
+                <div className="relative flex flex-col items-center">
+                  <div className="relative w-12 h-9 bg-[#1a1917] border border-[#333] rounded-t-md flex items-center justify-center gap-2 shadow-inner">
+                    <span className="w-2 h-2 rounded-full bg-[#52ff40] shadow-[0_0_8px_#52ff40] animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-[#52ff40] shadow-[0_0_8px_#52ff40] animate-pulse" />
+                  </div>
+                  <div className="w-14 h-2 bg-[#121110] border-t border-[#262523]" />
+                </div>
+
+                {/* Dynamic Speech Bubble from BIT */}
+                <div className="max-w-[210px] sm:max-w-[230px] p-2.5 bg-[#121110]/95 border border-[#2b2a28] rounded-sm font-mono text-[10px] text-[#e7e5df] leading-snug shadow-lg relative">
+                  <div className="text-[9px] font-bold text-[#f4ddb8] tracking-wider mb-0.5">
+                    BIT
+                  </div>
+                  <p className="line-clamp-2 text-[#a8a59d]">
+                    {companionTip}
+                  </p>
+                  <div className="absolute -left-1.5 bottom-3 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-r-[6px] border-r-[#2b2a28]" />
+                </div>
+
+              </div>
+            </div>
+
+            {/* ── RIGHT COLUMN: VERTICAL YEAR TIMELINE (MATCHING IMAGE 2) ── */}
+            <div className="md:col-span-2 lg:col-span-2 flex flex-col justify-between h-full py-2 pl-4 border-l border-[#1f1e1c]/80 hidden md:flex">
+              
+              <div>
+                <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#888] mb-6">
+                  Timeline
+                </span>
+
+                {/* Vertical Timeline Nodes linked with line */}
+                <div className="relative flex flex-col gap-6 pl-2">
+                  {/* Vertical Connector Line */}
+                  <div className="absolute left-[7px] top-3 bottom-3 w-[1px] bg-[#232220]" />
+
+                  {milestones.map((m, idx) => {
+                    const isActive = idx === activeMilestoneIndex;
+                    const displayYear = m.year.split("—")[0].trim();
+                    const shortName = m.institution
+                      ? m.institution.replace(/^at\s+/i, "").split("•")[0].trim()
+                      : m.title;
+
+                    return (
+                      <button
+                        key={m.id || idx}
+                        type="button"
+                        onClick={() => goToMilestone(idx)}
+                        className={`group flex items-start gap-3 text-left transition-colors cursor-pointer relative z-10 ${
+                          isActive ? "opacity-100" : "opacity-45 hover:opacity-80"
+                        }`}
+                      >
+                        {/* Square Indicator Node */}
+                        <div
+                          className={`w-3.5 h-3.5 rounded-[1px] mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
+                            isActive
+                              ? "bg-[#d36b54] shadow-[0_0_8px_#d36b54]"
+                              : "border border-[#444] bg-[#0c0c0c] group-hover:border-[#777]"
+                          }`}
+                        >
+                          {isActive && <div className="w-1.5 h-1.5 bg-[#070707] rounded-[1px]" />}
+                        </div>
+
+                        {/* Year & Institution */}
+                        <div className="flex flex-col">
+                          <span
+                            className={`font-stencil text-[22px] sm:text-[26px] font-black leading-none transition-colors ${
+                              isActive ? "text-[#e7e5df]" : "text-[#777] group-hover:text-[#aaa]"
+                            }`}
+                          >
+                            {displayYear}
+                          </span>
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-[#888] line-clamp-1 mt-0.5">
+                            {shortName}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom Telemetry HUD */}
+              <div className="pt-4 border-t border-[#1f1e1c] font-mono text-[10px] text-[#666] flex flex-col gap-1 select-none">
+                <div className="flex items-center justify-between text-[#888]">
+                  <span>FOCUS</span>
+                  <span className="text-[#f4ddb8]">065%</span>
+                </div>
+                <div className="text-[9px] tracking-wider text-[#555]">
+                  x -0.03 y 1.56 2700K
+                </div>
+              </div>
+
             </div>
 
           </div>
 
-        </div>
+          {/* ── BOTTOM PROGRESS BAR & CUE ── */}
+          <div className="relative z-10 w-full max-w-[1550px] mx-auto pt-3">
+            <div className="w-full flex items-center justify-between text-[10px] font-mono text-[#666] uppercase tracking-[2px] mb-2">
+              <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
+                Trajectory Sequence
+              </span>
+              <span className="hidden sm:inline-block">
+                Scroll down to traverse milestones
+              </span>
+              <span>
+                {Math.round(((activeMilestoneIndex + 1) / totalMilestones) * 100)}% History
+              </span>
+            </div>
 
-      </div>
-    </section>
+            {/* GSAP Progress Line */}
+            <div className="w-full h-[2px] bg-[#1a1918] relative overflow-hidden rounded-full">
+              <div
+                className="absolute top-0 left-0 bottom-0 bg-[#d36b54] transition-all duration-150 ease-out"
+                style={{
+                  width: `${Math.max(4, Math.round(timelineProgress * 100))}%`,
+                }}
+              />
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </>
   );
 }
