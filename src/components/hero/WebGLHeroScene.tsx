@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo, useCallback } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import RoomScene3D from "./RoomScene3D";
@@ -10,13 +10,15 @@ interface WebGLHeroSceneProps {
 }
 
 /**
- * Main WebGL Hero Canvas Container with Interactive Spotlight and Stable Persistence.
+ * Global 3D Theatrical Scene Canvas:
+ * Fixed background across the entire portfolio, responding to mouse position
+ * and scroll progress with camera tracking and volumetric spotlight physics.
  */
 export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pointerRef = useRef({ x: 0, y: 0, active: false });
 
-  // Safe DPR computation
+  // Safe DPR computation capped for low-end hardware efficiency
   const dpr = useMemo(() => {
     if (typeof window === "undefined") return 1;
     const urlParams = new URLSearchParams(window.location.search);
@@ -32,29 +34,36 @@ export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProp
     return !isNaN(dprParam) ? dprParam : isLowPower ? Math.min(baseDpr, 1.1) : baseDpr;
   }, []);
 
-  // Pointer tracking across the entire screen
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-    pointerRef.current = { x, y, active: true };
-  }, []);
+  // Global pointer tracking across the entire window
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -((e.clientY / window.innerHeight) * 2 - 1);
+      pointerRef.current = { x, y, active: true };
+    };
 
-  const handlePointerLeave = useCallback(() => {
-    pointerRef.current = { x: 0, y: 0, active: false };
+    const handlePointerLeave = () => {
+      pointerRef.current = { x: 0, y: 0, active: false };
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    document.addEventListener("mouseleave", handlePointerLeave);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("mouseleave", handlePointerLeave);
+    };
   }, []);
 
   return (
     <div
       ref={containerRef}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      className="absolute inset-0 w-full h-full pointer-events-auto z-0 select-none overflow-hidden"
+      className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none overflow-hidden"
       aria-hidden="true"
     >
       <Canvas
         dpr={dpr}
-        camera={{ position: [0, 1.0, 5.8], fov: 38, near: 0.1, far: 30 }}
+        camera={{ position: [0, 1.05, 5.8], fov: 38, near: 0.1, far: 30 }}
         gl={{
           antialias: true,
           powerPreference: "high-performance",

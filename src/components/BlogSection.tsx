@@ -8,7 +8,7 @@ export default function BlogSection({ posts = [] }: { posts?: any[] }) {
   return (
     <section
       id="blog"
-      className="py-[100px] md:py-[120px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] relative overflow-hidden"
+      className="py-[100px] md:py-[120px] px-[5%] md:px-[8%] bg-[#070707]/75 backdrop-blur-[1px] border-t border-[#232220]/50 relative overflow-hidden z-10"
     >
       <div className="max-w-[1400px] mx-auto">
         

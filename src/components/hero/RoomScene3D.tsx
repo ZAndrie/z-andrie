@@ -3,6 +3,7 @@
 import React, { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
+import { emitTelemetry } from "@/lib/telemetry";
 
 interface RoomSceneProps {
   pointerRef: React.MutableRefObject<{ x: number; y: number; active: boolean }>;
@@ -19,8 +20,82 @@ function mulberry32(a: number) {
   };
 }
 
+interface CameraWaypoint {
+  progress: number;
+  pos: [number, number, number];
+  look: [number, number, number];
+  targetName: string;
+}
+
 /**
- * Procedural Theatrical 3D Isometric Room with Interactive Volumetric Spotlight Beam.
+ * Camera Choreography Waypoints across the entire page scroll journey:
+ * 01. Hero overview: wide isometric room showing the lamp, full desk, monitor, and back wall.
+ * 02. About section: camera moves forward and downward, zooming in close to the desk and CRT monitor.
+ * 03. Works section: camera adjusts angle to frame the theatrical projector stage.
+ * 04. Skills & Expertise: camera tracks right towards the companion robot and bookshelf.
+ * 05. Certificates & Blog: elegant atmospheric vantage across the room.
+ * 06. Contact: camera centers on the lamp cord.
+ */
+const CAMERA_WAYPOINTS: CameraWaypoint[] = [
+  {
+    progress: 0.0,
+    pos: [0, 1.05, 5.8],
+    look: [0, 0.05, -1.0],
+    targetName: "ISOMETRIC OVERVIEW",
+  },
+  {
+    progress: 0.12,
+    pos: [-0.22, 0.28, 3.1],
+    look: [-0.18, -0.05, -1.0],
+    targetName: "DESK & CRT TERMINAL",
+  },
+  {
+    progress: 0.22,
+    pos: [-0.15, 0.35, 3.3],
+    look: [-0.12, -0.02, -1.0],
+    targetName: "PHILOSOPHY WORKSPACE",
+  },
+  {
+    progress: 0.36,
+    pos: [0.0, 0.65, 4.3],
+    look: [0.0, 0.22, -1.0],
+    targetName: "THEATRICAL PROJECTOR",
+  },
+  {
+    progress: 0.55,
+    pos: [0.0, 0.6, 4.3],
+    look: [0.0, 0.18, -1.0],
+    targetName: "PROJECTOR STAGE",
+  },
+  {
+    progress: 0.7,
+    pos: [0.45, 0.42, 3.7],
+    look: [0.15, 0.05, -1.0],
+    targetName: "COMPANION & ARCHITECTURE",
+  },
+  {
+    progress: 0.82,
+    pos: [-0.35, 0.58, 4.1],
+    look: [-0.05, 0.1, -1.0],
+    targetName: "CREDENTIAL VAULT",
+  },
+  {
+    progress: 0.92,
+    pos: [-0.1, 0.72, 4.6],
+    look: [0.0, 0.12, -1.0],
+    targetName: "EDITORIAL ARCHIVE",
+  },
+  {
+    progress: 1.0,
+    pos: [0, 0.85, 4.9],
+    look: [0, 0.1, -1.0],
+    targetName: "LAMP CONTROLS",
+  },
+];
+
+/**
+ * Procedural Theatrical 3D Isometric Room with Interactive Volumetric Spotlight Beam
+ * and Scroll-Driven Cinematic Camera Tracking.
  */
 export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomSceneProps) {
   const { viewport } = useThree();
@@ -34,6 +109,10 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
   const targetObjectRef = useRef<THREE.Object3D>(null);
   const dustRef = useRef<THREE.Points>(null);
   const wallWordRef = useRef<THREE.Mesh>(null);
+
+  // Smooth camera tracking refs
+  const currentCamPosRef = useRef(new THREE.Vector3(0, 1.05, 5.8));
+  const currentLookAtRef = useRef(new THREE.Vector3(0, 0.05, -1.0));
 
   // Position coordinates
   const lampPos = useMemo(() => new THREE.Vector3(0, 2.5, 0.4), []);
@@ -55,7 +134,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       side: THREE.DoubleSide,
       uniforms: {
         uColor: { value: new THREE.Color("#f4ddb8") },
-        uOpacity: { value: 0.22 },
+        uOpacity: { value: 0.24 },
         uTime: { value: 0 },
       },
       vertexShader: `
@@ -89,7 +168,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
   }, []);
 
   // Dust particles distributed in the 3D volume
-  const dustCount = 800;
+  const dustCount = 850;
   const [dustPositions, dustOffsets, dustSpeeds, dustColors] = useMemo(() => {
     const pos = new Float32Array(dustCount * 3);
     const offsets = new Float32Array(dustCount * 3);
@@ -101,9 +180,9 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
 
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
-      const x = (rng() - 0.5) * 4.5;
+      const x = (rng() - 0.5) * 4.8;
       const y = -1.2 + rng() * 3.8;
-      const z = -2.2 + rng() * 3.2;
+      const z = -2.2 + rng() * 3.6;
 
       pos[i3] = x;
       pos[i3 + 1] = y;
@@ -182,14 +261,65 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     }
   }, []);
 
-  // Render / Physics loop
+  // Render / Physics / Camera Choreography loop
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const pointer = pointerRef.current;
 
+    // ── 1. SCROLL-DRIVEN CINEMATIC CAMERA CHOREOGRAPHY ──
+    let scrollFrac = 0;
+    if (typeof window !== "undefined") {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      scrollFrac = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+    }
+
+    // Find bounding camera waypoints
+    let p1 = CAMERA_WAYPOINTS[0];
+    let p2 = CAMERA_WAYPOINTS[CAMERA_WAYPOINTS.length - 1];
+
+    for (let i = 0; i < CAMERA_WAYPOINTS.length - 1; i++) {
+      if (scrollFrac >= CAMERA_WAYPOINTS[i].progress && scrollFrac <= CAMERA_WAYPOINTS[i + 1].progress) {
+        p1 = CAMERA_WAYPOINTS[i];
+        p2 = CAMERA_WAYPOINTS[i + 1];
+        break;
+      }
+    }
+
+    const segRange = Math.max(0.0001, p2.progress - p1.progress);
+    const segFrac = Math.max(0, Math.min(1, (scrollFrac - p1.progress) / segRange));
+    // Smooth cosine easing for natural dolly movement
+    const ease = 0.5 - 0.5 * Math.cos(segFrac * Math.PI);
+
+    const targetPos = new THREE.Vector3(
+      THREE.MathUtils.lerp(p1.pos[0], p2.pos[0], ease),
+      THREE.MathUtils.lerp(p1.pos[1], p2.pos[1], ease),
+      THREE.MathUtils.lerp(p1.pos[2], p2.pos[2], ease)
+    );
+
+    const targetLook = new THREE.Vector3(
+      THREE.MathUtils.lerp(p1.look[0], p2.look[0], ease),
+      THREE.MathUtils.lerp(p1.look[1], p2.look[1], ease),
+      THREE.MathUtils.lerp(p1.look[2], p2.look[2], ease)
+    );
+
+    // Subtle interactive mouse parallax
+    targetPos.x += pointer.x * 0.16;
+    targetPos.y += pointer.y * 0.1;
+
+    // Smooth cinematic lerp (damping)
+    currentCamPosRef.current.lerp(targetPos, 0.05);
+    currentLookAtRef.current.lerp(targetLook, 0.05);
+
+    state.camera.position.copy(currentCamPosRef.current);
+    state.camera.lookAt(currentLookAtRef.current);
+
+    // ── 2. INTERACTIVE SPOTLIGHT AIMING ──
     // Pointer target aim: sweeps across desk and back wall
     const aimX = pointer.x * (viewport.width * 0.42);
-    const aimY = 0.2 + pointer.y * (viewport.height * 0.32);
+    // When zoomed close to desk, spotlight dips naturally towards desk surface
+    const isDeskClose = scrollFrac > 0.08 && scrollFrac < 0.32;
+    const baseAimY = isDeskClose ? -0.1 : 0.2;
+    const aimY = baseAimY + pointer.y * (viewport.height * 0.32);
     const aimZ = -1.8;
 
     // Lerp target position
@@ -266,14 +396,17 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       posAttr.needsUpdate = true;
     }
 
-    // Telemetry updates
-    if (onTelemetryUpdate && Math.random() < 0.1) {
-      onTelemetryUpdate({
-        x: Math.round(pointer.x * 100) / 100,
-        y: Math.round(pointer.y * 100) / 100,
-        focus: Math.round(Math.max(0, Math.min(100, (1 - Math.hypot(pointer.x, pointer.y)) * 100))),
-        target: "INTERACTIVE SPOTLIGHT",
-      });
+    // Telemetry broadcast (updates Hero HUD and coordinates)
+    const telemetryPayload = {
+      x: Math.round(pointer.x * 100) / 100,
+      y: Math.round(pointer.y * 100) / 100,
+      focus: Math.round(Math.max(0, Math.min(100, (1 - Math.hypot(pointer.x, pointer.y)) * 100))),
+      target: p1.targetName,
+    };
+
+    emitTelemetry(telemetryPayload);
+    if (onTelemetryUpdate) {
+      onTelemetryUpdate(telemetryPayload);
     }
   });
 

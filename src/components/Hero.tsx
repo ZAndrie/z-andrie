@@ -1,47 +1,27 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import TechParticles from "./TechParticles";
 import { whenRevealed } from "@/lib/preloader";
-
-// Lazy-load WebGL scene
-const WebGLHeroScene = dynamic(() => import("./hero/WebGLHeroScene"), {
-  ssr: false,
-  loading: () => null,
-});
-
-function subscribeReducedMotion(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mql.addEventListener("change", callback);
-  return () => mql.removeEventListener("change", callback);
-}
-
-function getReducedMotionSnapshot() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+import { subscribeTelemetry, TelemetryData } from "@/lib/telemetry";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
 
   // Real-time telemetry state from 3D stage
-  const [telemetry, setTelemetry] = useState({
+  const [telemetry, setTelemetry] = useState<TelemetryData>({
     x: 0,
     y: 0,
     focus: 0,
-    target: "ISOMETRIC DESK",
+    target: "ISOMETRIC OVERVIEW",
   });
 
-  const isReducedMotion = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    () => false
-  );
+  // Subscribe to live telemetry broadcast
+  useEffect(() => {
+    return subscribeTelemetry(setTelemetry);
+  }, []);
 
   // GSAP Entrance Animations
   useGSAP(() => {
@@ -71,15 +51,8 @@ export default function Hero() {
     <section
       ref={containerRef}
       id="home"
-      className="relative w-full min-h-[100vh] flex flex-col justify-between bg-[#070707] text-[#e7e5df] overflow-hidden pt-[90px] md:pt-[110px] pb-8 select-none"
+      className="relative w-full min-h-[100vh] flex flex-col justify-between bg-transparent text-[#e7e5df] overflow-hidden pt-[90px] md:pt-[110px] pb-8 select-none z-10"
     >
-      {/* 3D WebGL Room Scene with Overhead Spotlight and Floating Dust */}
-      {!isReducedMotion ? (
-        <WebGLHeroScene onTelemetryUpdate={setTelemetry} />
-      ) : (
-        <TechParticles />
-      )}
-
       {/* Main Diallo-Style Layout Container */}
       <div className="relative z-10 w-full max-w-[1500px] mx-auto px-6 md:px-12 flex-1 flex flex-col justify-between pointer-events-none">
         
@@ -92,7 +65,7 @@ export default function Hero() {
               Creative developer, freelance
             </span>
             <h1 className="text-[28px] sm:text-[34px] md:text-[40px] lg:text-[46px] font-normal leading-[1.12] tracking-[-0.01em] text-[#e7e5df] font-sans">
-              I build 3D websites, modern web apps and AI products for startups and agencies.
+              Crafting digital spaces that are intuitive, modern &amp; impactful.
             </h1>
           </div>
 
@@ -129,7 +102,7 @@ export default function Hero() {
               Hold the mouse for UV
             </span>
             <div className="flex items-center gap-1.5 text-[10px] text-[#a8a59d]/50 mt-1">
-              <span>Scroll</span>
+              <span>Scroll to explore</span>
               <svg className="w-3 h-3 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
@@ -147,9 +120,6 @@ export default function Hero() {
         </div>
 
       </div>
-
-      {/* Smooth Theatrical Atmospheric Gradient Transition into About */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#070707] to-transparent z-10" />
     </section>
   );
 }

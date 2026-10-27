@@ -129,17 +129,8 @@ export default function About() {
     <section
       ref={containerRef}
       id="about"
-      className="py-[90px] md:py-[120px] px-[5%] md:px-[8%] bg-[#070707] text-[#e7e5df] border-t border-[#232220] relative overflow-hidden select-none"
+      className="py-[90px] md:py-[120px] px-[5%] md:px-[8%] bg-[#070707]/60 backdrop-blur-[1px] text-[#e7e5df] border-t border-[#232220]/50 relative overflow-hidden select-none z-10"
     >
-      {/* Theatrical subtle ambient light glow in background */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-40"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 75% 20%, rgba(211, 107, 84, 0.1) 0%, transparent 55%), radial-gradient(circle at 20% 80%, rgba(244, 221, 184, 0.05) 0%, transparent 55%)",
-        }}
-      />
-
       <div className="max-w-[1400px] mx-auto relative z-10">
         
         {/* Section Header */}
@@ -167,7 +158,7 @@ export default function About() {
             </p>
 
             {/* GSAP Dynamic Counter Stats */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-[var(--color-border)]">
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-[#232220]">
               <div>
                 <p
                   ref={counter1Ref}
@@ -244,7 +235,7 @@ export default function About() {
           </div>
 
           {/* Right Column: Architectural Badges Card */}
-          <div className="gsap-about-card lg:col-span-5 bg-[#100f0d]/80 backdrop-blur-sm border border-[var(--color-border)] p-8 sm:p-10 rounded-sm shadow-sm flex flex-col gap-6 relative group">
+          <div className="gsap-about-card lg:col-span-5 bg-[#100f0d]/85 backdrop-blur-md border border-[var(--color-border)] p-8 sm:p-10 rounded-sm shadow-sm flex flex-col gap-6 relative group">
             {/* Viewfinder crosshairs */}
             <span className="absolute -top-1 -left-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
             <span className="absolute -top-1 -right-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>

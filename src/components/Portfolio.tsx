@@ -283,14 +283,14 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
       style={{
         height: `calc(100vh + ${scrollDistance}px)`,
       }}
-      className="relative w-full bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
+      className="relative w-full bg-transparent text-[#e7e5df] border-t border-[#232220]/50 select-none"
     >
       {/* ── THEATRICAL VIEWPORT STAGE (STICKY TOP-0 FOR NATIVE 60FPS COMPOSITING) ── */}
       <div
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707] z-20"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/60 backdrop-blur-[1px] z-20"
       >
         {/* Theatrical background atmosphere */}
         <div

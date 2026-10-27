@@ -5,6 +5,7 @@ import Expertise from "@/components/Expertise";
 import Certificates from "@/components/Certificates";
 import BlogSection from "@/components/BlogSection";
 import Contact from "@/components/Contact";
+import Global3DScene from "@/components/hero/Global3DScene";
 import {
   fetchGitHubProjects,
   fetchGitHubExpertise,
@@ -25,6 +26,7 @@ export default async function Home() {
 
   return (
     <>
+      <Global3DScene />
       <Hero />
       <About />
       <Portfolio projects={projects} />

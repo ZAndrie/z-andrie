@@ -158,7 +158,7 @@ export default function Contact() {
     <section
       ref={containerRef}
       id="contact"
-      className="pt-[90px] md:pt-[120px] pb-[50px] px-[5%] md:px-[8%] bg-[var(--color-dark-bg)] text-[var(--color-light-bg)] relative overflow-hidden"
+      className="pt-[90px] md:pt-[120px] pb-[50px] px-[5%] md:px-[8%] bg-[#070707]/70 backdrop-blur-[1px] text-[#e7e5df] border-t border-[#232220]/50 relative overflow-hidden z-10"
     >
       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row justify-between gap-[50px] lg:gap-[80px]">
         

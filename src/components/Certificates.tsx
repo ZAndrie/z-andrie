@@ -43,7 +43,7 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
   return (
     <section
       id="certificates"
-      className="relative w-full py-16 md:py-20 bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none overflow-hidden"
+      className="relative w-full py-16 md:py-20 bg-[#070707]/70 backdrop-blur-[1px] text-[#e7e5df] border-t border-[#232220]/50 select-none overflow-hidden z-10"
     >
       <div className="max-w-[1500px] mx-auto px-6 md:px-12 mb-6">
         {/* Header HUD */}
