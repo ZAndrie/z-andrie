@@ -118,7 +118,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-hidden relative`}>
+      <body className={`${inter.variable} ${playfair.variable} bg-[var(--color-light-bg)] text-[var(--color-text-dark)] font-sans antialiased flex flex-col min-h-[100dvh] overflow-x-clip relative`}>
         {/* Architectural Backdrop Grid (Driezie Blueprint) */}
         <div className="grid-backdrop pointer-events-none fixed inset-0 z-0 select-none overflow-hidden" aria-hidden="true">
           <div className="max-w-[1400px] h-full mx-auto px-[5%] md:px-[8%] relative">
@@ -138,7 +138,7 @@ export default function RootLayout({
         <CustomCursor />
         <ScrollProgress />
         <Navbar />
-        <main className="flex-1 flex flex-col w-full overflow-x-hidden relative z-10">
+        <main className="flex-1 flex flex-col w-full overflow-x-clip relative z-10">
           {children}
         </main>
         <Footer />

@@ -173,8 +173,9 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
       if (trig && window.innerWidth >= 768) {
         const start = trig.start;
         const end = trig.end;
-        const targetScroll = start + (clamped / Math.max(1, total - 1)) * (end - start);
-        scrollToTarget(targetScroll, { duration: 0.9 });
+        const targetProgress = (clamped + 0.5) / total;
+        const targetScroll = start + targetProgress * (end - start);
+        scrollToTarget(targetScroll, { duration: 0.8 });
       }
     },
     [total]
@@ -184,26 +185,39 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
   useGSAP(
     () => {
       const container = containerRef.current;
-      if (!container) return;
+      const stage = stageRef.current;
+      if (!container || !stage) return;
 
       const mm = gsap.matchMedia();
 
-      // Desktop & Tablet: Sticky Pinned Stage
+      // Desktop & Tablet: Sticky Pinned Stage with Scroll Scrubbing
       mm.add("(min-width: 768px)", () => {
+        // Calculate dynamic scrub height: gives user smooth control across each project
+        const scrollPerProject = Math.max(window.innerHeight * 0.65, 520);
+        const totalScrollDistance = Math.max(1, total - 1) * scrollPerProject;
+
         const trig = ScrollTrigger.create({
           trigger: container,
+          pin: stage,
+          pinSpacing: true,
           start: "top top",
-          end: "bottom bottom",
-          scrub: 0.6,
+          end: () => `+=${totalScrollDistance}`,
+          scrub: 0.4,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = self.progress;
             setScrollProgress(p);
+            // Evenly map scroll progress across all projects before unpinning
             const idx = Math.min(total - 1, Math.floor(p * total));
             setActiveIndex(idx);
           },
         });
 
         triggerRef.current = trig;
+
+        // Refresh ScrollTrigger to compute exact coordinates with Lenis
+        ScrollTrigger.refresh();
 
         return () => {
           trig.kill();
@@ -284,17 +298,13 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
       id="works"
       ref={containerRef}
       className="relative w-full bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
-      style={{
-        // Desktop height expands to allow scrubbing through all projects
-        minHeight: `${Math.max(2, total) * 80}vh`,
-      }}
     >
-      {/* ── STICKY VIEWPORT STAGE ── */}
+      {/* ── THEATRICAL VIEWPORT STAGE (PINNED VIA GSAP) ── */}
       <div
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]"
+        className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]"
       >
         {/* Subtle theatrical background atmosphere */}
         <div
