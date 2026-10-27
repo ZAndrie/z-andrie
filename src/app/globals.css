@@ -3,14 +3,24 @@
 @theme {
   --color-primary: #d36b54;
   --color-secondary: #b5543f;
-  --color-dark-bg: #1c1c1c;
-  --color-light-bg: #f5f2eb;
-  --color-text-dark: #1c1c1c;
-  --color-text-light: #6a6760;
-  --color-border: #e8e4db;
+  --color-dark-bg: #070707;
+  --color-light-bg: #070707;
+  --color-text-dark: #e7e5df;
+  --color-text-light: #a8a59d;
+  --color-border: #232220;
   
   --font-sans: var(--font-inter), sans-serif;
   --font-serif: var(--font-playfair), serif;
+  --font-stencil: 'Big Shoulders Stencil', 'Arial Narrow', Impact, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.font-stencil {
+  font-family: 'Big Shoulders Stencil', 'Arial Narrow', Impact, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 html {

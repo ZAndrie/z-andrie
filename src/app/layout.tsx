@@ -62,6 +62,9 @@ export default function RootLayout({
         <noscript>
           <style>{`.site-preloader{display:none!important}html{overflow:auto!important}`}</style>
         </noscript>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         
         {/* Google Analytics Placeholder - Replace G-XXXXXXXXXX with your actual Measurement ID when ready */}
