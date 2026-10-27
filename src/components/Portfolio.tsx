@@ -162,18 +162,20 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
 
   const activeProject = items[activeIndex] || items[0];
 
+  // Dynamic scrub distance: smooth scroll distance per project
+  const scrollDistance = Math.max(1, total - 1) * 580;
+
   // Programmatic jump to a specific project
   const goToProject = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(total - 1, index));
       setActiveIndex(clamped);
 
-      // On desktop with ScrollTrigger pin, scroll to matching scroll position
       const trig = triggerRef.current;
-      if (trig && window.innerWidth >= 768) {
+      if (trig) {
         const start = trig.start;
         const end = trig.end;
-        const targetProgress = (clamped + 0.5) / total;
+        const targetProgress = clamped / Math.max(1, total - 1);
         const targetScroll = start + targetProgress * (end - start);
         scrollToTarget(targetScroll, { duration: 0.8 });
       }
@@ -181,51 +183,33 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
     [total]
   );
 
-  // GSAP ScrollTrigger Pinned Scrub
+  // Native CSS Sticky + GSAP ScrollTrigger Scrub (No DOM pin-spacer warping)
   useGSAP(
     () => {
       const container = containerRef.current;
-      const stage = stageRef.current;
-      if (!container || !stage) return;
+      if (!container) return;
 
-      const mm = gsap.matchMedia();
-
-      // Desktop & Tablet: Sticky Pinned Stage with Scroll Scrubbing
-      mm.add("(min-width: 768px)", () => {
-        // Calculate dynamic scrub height: gives user smooth control across each project
-        const scrollPerProject = Math.max(window.innerHeight * 0.65, 520);
-        const totalScrollDistance = Math.max(1, total - 1) * scrollPerProject;
-
-        const trig = ScrollTrigger.create({
-          trigger: container,
-          pin: stage,
-          pinSpacing: true,
-          start: "top top",
-          end: () => `+=${totalScrollDistance}`,
-          scrub: 0.4,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const p = self.progress;
-            setScrollProgress(p);
-            // Evenly map scroll progress across all projects before unpinning
-            const idx = Math.min(total - 1, Math.floor(p * total));
-            setActiveIndex(idx);
-          },
-        });
-
-        triggerRef.current = trig;
-
-        // Refresh ScrollTrigger to compute exact coordinates with Lenis
-        ScrollTrigger.refresh();
-
-        return () => {
-          trig.kill();
-          triggerRef.current = null;
-        };
+      const trig = ScrollTrigger.create({
+        trigger: container,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 0.2,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const p = self.progress;
+          setScrollProgress(p);
+          const idx = Math.min(total - 1, Math.floor(p * total));
+          setActiveIndex(idx);
+        },
       });
 
-      return () => mm.revert();
+      triggerRef.current = trig;
+      ScrollTrigger.refresh();
+
+      return () => {
+        trig.kill();
+        triggerRef.current = null;
+      };
     },
     { scope: containerRef, dependencies: [total] }
   );
@@ -233,7 +217,6 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
   // Keyboard Navigation: ArrowUp / ArrowDown / ArrowLeft / ArrowRight
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only capture if container is in viewport
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
@@ -297,20 +280,23 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
     <section
       id="works"
       ref={containerRef}
+      style={{
+        height: `calc(100vh + ${scrollDistance}px)`,
+      }}
       className="relative w-full bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
     >
-      {/* ── THEATRICAL VIEWPORT STAGE (PINNED VIA GSAP) ── */}
+      {/* ── THEATRICAL VIEWPORT STAGE (STICKY TOP-0 FOR NATIVE 60FPS COMPOSITING) ── */}
       <div
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707] z-20"
       >
-        {/* Subtle theatrical background atmosphere */}
+        {/* Theatrical background atmosphere */}
         <div
           className="absolute inset-0 pointer-events-none opacity-40"
           style={{
-            backgroundImage: `radial-gradient(circle at 50% 30%, rgba(244, 221, 184, 0.08) 0%, rgba(7, 7, 7, 0.95) 70%)`,
+            backgroundImage: `radial-gradient(circle at 50% 25%, rgba(244, 221, 184, 0.1) 0%, rgba(7, 7, 7, 0.98) 75%)`,
           }}
         />
 
@@ -321,8 +307,8 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
           <div className="md:col-span-4 lg:col-span-4 flex flex-col justify-between h-full py-2 max-w-[480px]">
             {/* Top: Section Tag, Odometer & Controls */}
             <div>
-              <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#888] mb-1">
-                Work
+              <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#d36b54] mb-1 font-bold">
+                [ 02 // SELECTED WORKS ]
               </span>
 
               <div className="flex items-baseline gap-3">
@@ -338,7 +324,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                     onClick={() => goToProject(activeIndex - 1)}
                     disabled={activeIndex === 0}
                     aria-label="Previous project"
-                    className="w-6 h-6 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[11px] font-mono"
+                    className="w-7 h-7 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[12px] font-mono cursor-pointer"
                   >
                     ↑
                   </button>
@@ -347,7 +333,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                     onClick={() => goToProject(activeIndex + 1)}
                     disabled={activeIndex === total - 1}
                     aria-label="Next project"
-                    className="w-6 h-6 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[11px] font-mono"
+                    className="w-7 h-7 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[12px] font-mono cursor-pointer"
                   >
                     ↓
                   </button>
@@ -362,21 +348,21 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                   {activeProject.category?.toLowerCase() || "website"}
                 </span>
                 <span className="px-2 py-0.5 rounded-sm border border-[#2e2e2e] bg-[#141414] text-[#f4ddb8] text-[9px] font-mono uppercase tracking-widest">
-                  Showcase
+                  Live Showcase
                 </span>
               </div>
 
               {/* Massive Stencil Title with animated transition */}
               <h2
                 key={`title-${activeProject.id}`}
-                className="font-stencil text-[36px] sm:text-[48px] md:text-[56px] lg:text-[68px] font-black uppercase text-[#e7e5df] leading-[0.92] tracking-tight transition-opacity duration-300"
+                className="font-stencil text-[36px] sm:text-[48px] md:text-[56px] lg:text-[68px] font-black uppercase text-[#e7e5df] leading-[0.92] tracking-tight transition-all duration-300"
               >
                 {activeProject.title}
               </h2>
 
               <p
                 key={`desc-${activeProject.id}`}
-                className="text-[13px] sm:text-[14px] text-[#a8a59d] font-sans leading-relaxed mt-4 line-clamp-3 sm:line-clamp-4 max-w-[420px] transition-opacity duration-300"
+                className="text-[13px] sm:text-[14px] text-[#a8a59d] font-sans leading-relaxed mt-4 line-clamp-3 sm:line-clamp-4 max-w-[420px] transition-all duration-300"
               >
                 {activeProject.subtitle}
               </p>
@@ -466,7 +452,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                     alt={activeProject.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 540px"
-                    className="object-cover filter contrast-[1.05] brightness-[0.9] saturate-[0.85] transition-all duration-700 group-hover:scale-105"
+                    className="object-cover filter contrast-[1.05] brightness-[0.9] saturate-[0.85] transition-all duration-500 group-hover:scale-105"
                     onError={() =>
                       setImgErrorMap((prev) => ({ ...prev, [activeProject.id]: true }))
                     }
@@ -479,7 +465,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 text-center pointer-events-none">
                 <span
                   key={`proj-title-${activeProject.id}`}
-                  className="font-stencil text-[36px] sm:text-[46px] md:text-[54px] lg:text-[62px] font-black uppercase text-[#f4ddb8] drop-shadow-[0_0_25px_rgba(244,221,184,0.55)] tracking-wide leading-tight transition-opacity duration-500"
+                  className="font-stencil text-[36px] sm:text-[46px] md:text-[54px] lg:text-[62px] font-black uppercase text-[#f4ddb8] drop-shadow-[0_0_25px_rgba(244,221,184,0.55)] tracking-wide leading-tight transition-all duration-300"
                 >
                   {activeProject.title}
                 </span>
@@ -551,7 +537,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                       <button
                         type="button"
                         onClick={() => goToProject(idx)}
-                        className={`w-full text-left font-mono text-[12px] lg:text-[13px] py-1.5 px-2 rounded-sm transition-all duration-200 flex items-center justify-between group ${
+                        className={`w-full text-left font-mono text-[12px] lg:text-[13px] py-1.5 px-2 rounded-sm transition-all duration-200 flex items-center justify-between group cursor-pointer ${
                           isActive
                             ? "text-[#e7e5df] font-bold bg-[#141414] border-l-2 border-[#d36b54]"
                             : "text-[#555] hover:text-[#bbb] hover:bg-[#0e0e0e]"

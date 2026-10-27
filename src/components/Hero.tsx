@@ -147,6 +147,9 @@ export default function Hero() {
         </div>
 
       </div>
+
+      {/* Smooth Theatrical Atmospheric Gradient Transition into About */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#070707] to-transparent z-10" />
     </section>
   );
 }

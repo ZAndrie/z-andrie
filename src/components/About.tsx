@@ -19,99 +19,137 @@ export default function About() {
   const btn1Ref = useRef<HTMLAnchorElement>(null);
   const btn2Ref = useRef<HTMLAnchorElement>(null);
 
-  useGSAP(() => {
-    // 1. Staggered Entrance Animation on Scroll
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-    });
+  useGSAP(
+    () => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    tl.from(".gsap-about-header", {
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power3.out",
-    })
-    .from(".gsap-about-bio", {
-      opacity: 0,
-      x: -30,
-      duration: 0.8,
-      ease: "power3.out",
-    }, "-=0.4")
-    .from(".gsap-about-card", {
-      opacity: 0,
-      x: 30,
-      duration: 0.8,
-      ease: "power3.out",
-    }, "-=0.6");
-
-    // 2. Animated Stats Counter (GSAP Tweening)
-    const statsObj = { c1: 0, c2: 0, c3: 0 };
-
-    ScrollTrigger.create({
-      trigger: counter1Ref.current,
-      start: "top 85%",
-      once: true,
-      onEnter: () => {
-        gsap.to(statsObj, {
-          c1: 1,
-          c2: 10,
-          c3: 100,
-          duration: 2,
-          ease: "power2.out",
-          onUpdate: () => {
-            if (counter1Ref.current) counter1Ref.current.innerText = Math.round(statsObj.c1).toString();
-            if (counter2Ref.current) counter2Ref.current.innerText = `${Math.round(statsObj.c2)}+`;
-            if (counter3Ref.current) counter3Ref.current.innerText = `${Math.round(statsObj.c3)}%`;
+      // 1. Staggered Entrance Animation on Scroll (once: true guarantees elements never get stuck at opacity 0)
+      gsap.fromTo(
+        ".gsap-about-header",
+        { opacity: 0, y: 25 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: container,
+            start: "top 85%",
+            once: true,
           },
-        });
-      },
-    });
+        }
+      );
 
-    // 3. Magnetic Hover Physics on Action Buttons (Desktop pointer only)
-    [btn1Ref.current, btn2Ref.current].forEach((btn) => {
-      if (!btn || !window.matchMedia("(hover: hover)").matches) return;
+      gsap.fromTo(
+        ".gsap-about-bio",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: container,
+            start: "top 80%",
+            once: true,
+          },
+        }
+      );
 
-      const xTo = gsap.quickTo(btn, "x", { duration: 0.4, ease: "power2.out" });
-      const yTo = gsap.quickTo(btn, "y", { duration: 0.4, ease: "power2.out" });
+      gsap.fromTo(
+        ".gsap-about-card",
+        { opacity: 0, y: 25 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: container,
+            start: "top 80%",
+            once: true,
+          },
+        }
+      );
 
-      const onMouseMove = (e: MouseEvent) => {
-        const rect = btn.getBoundingClientRect();
-        const relX = e.clientX - (rect.left + rect.width / 2);
-        const relY = e.clientY - (rect.top + rect.height / 2);
-        xTo(relX * 0.35);
-        yTo(relY * 0.35);
-      };
+      // 2. Animated Stats Counter (GSAP Tweening)
+      const statsObj = { c1: 0, c2: 0, c3: 0 };
 
-      const onMouseLeave = () => {
-        xTo(0);
-        yTo(0);
-      };
+      ScrollTrigger.create({
+        trigger: counter1Ref.current,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          gsap.to(statsObj, {
+            c1: 1,
+            c2: 10,
+            c3: 100,
+            duration: 1.8,
+            ease: "power2.out",
+            onUpdate: () => {
+              if (counter1Ref.current) counter1Ref.current.innerText = Math.round(statsObj.c1).toString();
+              if (counter2Ref.current) counter2Ref.current.innerText = `${Math.round(statsObj.c2)}+`;
+              if (counter3Ref.current) counter3Ref.current.innerText = `${Math.round(statsObj.c3)}%`;
+            },
+          });
+        },
+      });
 
-      btn.addEventListener("mousemove", onMouseMove);
-      btn.addEventListener("mouseleave", onMouseLeave);
-    });
-  }, { scope: containerRef });
+      // 3. Magnetic Hover Physics on Action Buttons (Desktop pointer only)
+      [btn1Ref.current, btn2Ref.current].forEach((btn) => {
+        if (!btn || !window.matchMedia("(hover: hover)").matches) return;
+
+        const xTo = gsap.quickTo(btn, "x", { duration: 0.4, ease: "power2.out" });
+        const yTo = gsap.quickTo(btn, "y", { duration: 0.4, ease: "power2.out" });
+
+        const onMouseMove = (e: MouseEvent) => {
+          const rect = btn.getBoundingClientRect();
+          const relX = e.clientX - (rect.left + rect.width / 2);
+          const relY = e.clientY - (rect.top + rect.height / 2);
+          xTo(relX * 0.35);
+          yTo(relY * 0.35);
+        };
+
+        const onMouseLeave = () => {
+          xTo(0);
+          yTo(0);
+        };
+
+        btn.addEventListener("mousemove", onMouseMove);
+        btn.addEventListener("mouseleave", onMouseLeave);
+      });
+    },
+    { scope: containerRef }
+  );
 
   return (
     <section
       ref={containerRef}
       id="about"
-      className="py-[90px] md:py-[120px] px-[5%] md:px-[8%] bg-[var(--color-light-bg)] border-t border-[var(--color-border)] relative overflow-hidden"
+      className="py-[90px] md:py-[120px] px-[5%] md:px-[8%] bg-[#070707] text-[#e7e5df] border-t border-[#232220] relative overflow-hidden select-none"
     >
-      <div className="max-w-[1400px] mx-auto">
+      {/* Theatrical subtle ambient light glow in background */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 75% 20%, rgba(211, 107, 84, 0.1) 0%, transparent 55%), radial-gradient(circle at 20% 80%, rgba(244, 221, 184, 0.05) 0%, transparent 55%)",
+        }}
+      />
+
+      <div className="max-w-[1400px] mx-auto relative z-10">
         
         {/* Section Header */}
         <div className="gsap-about-header mb-[50px] md:mb-[70px]">
-          <p className="text-[var(--color-primary)] text-[12px] uppercase tracking-[3px] font-bold mb-[12px] flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
-            BIOGRAPHY &amp; PHILOSOPHY
+          <p className="text-[var(--color-primary)] text-[12px] uppercase tracking-[3px] font-mono font-bold mb-[12px] flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+            [ 00 // BIOGRAPHY &amp; PHILOSOPHY ]
           </p>
-          <h2 className="text-[36px] sm:text-[46px] md:text-[60px] font-serif uppercase text-[var(--color-text-dark)] leading-[1.05]">
-            About <span className="text-[var(--color-primary)] italic">Me</span>
+          <h2 className="text-[36px] sm:text-[46px] md:text-[60px] font-stencil uppercase text-[var(--color-text-dark)] leading-[1.02] tracking-tight">
+            About <span className="text-[var(--color-primary)]">Me</span>
           </h2>
         </div>
 
@@ -120,7 +158,7 @@ export default function About() {
           
           {/* Left Column: 1-2 Paragraph Bio */}
           <div className="gsap-about-bio lg:col-span-7 flex flex-col gap-6">
-            <p className="text-[17px] md:text-[19px] text-[var(--color-text-dark)] leading-[1.8] font-serif font-normal">
+            <p className="text-[17px] md:text-[19px] text-[var(--color-text-dark)] leading-[1.8] font-sans font-normal">
               I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and an aspiring full-stack developer based in the <strong className="font-semibold">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
             </p>
 
@@ -133,7 +171,7 @@ export default function About() {
               <div>
                 <p
                   ref={counter1Ref}
-                  className="text-[28px] sm:text-[36px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums"
+                  className="text-[28px] sm:text-[36px] font-stencil font-bold text-[var(--color-primary)] leading-none tabular-nums"
                 >
                   1
                 </p>
@@ -144,7 +182,7 @@ export default function About() {
               <div>
                 <p
                   ref={counter2Ref}
-                  className="text-[28px] sm:text-[36px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums"
+                  className="text-[28px] sm:text-[36px] font-stencil font-bold text-[var(--color-primary)] leading-none tabular-nums"
                 >
                   10+
                 </p>
@@ -155,7 +193,7 @@ export default function About() {
               <div>
                 <p
                   ref={counter3Ref}
-                  className="text-[28px] sm:text-[36px] font-serif font-bold text-[var(--color-primary)] leading-none tabular-nums"
+                  className="text-[28px] sm:text-[36px] font-stencil font-bold text-[var(--color-primary)] leading-none tabular-nums"
                 >
                   100%
                 </p>
@@ -171,7 +209,7 @@ export default function About() {
                 ref={btn1Ref}
                 href="/#works"
                 data-magnetic
-                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
+                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2 font-mono"
               >
                 <span className="roll">
                   <span className="roll__inner">
@@ -189,7 +227,7 @@ export default function About() {
                 ref={btn2Ref}
                 href="/#contact"
                 data-magnetic
-                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2"
+                className="group text-[11px] font-bold uppercase tracking-[2px] text-[var(--color-text-dark)] hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-2 font-mono"
               >
                 <span className="roll">
                   <span className="roll__inner">
@@ -214,10 +252,10 @@ export default function About() {
             <span className="absolute -bottom-1 -right-1 text-[12px] font-mono text-[var(--color-primary)] font-bold">+</span>
 
             <div>
-              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-bold mb-2">
+              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-mono font-bold mb-2">
                 LOCATION
               </p>
-              <h3 className="text-[20px] font-serif text-[var(--color-text-dark)] flex items-center gap-2">
+              <h3 className="text-[20px] font-stencil uppercase text-[var(--color-text-dark)] flex items-center gap-2">
                 <span>📍</span> Philippines
               </h3>
             </div>
@@ -225,14 +263,14 @@ export default function About() {
             <div className="h-[1px] bg-[var(--color-border)]" />
 
             <div>
-              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-bold mb-2">
+              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-mono font-bold mb-2">
                 CURRENT FOCUS &amp; LEARNING
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
                 {["React & Next.js", "PHP", "Tailwind CSS", "TypeScript", "UI/UX Design", "Laravel", "Cybersecurity"].map((skill) => (
                   <span
                     key={skill}
-                    className="text-[11px] font-mono px-3 py-1 rounded-sm bg-[var(--color-light-bg)] border border-[var(--color-border)] text-[var(--color-text-dark)] font-medium hover:border-[var(--color-primary)] transition-colors"
+                    className="text-[11px] font-mono px-3 py-1 rounded-sm bg-[#161513] border border-[var(--color-border)] text-[var(--color-text-dark)] font-medium hover:border-[var(--color-primary)] transition-colors"
                   >
                     {skill}
                   </span>
@@ -243,7 +281,7 @@ export default function About() {
             <div className="h-[1px] bg-[var(--color-border)]" />
 
             <div>
-              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-bold mb-2">
+              <p className="text-[11px] uppercase tracking-[2px] text-[var(--color-primary)] font-mono font-bold mb-2">
                 CORE DISCIPLINES
               </p>
               <p className="text-[13px] text-[var(--color-text-light)] leading-relaxed">

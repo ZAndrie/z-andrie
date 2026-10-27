@@ -200,6 +200,8 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
   const activeMilestone = milestones[activeMilestoneIndex] || milestones[0];
   const isEducation = activeMilestone.category === "education";
 
+  const scrollDistance = Math.max(1, totalMilestones - 1) * 540;
+
   // Jump smoothly to a specific milestone
   const goToMilestone = useCallback(
     (index: number) => {
@@ -207,10 +209,10 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       setActiveMilestoneIndex(clamped);
 
       const trig = triggerRef.current;
-      if (trig && window.innerWidth >= 768) {
+      if (trig) {
         const start = trig.start;
         const end = trig.end;
-        const targetProgress = (clamped + 0.5) / totalMilestones;
+        const targetProgress = clamped / Math.max(1, totalMilestones - 1);
         const targetScroll = start + targetProgress * (end - start);
         scrollToTarget(targetScroll, { duration: 0.8 });
       }
@@ -218,45 +220,33 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     [totalMilestones]
   );
 
-  // GSAP ScrollTrigger Pinned Scrub for Trajectory Showcase
+  // Native CSS Sticky + GSAP ScrollTrigger Scrub for Trajectory Showcase
   useGSAP(
     () => {
       const container = pathContainerRef.current;
-      const stage = pathStageRef.current;
-      if (!container || !stage) return;
+      if (!container) return;
 
-      const mm = gsap.matchMedia();
-
-      mm.add("(min-width: 768px)", () => {
-        const scrollDistance = Math.max(1, totalMilestones - 1) * Math.max(window.innerHeight * 0.7, 540);
-
-        const trig = ScrollTrigger.create({
-          trigger: container,
-          pin: stage,
-          pinSpacing: true,
-          start: "top top",
-          end: () => `+=${scrollDistance}`,
-          scrub: 0.4,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const p = self.progress;
-            setTimelineProgress(p);
-            const idx = Math.min(totalMilestones - 1, Math.floor(p * totalMilestones));
-            setActiveMilestoneIndex(idx);
-          },
-        });
-
-        triggerRef.current = trig;
-        ScrollTrigger.refresh();
-
-        return () => {
-          trig.kill();
-          triggerRef.current = null;
-        };
+      const trig = ScrollTrigger.create({
+        trigger: container,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 0.2,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const p = self.progress;
+          setTimelineProgress(p);
+          const idx = Math.min(totalMilestones - 1, Math.floor(p * totalMilestones));
+          setActiveMilestoneIndex(idx);
+        },
       });
 
-      return () => mm.revert();
+      triggerRef.current = trig;
+      ScrollTrigger.refresh();
+
+      return () => {
+        trig.kill();
+        triggerRef.current = null;
+      };
     },
     { scope: pathContainerRef, dependencies: [totalMilestones] }
   );
@@ -387,12 +377,15 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       <section
         id="expertise"
         ref={pathContainerRef}
+        style={{
+          height: `calc(100vh + ${scrollDistance}px)`,
+        }}
         className="relative w-full bg-[#070707] text-[#e7e5df] border-t border-[#232220] select-none"
       >
-        {/* ── PINNED THEATRICAL STAGE ── */}
+        {/* ── THEATRICAL STAGE (STICKY TOP-0) ── */}
         <div
           ref={pathStageRef}
-          className="relative h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]"
+          className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707] z-20"
         >
           {/* Subtle theatrical background atmosphere */}
           <div

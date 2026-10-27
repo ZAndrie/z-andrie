@@ -6,6 +6,7 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { setLenis, getLenis } from "@/lib/smoothScroll";
+import { PRELOADER_DONE_EVENT } from "@/lib/preloader";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,7 +43,20 @@ export default function SmoothScroll() {
     };
     document.addEventListener("visibilitychange", onVisibility);
 
+    // Recompute scroll coordinates on preloader completion and viewport resize
+    const onPreloaderDone = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener(PRELOADER_DONE_EVENT, onPreloaderDone);
+
+    const onResize = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("resize", onResize);
+
     return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener(PRELOADER_DONE_EVENT, onPreloaderDone);
       document.removeEventListener("visibilitychange", onVisibility);
       gsap.ticker.remove(tick);
       lenis.off("scroll", ScrollTrigger.update);

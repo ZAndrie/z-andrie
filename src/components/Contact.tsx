@@ -23,7 +23,7 @@ export default function Contact() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top 75%",
-        toggleActions: "play none none reverse",
+        once: true,
       },
     });
 
@@ -144,7 +144,7 @@ export default function Contact() {
         setSubmitStatus("error");
         setErrorMessage("Failed to send message. Please try again.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Network error:", error);
       setSubmitStatus("error");
       setErrorMessage("Network error. Please try again.");

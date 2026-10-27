@@ -3,20 +3,41 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { scrollToTarget } from "@/lib/smoothScroll";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [soundActive, setSoundActive] = useState(true);
   const [uvActive, setUvActive] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const pathname = usePathname();
 
+  // Scroll detection & active section spy
   useEffect(() => {
+    const sectionIds = ["home", "about", "works", "skills", "expertise", "certificates", "blog", "contact"];
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
+
+      // Determine active section by measuring distance from viewport top
+      const scrollPos = window.scrollY + 200;
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const id = sectionIds[i];
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPos >= top) {
+            // Map "skills" to "expertise" in nav
+            setActiveSection(id === "skills" ? "expertise" : id);
+            break;
+          }
+        }
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -26,14 +47,28 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { name: "HOME", href: "/#home" },
-    { name: "ABOUT", href: "/#about" },
-    { name: "WORKS", href: "/#works" },
-    { name: "EXPERTISE", href: "/#expertise" },
-    { name: "CERTIFICATES", href: "/#certificates" },
-    { name: "BLOG", href: "/#blog" },
-    { name: "CONTACT", href: "/#contact" },
+    { id: "home", name: "HOME", href: "/#home" },
+    { id: "about", name: "ABOUT", href: "/#about" },
+    { id: "works", name: "WORKS", href: "/#works" },
+    { id: "expertise", name: "EXPERTISE", href: "/#expertise" },
+    { id: "certificates", name: "CERTIFICATES", href: "/#certificates" },
+    { id: "blog", name: "BLOG", href: "/#blog" },
+    { id: "contact", name: "CONTACT", href: "/#contact" },
   ];
+
+  // Intercept anchor clicks for smooth Lenis glide
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
+    setMobileMenuOpen(false);
+
+    if (pathname === "/") {
+      e.preventDefault();
+      const el = document.getElementById(link.id);
+      if (el) {
+        scrollToTarget(el, { duration: 1.2 });
+        history.pushState(null, "", link.href);
+      }
+    }
+  };
 
   return (
     <nav
@@ -47,9 +82,9 @@ export default function Navbar() {
         
         {/* Left: Diallo-style Text Brand & Stencil Role */}
         <Link
-          href="/"
-          onClick={() => setMobileMenuOpen(false)}
-          className="group flex flex-col text-left"
+          href="/#home"
+          onClick={(e) => handleNavClick(e, navLinks[0])}
+          className="group flex flex-col text-left cursor-pointer"
           title="Z Andrie – Creative Developer"
         >
           <span className="text-[20px] md:text-[22px] font-bold tracking-[1.5px] uppercase text-[#e7e5df] font-stencil group-hover:text-[var(--color-primary)] transition-colors duration-200">
@@ -67,18 +102,21 @@ export default function Navbar() {
           `}
         >
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === "/" ? activeSection === link.id : pathname === link.href;
             return (
               <li key={link.name}>
                 <Link
                   href={link.href}
                   prefetch={true}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`group relative text-[11px] md:text-[12px] tracking-[2px] uppercase font-mono transition-colors duration-200 hover:text-[var(--color-primary)] ${
-                    isActive ? "text-[var(--color-primary)] font-semibold" : "text-[#e7e5df]/90"
+                  onClick={(e) => handleNavClick(e, link)}
+                  className={`group relative text-[11px] md:text-[12px] tracking-[2px] uppercase font-mono transition-colors duration-200 py-1 hover:text-[var(--color-primary)] cursor-pointer ${
+                    isActive ? "text-[var(--color-primary)] font-bold" : "text-[#e7e5df]/80"
                   }`}
                 >
                   {link.name}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)] rounded-full" />
+                  )}
                 </Link>
               </li>
             );
