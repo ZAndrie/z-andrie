@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo, useCallback, useSyncExternalStore } from "react";
+import React, { useRef, useMemo, useCallback } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import RoomScene3D from "./RoomScene3D";
@@ -9,26 +9,14 @@ interface WebGLHeroSceneProps {
   onTelemetryUpdate?: (data: { x: number; y: number; focus: number; target: string }) => void;
 }
 
-// Helpers for checking WebGL capability
-function checkWebGLSupport(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 /**
- * Main WebGL Hero Canvas Container with Performance Optimization & Graceful Fallback.
+ * Main WebGL Hero Canvas Container with Interactive Spotlight and Stable Persistence.
  */
 export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pointerRef = useRef({ x: 0, y: 0, active: false });
-  const [isVisible, setIsVisible] = useState<boolean>(true);
 
-  // Compute performance settings safely
+  // Safe DPR computation
   const dpr = useMemo(() => {
     if (typeof window === "undefined") return 1;
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,33 +32,7 @@ export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProp
     return !isNaN(dprParam) ? dprParam : isLowPower ? Math.min(baseDpr, 1.1) : baseDpr;
   }, []);
 
-  const hasWebGL = useSyncExternalStore(
-    () => () => {},
-    () => checkWebGLSupport(),
-    () => true
-  );
-
-  // Pause rendering when tab is hidden or offscreen
-  useEffect(() => {
-    const handleVisibility = () => {
-      setIsVisible(!document.hidden);
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsVisible(entry.isIntersecting);
-    });
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
-      observer.disconnect();
-    };
-  }, []);
-
-  // Pointer tracking
+  // Pointer tracking across the entire screen
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -82,10 +44,6 @@ export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProp
     pointerRef.current = { x: 0, y: 0, active: false };
   }, []);
 
-  if (!hasWebGL) {
-    return null; // Graceful fallback
-  }
-
   return (
     <div
       ref={containerRef}
@@ -94,29 +52,23 @@ export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProp
       className="absolute inset-0 w-full h-full pointer-events-auto z-0 select-none overflow-hidden"
       aria-hidden="true"
     >
-      {isVisible && (
-        <Canvas
-          shadows
-          dpr={dpr}
-          camera={{ position: [0, 0.8, 6.2], fov: 36, near: 0.1, far: 30 }}
-          gl={{
-            antialias: true,
-            powerPreference: "high-performance",
-            stencil: false,
-            depth: true,
-          }}
-          onCreated={({ gl }) => {
-            gl.toneMapping = THREE.ACESFilmicToneMapping;
-            gl.toneMappingExposure = 1.1;
-            gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
-          }}
-        >
-          <RoomScene3D
-            pointerRef={pointerRef}
-            onTelemetryUpdate={onTelemetryUpdate}
-          />
-        </Canvas>
-      )}
+      <Canvas
+        dpr={dpr}
+        camera={{ position: [0, 1.0, 5.8], fov: 38, near: 0.1, far: 30 }}
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+        }}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.2;
+          gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
+        }}
+      >
+        <RoomScene3D pointerRef={pointerRef} onTelemetryUpdate={onTelemetryUpdate} />
+      </Canvas>
     </div>
   );
 }

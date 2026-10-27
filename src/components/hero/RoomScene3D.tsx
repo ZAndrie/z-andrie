@@ -20,44 +20,106 @@ function mulberry32(a: number) {
 }
 
 /**
- * Procedural Vintage 3D Desk Setup (Retro Computer, Chair, Bookshelf, Lamp, Dust).
+ * Procedural Theatrical 3D Isometric Room with Interactive Volumetric Spotlight Beam.
  */
 export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomSceneProps) {
   const { viewport } = useThree();
 
-  // Refs for moving components
-  const lampGroupRef = useRef<THREE.Group>(null);
+  // Primary animation and lighting refs
+  const lampAssemblyRef = useRef<THREE.Group>(null);
+  const lampCordRef = useRef<THREE.Mesh>(null);
+  const beamMeshRef = useRef<THREE.Mesh>(null);
   const spotLightRef = useRef<THREE.SpotLight>(null);
+  const poolLightRef = useRef<THREE.PointLight>(null);
   const targetObjectRef = useRef<THREE.Object3D>(null);
   const dustRef = useRef<THREE.Points>(null);
-  const screenTextRef = useRef<THREE.Mesh>(null);
   const wallWordRef = useRef<THREE.Mesh>(null);
 
-  // Stable dust motes inside the spotlight cone
-  const dustCount = 1200;
-  const [dustPositions, dustSpeeds, dustOffsets] = useMemo(() => {
+  // Position coordinates
+  const lampPos = useMemo(() => new THREE.Vector3(0, 2.5, 0.4), []);
+
+  // Geometry for the volumetric conical beam (open-ended cylinder with apex at origin)
+  const beamGeometry = useMemo(() => {
+    const geo = new THREE.CylinderGeometry(0.04, 1.0, 1.0, 48, 1, true);
+    geo.translate(0, 0.5, 0); // origin at top
+    geo.rotateX(Math.PI / 2); // along +Z
+    return geo;
+  }, []);
+
+  // Volumetric beam shader material
+  const beamMaterial = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uColor: { value: new THREE.Color("#f4ddb8") },
+        uOpacity: { value: 0.22 },
+        uTime: { value: 0 },
+      },
+      vertexShader: `
+        varying float vAxial;
+        varying vec3 vNormalV;
+        varying vec3 vViewPos;
+        void main() {
+          vAxial = position.z;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          vViewPos = mv.xyz;
+          vNormalV = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        uniform float uOpacity;
+        uniform float uTime;
+        varying float vAxial;
+        varying vec3 vNormalV;
+        varying vec3 vViewPos;
+        void main() {
+          float facing = abs(dot(normalize(vNormalV), normalize(-vViewPos)));
+          float core = pow(facing, 1.25);
+          float along = smoothstep(0.0, 0.08, vAxial) * pow(1.0 - clamp(vAxial, 0.0, 1.0), 1.25);
+          float a = uOpacity * core * along;
+          gl_FragColor = vec4(uColor * a, 1.0);
+        }
+      `,
+    });
+  }, []);
+
+  // Dust particles distributed in the 3D volume
+  const dustCount = 800;
+  const [dustPositions, dustOffsets, dustSpeeds, dustColors] = useMemo(() => {
     const pos = new Float32Array(dustCount * 3);
-    const speeds = new Float32Array(dustCount);
     const offsets = new Float32Array(dustCount * 3);
-    const rng = mulberry32(42424);
+    const speeds = new Float32Array(dustCount);
+    const colors = new Float32Array(dustCount * 3);
+    const rng = mulberry32(112233);
+
+    const warm = new THREE.Color("#f4ddb8");
 
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(rng(), 0.7) * 2.2;
-      const theta = rng() * Math.PI * 2;
+      const x = (rng() - 0.5) * 4.5;
       const y = -1.2 + rng() * 3.8;
+      const z = -2.2 + rng() * 3.2;
 
-      pos[i3] = Math.cos(theta) * r;
+      pos[i3] = x;
       pos[i3 + 1] = y;
-      pos[i3 + 2] = -0.5 + Math.sin(theta) * (r * 0.7);
+      pos[i3 + 2] = z;
 
-      offsets[i3] = pos[i3];
-      offsets[i3 + 1] = pos[i3 + 1];
-      offsets[i3 + 2] = pos[i3 + 2];
+      offsets[i3] = x;
+      offsets[i3 + 1] = y;
+      offsets[i3 + 2] = z;
 
-      speeds[i] = 0.2 + rng() * 0.6;
+      speeds[i] = 0.2 + rng() * 0.5;
+
+      colors[i3] = warm.r;
+      colors[i3 + 1] = warm.g;
+      colors[i3 + 2] = warm.b;
     }
-    return [pos, speeds, offsets];
+    return [pos, offsets, speeds, colors];
   }, [dustCount]);
 
   // Texture for the glowing CRT monitor screen
@@ -92,7 +154,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     return tex;
   }, []);
 
-  // Texture for the shadow word on the wall ("Z ANDRIE")
+  // Texture for the wall projected title ("Z ANDRIE")
   const wallWordTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
@@ -102,10 +164,10 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     if (!ctx) return null;
 
     ctx.clearRect(0, 0, 512, 256);
-    ctx.fillStyle = "#f2dcb4";
+    ctx.fillStyle = "#f4ddb8";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "900 82px 'Big Shoulders Stencil', Impact, sans-serif";
+    ctx.font = "900 84px 'Big Shoulders Stencil', Impact, sans-serif";
     ctx.fillText("Z ANDRIE", 256, 128);
 
     const tex = new THREE.CanvasTexture(canvas);
@@ -113,57 +175,95 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     return tex;
   }, []);
 
-  // Target object for Spotlight aiming
+  // Connect spotlight target
   useEffect(() => {
     if (spotLightRef.current && targetObjectRef.current) {
       spotLightRef.current.target = targetObjectRef.current;
     }
   }, []);
 
-  // Frame physics loop
+  // Render / Physics loop
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const pointer = pointerRef.current;
 
-    // Smooth aim tracking
-    const aimX = pointer.x * (viewport.width * 0.35);
-    const aimY = -0.4 + pointer.y * (viewport.height * 0.25);
-    const aimZ = -1.2;
+    // Pointer target aim: sweeps across desk and back wall
+    const aimX = pointer.x * (viewport.width * 0.42);
+    const aimY = 0.2 + pointer.y * (viewport.height * 0.32);
+    const aimZ = -1.8;
 
+    // Lerp target position
     if (targetObjectRef.current) {
-      targetObjectRef.current.position.x = THREE.MathUtils.lerp(targetObjectRef.current.position.x, aimX, 0.06);
-      targetObjectRef.current.position.y = THREE.MathUtils.lerp(targetObjectRef.current.position.y, aimY, 0.06);
-      targetObjectRef.current.position.z = THREE.MathUtils.lerp(targetObjectRef.current.position.z, aimZ, 0.06);
+      targetObjectRef.current.position.x = THREE.MathUtils.lerp(targetObjectRef.current.position.x, aimX, 0.08);
+      targetObjectRef.current.position.y = THREE.MathUtils.lerp(targetObjectRef.current.position.y, aimY, 0.08);
+      targetObjectRef.current.position.z = THREE.MathUtils.lerp(targetObjectRef.current.position.z, aimZ, 0.08);
     }
 
-    // Lamp shade tilt
-    if (lampGroupRef.current) {
-      lampGroupRef.current.rotation.z = THREE.MathUtils.lerp(lampGroupRef.current.rotation.z, -pointer.x * 0.18, 0.05);
-      lampGroupRef.current.rotation.x = THREE.MathUtils.lerp(lampGroupRef.current.rotation.x, pointer.y * 0.14, 0.05);
+    const currentAim = targetObjectRef.current ? targetObjectRef.current.position : new THREE.Vector3(aimX, aimY, aimZ);
+
+    // Lamp assembly tilt: look towards aim
+    if (lampAssemblyRef.current) {
+      lampAssemblyRef.current.lookAt(currentAim);
     }
 
-    // Dust particles drift inside light cone
+    // Volumetric beam positioning and scaling
+    if (beamMeshRef.current) {
+      const dist = lampPos.distanceTo(currentAim);
+      const spotAngle = 0.52; // Half-angle
+      const radius = Math.tan(spotAngle) * dist;
+
+      beamMeshRef.current.position.copy(lampPos);
+      beamMeshRef.current.lookAt(currentAim);
+      beamMeshRef.current.scale.set(radius, radius, dist * 1.02);
+
+      const mat = beamMeshRef.current.material as THREE.ShaderMaterial;
+      if (mat.uniforms?.uTime) {
+        mat.uniforms.uTime.value = time;
+      }
+    }
+
+    // Spotlight pool illumination right where the beam lands
+    if (poolLightRef.current) {
+      poolLightRef.current.position.set(currentAim.x, currentAim.y, currentAim.z + 0.35);
+    }
+
+    // Dynamic wall word illumination
+    if (wallWordRef.current) {
+      const distToWord = Math.hypot(currentAim.x - 0, currentAim.y - 1.5);
+      const intensity = Math.max(0, 1 - distToWord / 2.0);
+      (wallWordRef.current.material as THREE.MeshBasicMaterial).opacity = 0.15 + intensity * 0.85;
+    }
+
+    // Dust motes: smooth gentle drift inside the light beam
     if (dustRef.current) {
       const posAttr = dustRef.current.geometry.attributes.position as THREE.BufferAttribute;
       const posArray = posAttr.array as Float32Array;
+
+      // Beam direction unit vector
+      const beamDir = new THREE.Vector3().subVectors(currentAim, lampPos).normalize();
 
       for (let i = 0; i < dustCount; i++) {
         const i3 = i * 3;
         const spd = dustSpeeds[i];
 
-        // Smooth vertical drift and gentle floating turbulence (no sudden loop)
-        posArray[i3 + 1] = dustOffsets[i3 + 1] + Math.sin(time * spd + i) * 0.25;
-        posArray[i3] = dustOffsets[i3] + Math.cos(time * 0.5 * spd + i * 0.5) * 0.15;
-        posArray[i3 + 2] = dustOffsets[i3 + 2] + Math.sin(time * 0.4 * spd + i * 0.3) * 0.15;
+        // Smooth sinusoidal turbulence (no hard loops)
+        posArray[i3] = dustOffsets[i3] + Math.sin(time * 0.3 * spd + i * 0.2) * 0.15;
+        posArray[i3 + 1] = dustOffsets[i3 + 1] + Math.cos(time * 0.4 * spd + i * 0.3) * 0.2;
+        posArray[i3 + 2] = dustOffsets[i3 + 2] + Math.sin(time * 0.25 * spd + i * 0.1) * 0.12;
+
+        // Check if mote is inside the light cone
+        const motePos = new THREE.Vector3(posArray[i3], posArray[i3 + 1], posArray[i3 + 2]);
+        const toMote = motePos.sub(lampPos);
+        const distMote = toMote.length();
+        const cosAngle = toMote.normalize().dot(beamDir);
+
+        // Hide motes outside the spotlight beam
+        const inCone = cosAngle > 0.86 && distMote < 6.0;
+        if (!inCone) {
+          posArray[i3 + 1] = -10;
+        }
       }
       posAttr.needsUpdate = true;
-    }
-
-    // Dynamic wall word visibility based on light aim proximity
-    if (wallWordRef.current) {
-      const wallDist = Math.hypot(aimX - 0, aimY - 1.4);
-      const intensity = Math.max(0, 1 - wallDist / 2.2);
-      (wallWordRef.current.material as THREE.MeshBasicMaterial).opacity = 0.1 + intensity * 0.85;
     }
 
     // Telemetry updates
@@ -172,71 +272,72 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         x: Math.round(pointer.x * 100) / 100,
         y: Math.round(pointer.y * 100) / 100,
         focus: Math.round(Math.max(0, Math.min(100, (1 - Math.hypot(pointer.x, pointer.y)) * 100))),
-        target: "ISOMETRIC DESK",
+        target: "INTERACTIVE SPOTLIGHT",
       });
     }
   });
 
   return (
     <>
-      {/* Target object for spotlight tracking */}
-      <object3D ref={targetObjectRef} position={[0, -0.4, -1.2]} />
+      {/* Target object for spotlight and beam aiming */}
+      <object3D ref={targetObjectRef} position={[0, 0, -1.8]} />
 
-      {/* Deep dark ambient fill */}
-      <ambientLight color="#0e0c0a" intensity={0.65} />
+      {/* Dark ambient fill */}
+      <ambientLight color="#12100e" intensity={0.7} />
 
-      {/* Overhead Lamp assembly with Spotlight */}
-      <group ref={lampGroupRef} position={[0, 2.8, -0.2]}>
-        {/* Cord from ceiling */}
-        <mesh position={[0, 0.8, 0]}>
-          <cylinderGeometry args={[0.006, 0.006, 1.6, 8]} />
-          <meshStandardMaterial color="#1a1816" roughness={0.7} />
-        </mesh>
+      {/* Hanging Lamp Cord from ceiling */}
+      <mesh ref={lampCordRef} position={[0, 3.35, 0.4]}>
+        <cylinderGeometry args={[0.005, 0.005, 1.7, 8]} />
+        <meshStandardMaterial color="#1f1c19" roughness={0.7} />
+      </mesh>
 
+      {/* Overhead Lamp Shade Assembly (Tilts towards target) */}
+      <group ref={lampAssemblyRef} position={lampPos}>
         {/* Lamp Cone Shade */}
-        <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
-          <coneGeometry args={[0.38, 0.35, 32, 1, true]} />
-          <meshStandardMaterial color="#1f1b17" roughness={0.4} metalness={0.6} side={THREE.DoubleSide} />
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <coneGeometry args={[0.36, 0.4, 32, 1, true]} />
+          <meshStandardMaterial color="#1a1715" roughness={0.4} metalness={0.7} side={THREE.DoubleSide} />
         </mesh>
 
         {/* Glowing bulb inside shade */}
-        <mesh position={[0, -0.06, 0]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
-          <meshBasicMaterial color="#fff2db" />
+        <mesh position={[0, 0, 0.08]}>
+          <sphereGeometry args={[0.065, 16, 16]} />
+          <meshBasicMaterial color="#fff4e0" toneMapped={false} />
         </mesh>
 
-        {/* Theatrical Spotlight shining down */}
+        {/* Overhead SpotLight */}
         <spotLight
           ref={spotLightRef}
-          position={[0, -0.08, 0]}
+          position={[0, 0, 0.08]}
           color="#f4ddb8"
-          intensity={5.8}
-          angle={0.62}
-          penumbra={0.78}
-          distance={16}
-          decay={1.8}
-          castShadow
-          shadow-bias={-0.0001}
+          intensity={6.5}
+          angle={0.52}
+          penumbra={0.65}
+          distance={15}
+          decay={1.6}
         />
-
-        {/* Subtle warm point light for local glow */}
-        <pointLight position={[0, -0.1, 0]} color="#f2dcb4" intensity={1.2} distance={4} decay={1.5} />
       </group>
 
-      {/* Theatrical Back Wall Plane */}
+      {/* Volumetric Glowing Light Cone Mesh */}
+      <mesh ref={beamMeshRef} geometry={beamGeometry} material={beamMaterial} renderOrder={10} raycast={() => null} />
+
+      {/* Incandescent Light Pool at Aim Point */}
+      <pointLight ref={poolLightRef} position={[0, 0, -1.5]} color="#f4ddb8" intensity={4.5} distance={5.5} decay={1.6} />
+
+      {/* Back Wall Plane */}
       <mesh position={[0, 1.2, -2.4]} receiveShadow>
         <planeGeometry args={[18, 10]} />
-        <meshStandardMaterial color="#100e0c" roughness={0.85} metalness={0.05} />
+        <meshStandardMaterial color="#161412" roughness={0.8} metalness={0.05} />
       </mesh>
 
-      {/* Stencil Word projected on Wall ("Z ANDRIE") */}
+      {/* Wall Stencil Word ("Z ANDRIE") */}
       {wallWordTexture && (
         <mesh ref={wallWordRef} position={[0, 1.5, -2.38]}>
           <planeGeometry args={[4.2, 2.1]} />
           <meshBasicMaterial
             map={wallWordTexture}
             transparent
-            opacity={0.75}
+            opacity={0.85}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />
@@ -246,7 +347,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       {/* Floor Plane */}
       <mesh position={[0, -1.2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[18, 14]} />
-        <meshStandardMaterial color="#0c0b09" roughness={0.75} metalness={0.15} />
+        <meshStandardMaterial color="#0f0e0c" roughness={0.7} metalness={0.15} />
       </mesh>
 
       {/* Isometric Desk Setup */}
@@ -264,7 +365,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           [-1.15, 0.5],
           [1.15, 0.5],
         ].map(([x, z], i) => (
-          <mesh key={i} position={[x, -0.05, z]} castShadow>
+          <mesh key={i} position={[x, -0.05, z]}>
             <cylinderGeometry args={[0.032, 0.032, 0.95, 12]} />
             <meshStandardMaterial color="#141210" metalness={0.8} roughness={0.3} />
           </mesh>
@@ -279,27 +380,27 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           </mesh>
 
           {/* CRT Screen Frame */}
-          <mesh position={[0, 0, 0.265]} castShadow>
+          <mesh position={[0, 0, 0.265]}>
             <boxGeometry args={[0.54, 0.46, 0.04]} />
             <meshStandardMaterial color="#302d29" roughness={0.4} />
           </mesh>
 
           {/* Glowing Green Phosphor Display */}
           {screenTexture && (
-            <mesh ref={screenTextRef} position={[0, 0, 0.288]}>
+            <mesh position={[0, 0, 0.288]}>
               <planeGeometry args={[0.48, 0.4]} />
               <meshBasicMaterial map={screenTexture} toneMapped={false} />
             </mesh>
           )}
 
           {/* Monitor Stand */}
-          <mesh position={[0, -0.32, 0]} castShadow>
+          <mesh position={[0, -0.32, 0]}>
             <cylinderGeometry args={[0.16, 0.22, 0.1, 16]} />
             <meshStandardMaterial color="#948c7e" roughness={0.6} />
           </mesh>
 
           {/* Vintage Keyboard */}
-          <mesh position={[0, -0.31, 0.54]} rotation={[-0.08, 0, 0]} castShadow>
+          <mesh position={[0, -0.31, 0.54]} rotation={[-0.08, 0, 0]}>
             <boxGeometry args={[0.56, 0.04, 0.22]} />
             <meshStandardMaterial color="#c2baa9" roughness={0.5} />
           </mesh>
@@ -308,7 +409,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         {/* Desktop Companion Robot / Radio */}
         <group position={[0.48, 0.62, 0.05]} rotation={[0, -0.22, 0]}>
           {/* Body */}
-          <mesh castShadow>
+          <mesh>
             <boxGeometry args={[0.34, 0.22, 0.24]} />
             <meshStandardMaterial color="#2c2823" roughness={0.4} metalness={0.5} />
           </mesh>
@@ -326,17 +427,17 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         {/* Office Chair */}
         <group position={[0, 0.15, 0.9]} rotation={[0, -0.15, 0]}>
           {/* Seat Cushion */}
-          <mesh position={[0, 0.18, 0]} castShadow>
+          <mesh position={[0, 0.18, 0]}>
             <boxGeometry args={[0.55, 0.09, 0.52]} />
             <meshStandardMaterial color="#1a1816" roughness={0.7} />
           </mesh>
           {/* Backrest */}
-          <mesh position={[0, 0.58, 0.24]} rotation={[-0.1, 0, 0]} castShadow>
+          <mesh position={[0, 0.58, 0.24]} rotation={[-0.1, 0, 0]}>
             <boxGeometry args={[0.5, 0.62, 0.08]} />
             <meshStandardMaterial color="#1a1816" roughness={0.7} />
           </mesh>
           {/* Vertical Post */}
-          <mesh position={[0, -0.1, 0]} castShadow>
+          <mesh position={[0, -0.1, 0]}>
             <cylinderGeometry args={[0.03, 0.03, 0.44, 12]} />
             <meshStandardMaterial color="#403c37" metalness={0.9} roughness={0.2} />
           </mesh>
@@ -350,7 +451,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         {/* Bookshelf with Books */}
         <group position={[-1.7, 0.8, -0.3]} rotation={[0, 0.24, 0]}>
           {/* Shelf Frame */}
-          <mesh castShadow receiveShadow>
+          <mesh>
             <boxGeometry args={[0.6, 1.8, 0.4]} />
             <meshStandardMaterial color="#1b1815" roughness={0.8} />
           </mesh>
@@ -358,7 +459,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           {[-0.4, 0.1, 0.55].map((y, rowIdx) => (
             <group key={rowIdx} position={[-0.2, y, 0.08]}>
               {[0, 0.08, 0.16, 0.24, 0.32].map((x, bookIdx) => (
-                <mesh key={bookIdx} position={[x, 0, 0]} castShadow>
+                <mesh key={bookIdx} position={[x, 0, 0]}>
                   <boxGeometry args={[0.065, 0.28, 0.24]} />
                   <meshStandardMaterial
                     color={bookIdx % 2 === 0 ? "#d36b54" : bookIdx === 1 ? "#786c5f" : "#a8a59d"}
@@ -371,16 +472,17 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         </group>
       </group>
 
-      {/* Floating Dust Particles drifting gently in the light cone */}
+      {/* Floating Dust Particles (Only visible inside spotlight beam) */}
       <points ref={dustRef}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[dustPositions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[dustColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.032}
-          color="#f4ddb8"
+          size={0.036}
+          vertexColors
           transparent
-          opacity={0.65}
+          opacity={0.8}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           sizeAttenuation
