@@ -341,7 +341,7 @@ export default function Navbar() {
               UV
             </button>
 
-            {/* Indie Game Pause Menu Toggle Button */}
+            {/* Indie Game Menu Toggle Button */}
             <button
               type="button"
               data-magnetic
@@ -354,7 +354,7 @@ export default function Navbar() {
                   ? "border-[var(--color-primary)] bg-[#1e1713] text-[#f4ddb8]"
                   : "border-[#3e3b36] hover:border-[var(--color-primary)] bg-[#141210]/70 hover:bg-[#1a1714] text-[#e7e5df]"
               }`}
-              aria-label="Toggle game pause menu"
+              aria-label="Toggle game menu"
               aria-expanded={menuOpen}
             >
               <div className="flex flex-col gap-[3px] w-3.5 justify-center" aria-hidden="true">
@@ -375,7 +375,7 @@ export default function Navbar() {
                 />
               </div>
               <span className="font-bold tracking-[2px] text-[11px]">
-                {menuOpen ? "RESUME" : "PAUSE MENU"}
+                {menuOpen ? "CLOSE" : "GAME MENU"}
               </span>
               <span className="hidden md:inline-block text-[9px] px-1 py-0.2 rounded border border-[#3e3b36] text-[#786c5f] group-hover:border-[var(--color-primary)] group-hover:text-[#f4ddb8]">
                 ESC
@@ -385,11 +385,11 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ── 2. ORIGINAL FULLSCREEN INDIE GAMER PAUSE TERMINAL ── */}
+      {/* ── 2. ORIGINAL FULLSCREEN INDIE GAMER TERMINAL ── */}
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Indie Game Pause Menu"
+        aria-label="Indie Game Menu"
         className={`fixed inset-0 w-screen h-screen z-[99999] bg-[#090807]/94 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto overflow-x-hidden font-mono select-none transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           menuOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
@@ -403,11 +403,11 @@ export default function Navbar() {
         />
 
         {/* ── TOP HUD HEADER BAR ── */}
-        <header className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-5 flex justify-between items-center border-b border-[#23201d]">
+        <header className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-4 flex justify-between items-center border-b border-[#23201d]">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-2 text-[11px] md:text-[12px] tracking-[2px] uppercase text-[#f4ddb8] font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#ef4444] animate-pulse" />
-              GAME PAUSED
+              <span className="w-2 h-2 rounded-full bg-[#f4ddb8] shadow-[0_0_8px_#f4ddb8] animate-pulse" />
+              GAME MENU
             </span>
             <span className="text-[#3e3b36]">|</span>
             <span className="hidden sm:inline-block text-[11px] tracking-[1.5px] uppercase text-[#786c5f]">
@@ -415,7 +415,7 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* Right: Controls & Resume Button */}
+          {/* Right: Controls & Close Button */}
           <div className="flex items-center gap-4">
             <div className="hidden lg:flex items-center gap-3 text-[10px] text-[#786c5f] tracking-[1.5px]">
               <span>
@@ -435,7 +435,7 @@ export default function Navbar() {
               }}
               className="group flex items-center gap-2 text-[11px] md:text-[12px] tracking-[2px] uppercase text-[#e7e5df] hover:text-[var(--color-primary)] transition-colors cursor-pointer px-3 py-1 border border-[#3e3b36] hover:border-[var(--color-primary)] rounded bg-[#161311]"
             >
-              <span>RESUME GAME</span>
+              <span>CLOSE MENU</span>
               <span className="px-1.5 py-0.2 rounded text-[9px] bg-[#221c17] text-[#f4ddb8] border border-[#3e3b36]">
                 ESC
               </span>
@@ -443,79 +443,96 @@ export default function Navbar() {
           </div>
         </header>
 
-        {/* ── MAIN 2-COLUMN SPLIT: INTEL DOSSIER & STAGE SELECT ── */}
-        <main className="relative z-10 w-full max-w-[1600px] mx-auto flex-1 flex flex-col lg:flex-row gap-8 px-6 md:px-12 py-6 my-auto items-stretch">
+        {/* ── MAIN 2-COLUMN SPLIT: BALANCED INTEL HUD & STAGE SELECT ── */}
+        <main className="relative z-10 w-full max-w-[1600px] mx-auto flex-1 flex flex-col lg:flex-row gap-6 md:gap-8 px-6 md:px-12 py-4 my-auto items-center justify-center">
           
-          {/* ── LEFT COLUMN: PLAYER CARD & LIVE MISSION INTEL (Unique original touch!) ── */}
-          <aside className="hidden lg:flex lg:w-5/12 flex-col justify-between gap-5 p-6 rounded-[4px] border border-[#23201d] bg-[#110e0c]/80 backdrop-blur-md relative overflow-hidden">
+          {/* ── LEFT COLUMN: BALANCED PLAYER CARD & LIVE MISSION INTEL (Zero Gaps) ── */}
+          <aside className="hidden lg:flex lg:w-[420px] xl:w-[460px] flex-col gap-3.5 p-5 rounded-[4px] border border-[#23201d] bg-[#110e0c]/85 backdrop-blur-md relative overflow-hidden shrink-0 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
             {/* Corner Decorative Tech Marks */}
             <div className="absolute top-2 left-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
             <div className="absolute top-2 right-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
             <div className="absolute bottom-2 left-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
             <div className="absolute bottom-2 right-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
 
-            {/* Player / Bot Status Header */}
-            <div>
-              <div className="flex justify-between items-center pb-3 border-b border-[#23201d]">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded border border-[#3e3b36] bg-[#1a1714] flex items-center justify-center text-sm font-mono text-[#f4ddb8]">
-                    [•_•]
-                  </div>
-                  <div>
-                    <h2 className="text-[12px] font-bold tracking-[1.5px] uppercase text-[#e7e5df]">
-                      Z ANDRIE
-                    </h2>
-                    <p className="text-[9px] tracking-[1.5px] uppercase text-[#786c5f]">
-                      LVL 26 • CREATIVE DEV
-                    </p>
-                  </div>
+            {/* 1. Player & Companion Status Header */}
+            <div className="flex justify-between items-center pb-2.5 border-b border-[#23201d]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded border border-[#3e3b36] bg-[#1a1714] flex items-center justify-center text-xs font-mono text-[#f4ddb8]">
+                  [•_•]
                 </div>
-
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#22c55e]/30 bg-[#22c55e]/10 text-[9px] text-[#4ade80]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-ping" />
-                  BOT-01 ONLINE
-                </div>
-              </div>
-
-              {/* Dynamic Mission Intel Block */}
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between text-[10px] tracking-[2px] uppercase">
-                  <span className="text-[#d36b54] font-bold">
-                    &gt;&gt; STAGE INTEL
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded border border-[#3e3b36] text-[#f4ddb8] bg-[#1c1814] text-[9px]">
-                    {currentItem.badge}
-                  </span>
-                </div>
-
                 <div>
-                  <span className="text-[10px] text-[#786c5f] tracking-[1.5px] uppercase block">
-                    {currentItem.stage}
-                  </span>
-                  <h3 className="text-2xl font-stencil font-bold tracking-[1px] uppercase text-[#f4ddb8] leading-tight">
-                    {currentItem.name}
-                  </h3>
-                </div>
-
-                <p className="text-[12px] text-[#a8a59d] leading-relaxed font-mono border-l-2 border-[#d36b54] pl-3 py-1">
-                  {currentItem.intel}
-                </p>
-
-                <div className="p-3 rounded border border-[#26221d] bg-[#14110e]/90 space-y-1.5">
-                  <span className="text-[9px] tracking-[1.5px] text-[#786c5f] uppercase block font-bold">
-                    MISSION OBJECTIVE
-                  </span>
-                  <p className="text-[11px] text-[#e7e5df] font-mono">
-                    {currentItem.objective}
+                  <h2 className="text-[12px] font-bold tracking-[1.5px] uppercase text-[#e7e5df]">
+                    Z ANDRIE
+                  </h2>
+                  <p className="text-[9px] tracking-[1.5px] uppercase text-[#786c5f]">
+                    LVL 26 • CREATIVE DEV
                   </p>
                 </div>
               </div>
+
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#22c55e]/30 bg-[#22c55e]/10 text-[9px] text-[#4ade80]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-ping" />
+                BOT-01 ONLINE
+              </div>
             </div>
 
-            {/* Quick Deploy Button */}
-            <div className="pt-4 border-t border-[#23201d] flex items-center justify-between">
-              <span className="text-[10px] tracking-[1.5px] text-[#786c5f] uppercase">
-                READY FOR WARP
+            {/* 2. Dynamic Stage Intel Card */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[10px] tracking-[2px] uppercase">
+                <span className="text-[#d36b54] font-bold">
+                  &gt;&gt; STAGE INTEL
+                </span>
+                <span className="px-1.5 py-0.5 rounded border border-[#3e3b36] text-[#f4ddb8] bg-[#1c1814] text-[9px]">
+                  {currentItem.badge}
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[9px] text-[#786c5f] tracking-[1.5px] uppercase block">
+                  {currentItem.stage}
+                </span>
+                <h3 className="text-xl md:text-2xl font-stencil font-bold tracking-[1px] uppercase text-[#f4ddb8] leading-tight">
+                  {currentItem.name}
+                </h3>
+              </div>
+
+              <p className="text-[11px] text-[#a8a59d] leading-relaxed font-mono border-l-2 border-[#d36b54] pl-2.5 py-0.5">
+                {currentItem.intel}
+              </p>
+            </div>
+
+            {/* 3. Mission Objective Box */}
+            <div className="p-2.5 rounded border border-[#26221d] bg-[#14110e]/95 space-y-1">
+              <span className="text-[8px] tracking-[1.5px] text-[#786c5f] uppercase block font-bold">
+                MISSION OBJECTIVE
+              </span>
+              <p className="text-[10px] md:text-[11px] text-[#e7e5df] font-mono leading-snug">
+                {currentItem.objective}
+              </p>
+            </div>
+
+            {/* 4. Live System Telemetry Strip */}
+            <div className="grid grid-cols-3 gap-2 py-2 border-y border-[#23201d] text-center text-[9px] font-mono uppercase text-[#786c5f]">
+              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
+                <span className="block text-[#a8a59d] font-bold">STATUS</span>
+                <span className="text-[#4ade80]">READY</span>
+              </div>
+              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
+                <span className="block text-[#a8a59d] font-bold">LIGHT</span>
+                <span className="text-[#f4ddb8]">2700K</span>
+              </div>
+              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
+                <span className="block text-[#a8a59d] font-bold">AUDIO</span>
+                <span className={soundActive ? "text-[#4ade80]" : "text-[#786c5f]"}>
+                  {soundActive ? "SFX ON" : "MUTED"}
+                </span>
+              </div>
+            </div>
+
+            {/* 5. Direct Deploy Action Bar */}
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[9px] tracking-[1.5px] text-[#786c5f] uppercase">
+                WARP TO SECTOR
               </span>
               <button
                 type="button"
@@ -523,7 +540,7 @@ export default function Navbar() {
                   playMenuSound("select");
                   triggerNav(currentItem);
                 }}
-                className="px-4 py-2 rounded-[2px] bg-[#d36b54] hover:bg-[#e0755e] text-[#120f0c] text-[11px] font-bold tracking-[2px] uppercase transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-[0_0_16px_rgba(211,107,84,0.3)]"
+                className="px-3.5 py-1.5 rounded-[2px] bg-[#d36b54] hover:bg-[#e0755e] text-[#120f0c] text-[10px] md:text-[11px] font-bold tracking-[2px] uppercase transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-[0_0_14px_rgba(211,107,84,0.3)]"
               >
                 <span>DEPLOY TO STAGE</span>
                 <span>►</span>
@@ -531,11 +548,11 @@ export default function Navbar() {
             </div>
           </aside>
 
-          {/* ── RIGHT COLUMN: TACTICAL STAGE SELECTION DECK ── */}
-          <section className="w-full lg:w-7/12 flex flex-col justify-center space-y-2">
-            <div className="flex justify-between items-center px-2 pb-1 text-[10px] tracking-[2px] uppercase text-[#786c5f]">
+          {/* ── RIGHT COLUMN: TACTICAL STAGE SELECTION DECK (Compact & Perfectly Balanced) ── */}
+          <section className="w-full flex-1 max-w-[720px] flex flex-col justify-center space-y-1.5">
+            <div className="flex justify-between items-center px-1 pb-1 text-[9px] tracking-[2px] uppercase text-[#786c5f]">
               <span>SELECT STAGE DESTINATION</span>
-              <span>7 STAGES AVAILABLE</span>
+              <span>7 STAGES READY</span>
             </div>
 
             {menuItems.map((item, idx) => {
@@ -555,17 +572,17 @@ export default function Navbar() {
                     href={item.href}
                     prefetch={true}
                     onClick={(e) => handleNavClick(e, item)}
-                    className={`group w-full flex items-center justify-between p-3.5 sm:p-4 md:p-4.5 rounded-[3px] border transition-all duration-200 cursor-pointer ${
+                    className={`group w-full flex items-center justify-between py-2 px-3.5 sm:py-2.5 sm:px-4 md:py-2.5 md:px-5 rounded-[3px] border transition-all duration-150 cursor-pointer ${
                       isSelected
-                        ? "border-[#d36b54] bg-[#1a1512] shadow-[0_0_20px_rgba(211,107,84,0.18)] translate-x-2"
+                        ? "border-[#d36b54] bg-[#1a1512] shadow-[0_0_16px_rgba(211,107,84,0.16)] translate-x-1.5"
                         : "border-[#23201d] hover:border-[#3e3b36] bg-[#110e0c]/60"
                     }`}
                   >
                     {/* Left: Stage number + Title */}
-                    <div className="flex items-center gap-3 sm:gap-5">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       {/* Selection cursor indicator */}
                       <span
-                        className={`text-[12px] font-mono transition-all duration-200 w-5 text-center ${
+                        className={`text-[11px] font-mono transition-all duration-150 w-4 text-center ${
                           isSelected ? "text-[#d36b54] font-bold" : "text-[#5e5850]"
                         }`}
                       >
@@ -573,24 +590,24 @@ export default function Navbar() {
                       </span>
 
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 leading-none">
                           <span
-                            className={`text-[9px] tracking-[1.5px] uppercase font-mono ${
+                            className={`text-[8.5px] tracking-[1.5px] uppercase font-mono ${
                               isSelected ? "text-[#d36b54]" : "text-[#665f54]"
                             }`}
                           >
                             {item.stage}
                           </span>
                           {isActiveSection && (
-                            <span className="text-[8px] px-1 py-0.2 rounded bg-[#22c55e]/20 text-[#4ade80] border border-[#22c55e]/40 font-bold">
+                            <span className="text-[7.5px] px-1 py-0.2 rounded bg-[#22c55e]/20 text-[#4ade80] border border-[#22c55e]/40 font-bold">
                               CURRENT
                             </span>
                           )}
                         </div>
 
                         <span
-                          className={`font-stencil font-bold tracking-[1px] uppercase text-2xl sm:text-3xl md:text-4xl transition-colors duration-200 leading-none ${
-                            isSelected ? "text-[#f4ddb8]" : "text-[#68635a]"
+                          className={`font-stencil font-bold tracking-[1px] uppercase text-xl sm:text-2xl md:text-3xl transition-colors duration-150 leading-tight block mt-0.5 ${
+                            isSelected ? "text-[#f4ddb8]" : "text-[#706a60]"
                           }`}
                         >
                           {item.name}
@@ -599,9 +616,9 @@ export default function Navbar() {
                     </div>
 
                     {/* Right: Stage Badge Chip & Enter hint */}
-                    <div className="flex items-center gap-3 text-right">
+                    <div className="flex items-center gap-2.5 text-right">
                       <span
-                        className={`hidden sm:inline-block text-[10px] md:text-[11px] tracking-[1.5px] uppercase font-mono px-2 py-0.5 rounded border transition-colors ${
+                        className={`hidden sm:inline-block text-[9.5px] md:text-[10px] tracking-[1.5px] uppercase font-mono px-2 py-0.5 rounded border transition-colors ${
                           isSelected
                             ? "border-[#d36b54]/50 bg-[#261814] text-[#f4ddb8]"
                             : "border-[#2b2723] text-[#5e5850]"
@@ -611,7 +628,7 @@ export default function Navbar() {
                       </span>
 
                       <span
-                        className={`text-[12px] text-[#d36b54] transition-opacity duration-200 ${
+                        className={`text-[11px] text-[#d36b54] transition-opacity duration-150 ${
                           isSelected ? "opacity-100" : "opacity-0"
                         }`}
                       >
@@ -626,7 +643,7 @@ export default function Navbar() {
         </main>
 
         {/* ── BOTTOM HUD FOOTER BAR ── */}
-        <footer className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#23201d] text-[10px] md:text-[11px] tracking-[1.5px] uppercase text-[#786c5f]">
+        <footer className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-3 flex flex-col sm:flex-row justify-between items-center gap-2 border-t border-[#23201d] text-[10px] md:text-[11px] tracking-[1.5px] uppercase text-[#786c5f]">
           <div className="flex items-center gap-4">
             <span className="text-[#a8a59d]">CONNECT:</span>
             <a
