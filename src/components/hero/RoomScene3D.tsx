@@ -321,62 +321,71 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Midnight dark sky gradient
-    const grad = ctx.createLinearGradient(0, 0, 0, 360);
-    grad.addColorStop(0, "#080911");
-    grad.addColorStop(0.55, "#181224");
-    grad.addColorStop(1, "#361b28");
-    ctx.fillStyle = grad;
+    // Dark parchment / indie art print border
+    ctx.fillStyle = "#221c18";
     ctx.fillRect(0, 0, 256, 360);
+
+    // Warm sand inner border
+    ctx.strokeStyle = "#8c6f56";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(10, 10, 236, 340);
+
+    // Midnight dark sky gradient
+    const grad = ctx.createLinearGradient(0, 16, 0, 340);
+    grad.addColorStop(0, "#0c0e18");
+    grad.addColorStop(0.55, "#22162e");
+    grad.addColorStop(1, "#452233");
+    ctx.fillStyle = grad;
+    ctx.fillRect(14, 14, 228, 332);
 
     // Glowing low-poly pixel moon
     ctx.fillStyle = "#f4ddb8";
     ctx.beginPath();
-    ctx.arc(128, 90, 32, 0, Math.PI * 2);
+    ctx.arc(128, 95, 26, 0, Math.PI * 2);
     ctx.fill();
 
     // Distant mountain silhouettes (synthwave / pixel adventure)
-    ctx.fillStyle = "#4a2840";
+    ctx.fillStyle = "#5c2f4f";
     ctx.beginPath();
-    ctx.moveTo(0, 230);
-    ctx.lineTo(60, 150);
-    ctx.lineTo(128, 200);
-    ctx.lineTo(190, 140);
-    ctx.lineTo(256, 210);
-    ctx.lineTo(256, 360);
-    ctx.lineTo(0, 360);
+    ctx.moveTo(14, 230);
+    ctx.lineTo(65, 160);
+    ctx.lineTo(128, 205);
+    ctx.lineTo(190, 150);
+    ctx.lineTo(242, 215);
+    ctx.lineTo(242, 346);
+    ctx.lineTo(14, 346);
     ctx.closePath();
     ctx.fill();
 
     // Foreground mountain ridge
-    ctx.fillStyle = "#1e1120";
+    ctx.fillStyle = "#2b172d";
     ctx.beginPath();
-    ctx.moveTo(0, 250);
-    ctx.lineTo(90, 185);
-    ctx.lineTo(160, 240);
-    ctx.lineTo(220, 195);
-    ctx.lineTo(256, 235);
-    ctx.lineTo(256, 360);
-    ctx.lineTo(0, 360);
+    ctx.moveTo(14, 250);
+    ctx.lineTo(90, 195);
+    ctx.lineTo(160, 245);
+    ctx.lineTo(215, 205);
+    ctx.lineTo(242, 240);
+    ctx.lineTo(242, 346);
+    ctx.lineTo(14, 346);
     ctx.closePath();
     ctx.fill();
 
     // Pixel stars
     ctx.fillStyle = "#fef08a";
     [
-      [35, 40],
-      [80, 28],
-      [210, 45],
-      [180, 70],
-      [45, 105],
-      [225, 110],
+      [38, 42],
+      [78, 32],
+      [205, 48],
+      [175, 75],
+      [48, 105],
+      [218, 115],
     ].forEach(([x, y]) => {
       ctx.fillRect(x, y, 3, 3);
     });
 
     // Poster Title Typography
     ctx.fillStyle = "#f4ddb8";
-    ctx.font = "bold 18px 'Courier New', monospace";
+    ctx.font = "bold 17px 'Courier New', monospace";
     ctx.textAlign = "center";
     ctx.fillText("INDIE QUEST", 128, 285);
 
@@ -385,49 +394,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     ctx.fillText("16-BIT CHRONICLES // 199X", 128, 308);
 
     ctx.fillStyle = "#4ade80";
-    ctx.fillText("▶ PRESS START", 128, 330);
-
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.needsUpdate = true;
-    return tex;
-  }, []);
-
-  // Mini bartop arcade screen texture (Space Invader pixel sprite)
-  const arcadeScreenTexture = useMemo(() => {
-    if (typeof document === "undefined") return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-
-    ctx.fillStyle = "#0a0817";
-    ctx.fillRect(0, 0, 128, 128);
-
-    // Pixel Space Invader sprite
-    ctx.fillStyle = "#4ade80";
-    const invader = [
-      "  █     █  ",
-      "   █   █   ",
-      "  ███████  ",
-      " ██ █ █ ██ ",
-      "███████████",
-      "█ █     █ █",
-      "█ █     █ █",
-    ];
-    invader.forEach((row, r) => {
-      for (let c = 0; c < row.length; c++) {
-        if (row[c] === "█") {
-          ctx.fillRect(18 + c * 8, 26 + r * 7, 7, 6);
-        }
-      }
-    });
-
-    ctx.fillStyle = "#f4ddb8";
-    ctx.font = "bold 9px monospace";
-    ctx.fillText("HI-SCORE: 9999", 16, 98);
-    ctx.fillStyle = "#ef4444";
-    ctx.fillText("1P INSERT COIN", 16, 114);
+    ctx.fillText("▶ PRESS START", 128, 328);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
@@ -756,34 +723,48 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         </mesh>
       </group>
 
-      {/* Cozy Potted Floor Monstera Plant */}
-      <group position={[1.48, -0.85, -0.45]}>
-        {/* Modern Ceramic Pot */}
-        <mesh castShadow receiveShadow>
-          <cylinderGeometry args={[0.2, 0.15, 0.55, 18]} />
-          <meshStandardMaterial color="#262320" roughness={0.6} />
+      {/* Sleek Potted Floor Plant (Solid 3D Geometry, Glitch-Free) */}
+      <group position={[1.42, -1.2, -0.45]}>
+        {/* Ceramic Planter Pot (Rests flat on the floor at y = -1.2) */}
+        <mesh position={[0, 0.18, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.15, 0.11, 0.36, 18]} />
+          <meshStandardMaterial color="#6e372b" roughness={0.5} />
         </mesh>
-        {/* Pot Dark Soil */}
-        <mesh position={[0, 0.26, 0]}>
-          <cylinderGeometry args={[0.19, 0.19, 0.04, 18]} />
+        {/* Pot Top Rim */}
+        <mesh position={[0, 0.36, 0]}>
+          <cylinderGeometry args={[0.16, 0.15, 0.035, 18]} />
+          <meshStandardMaterial color="#5c2e24" roughness={0.5} />
+        </mesh>
+        {/* Pot Soil */}
+        <mesh position={[0, 0.355, 0]}>
+          <cylinderGeometry args={[0.145, 0.145, 0.02, 16]} />
           <meshStandardMaterial color="#1a1410" roughness={0.9} />
         </mesh>
-        {/* Monstera Stems & Broad Leaves catching light */}
+
+        {/* Central Stem */}
+        <mesh position={[0, 0.48, 0]}>
+          <cylinderGeometry args={[0.008, 0.012, 0.26, 8]} />
+          <meshStandardMaterial color="#1e3e2b" roughness={0.6} />
+        </mesh>
+
+        {/* 3D Solid Tapered Leaves (Real geometry thickness with true outward normals) */}
         {[
-          { rot: [0.35, 0.4, -0.3], pos: [0.08, 0.45, 0.05], scale: [0.26, 0.38] },
-          { rot: [0.25, -0.9, 0.35], pos: [-0.06, 0.5, 0.08], scale: [0.28, 0.4] },
-          { rot: [-0.3, 1.2, -0.2], pos: [0.04, 0.42, -0.06], scale: [0.24, 0.35] },
-          { rot: [-0.2, -2.1, 0.28], pos: [-0.08, 0.48, -0.05], scale: [0.25, 0.36] },
-          { rot: [0.1, 0.1, 0.0], pos: [0, 0.58, 0], scale: [0.27, 0.39] },
+          { pos: [0.06, 0.52, 0.05], rot: [0.35, 0.4, -0.35], scale: [0.11, 0.008, 0.24] },
+          { pos: [-0.06, 0.54, 0.04], rot: [0.28, -0.85, 0.4], scale: [0.12, 0.008, 0.25] },
+          { pos: [0.04, 0.49, -0.06], rot: [-0.32, 1.15, -0.25], scale: [0.10, 0.008, 0.22] },
+          { pos: [-0.05, 0.50, -0.05], rot: [-0.22, -1.8, 0.32], scale: [0.11, 0.008, 0.23] },
+          { pos: [0.0, 0.62, 0.0], rot: [0.15, 0.1, 0.0], scale: [0.12, 0.008, 0.26] },
         ].map((leaf, i) => (
           <group key={i} position={leaf.pos as [number, number, number]} rotation={leaf.rot as [number, number, number]}>
-            <mesh position={[0, 0.15, 0]}>
-              <cylinderGeometry args={[0.008, 0.012, 0.32, 6]} />
+            {/* Petiole Stem */}
+            <mesh position={[0, -0.04, -0.06]} rotation={[0.4, 0, 0]}>
+              <cylinderGeometry args={[0.004, 0.006, 0.14, 6]} />
               <meshStandardMaterial color="#1e3e2b" roughness={0.6} />
             </mesh>
-            <mesh position={[0, 0.32, 0]} rotation={[0.4, 0, 0]}>
-              <circleGeometry args={[leaf.scale[0], 12]} />
-              <meshStandardMaterial color={i % 2 === 0 ? "#2b563c" : "#356647"} roughness={0.5} side={THREE.DoubleSide} />
+            {/* Solid 3D Leaf Blade (Has thickness, never inverts or turns black under lighting!) */}
+            <mesh position={[0, 0.02, 0.06]} castShadow receiveShadow>
+              <boxGeometry args={leaf.scale as [number, number, number]} />
+              <meshStandardMaterial color={i % 2 === 0 ? "#2b6b47" : "#327b52"} roughness={0.35} metalness={0.05} />
             </mesh>
           </group>
         ))}
@@ -1092,128 +1073,130 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           </mesh>
         </group>
 
-        {/* Bookshelf with Books & Indie Collectibles */}
+        {/* Bookshelf with Books & Retro Game Collectibles (Recessed Frame, Zero Z-Fighting) */}
         <group position={[-1.7, 0.8, -0.3]} rotation={[0, 0.24, 0]}>
-          {/* Shelf Frame */}
-          <mesh>
-            <boxGeometry args={[0.6, 1.8, 0.4]} />
-            <meshStandardMaterial color="#1b1815" roughness={0.8} />
-          </mesh>
-
-          {/* Cascading Potted Succulent Plant on top of Bookshelf */}
-          <group position={[0, 0.96, 0]}>
-            {/* Terracotta Pot */}
-            <mesh>
-              <cylinderGeometry args={[0.08, 0.065, 0.12, 16]} />
-              <meshStandardMaterial color="#b45309" roughness={0.7} />
+          {/* Bookshelf Outer Wood Frame (Hollowed Structure) */}
+          <group>
+            {/* Left Side Panel */}
+            <mesh position={[-0.29, 0, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.04, 1.8, 0.38]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
             </mesh>
-            {/* Soil */}
-            <mesh position={[0, 0.058, 0]}>
-              <cylinderGeometry args={[0.076, 0.076, 0.01, 14]} />
-              <meshStandardMaterial color="#1f1813" roughness={0.9} />
+            {/* Right Side Panel */}
+            <mesh position={[0.29, 0, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.04, 1.8, 0.38]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
             </mesh>
-            {/* Trailing Vine Leaves cascading down the shelf edge */}
-            {[
-              { pos: [0.06, 0.04, 0.08], rot: [0.5, 0.2, 0.3], len: 0.18 },
-              { pos: [-0.04, 0.03, 0.08], rot: [0.65, -0.15, -0.2], len: 0.26 },
-              { pos: [0.02, 0.02, 0.08], rot: [0.8, 0.05, 0], len: 0.22 },
-            ].map((vine, vi) => (
-              <group key={vi} position={vine.pos as [number, number, number]} rotation={vine.rot as [number, number, number]}>
-                <mesh position={[0, -vine.len / 2, 0]}>
-                  <cylinderGeometry args={[0.005, 0.007, vine.len, 6]} />
-                  <meshStandardMaterial color="#166534" roughness={0.6} />
-                </mesh>
-                {/* Small cascading leaf nodes */}
-                {[-0.04, -0.09, -0.15].map((ly, lidx) => (
-                  <mesh key={lidx} position={[lidx % 2 === 0 ? 0.015 : -0.015, ly, 0.01]} rotation={[0.2, 0, 0.4]}>
-                    <circleGeometry args={[0.022, 8]} />
-                    <meshStandardMaterial color={lidx % 2 === 0 ? "#22c55e" : "#15803d"} side={THREE.DoubleSide} />
-                  </mesh>
-                ))}
-              </group>
-            ))}
+            {/* Top Shelf Cap */}
+            <mesh position={[0, 0.88, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.62, 0.04, 0.38]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
+            </mesh>
+            {/* Bottom Base */}
+            <mesh position={[0, -0.88, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.62, 0.04, 0.38]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
+            </mesh>
+            {/* Back Panel */}
+            <mesh position={[0, 0, -0.17]} receiveShadow>
+              <boxGeometry args={[0.58, 1.74, 0.02]} />
+              <meshStandardMaterial color="#14110f" roughness={0.85} />
+            </mesh>
+            {/* Shelf Tier 1 Divider */}
+            <mesh position={[0, 0.28, 0]} receiveShadow>
+              <boxGeometry args={[0.58, 0.03, 0.36]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
+            </mesh>
+            {/* Shelf Tier 2 Divider */}
+            <mesh position={[0, -0.30, 0]} receiveShadow>
+              <boxGeometry args={[0.58, 0.03, 0.36]} />
+              <meshStandardMaterial color="#1b1815" roughness={0.75} />
+            </mesh>
           </group>
 
-          {/* Glowing Indie Health Potion Flask on top shelf */}
-          <group position={[0.18, 0.63, 0.08]}>
-            {/* Spherical Glass Bulb */}
-            <mesh>
-              <sphereGeometry args={[0.055, 16, 16]} />
-              <meshStandardMaterial color="#ef4444" roughness={0.2} metalness={0.1} />
+          {/* Top of Bookshelf: Classic 8-Bit Game Console (NES Style) */}
+          <group position={[0, 0.94, 0]} rotation={[0, -0.1, 0]}>
+            {/* Console Body */}
+            <mesh castShadow>
+              <boxGeometry args={[0.24, 0.065, 0.18]} />
+              <meshStandardMaterial color="#c2baa9" roughness={0.5} />
             </mesh>
-            {/* Glowing Liquid Core */}
-            <mesh>
-              <sphereGeometry args={[0.048, 14, 14]} />
+            {/* Dark Front Flap */}
+            <mesh position={[0, -0.005, 0.088]}>
+              <boxGeometry args={[0.22, 0.032, 0.01]} />
+              <meshStandardMaterial color="#262320" roughness={0.4} />
+            </mesh>
+            {/* Power LED (Red) */}
+            <mesh position={[-0.08, -0.015, 0.095]}>
+              <boxGeometry args={[0.012, 0.008, 0.004]} />
               <meshBasicMaterial color="#ef4444" toneMapped={false} />
             </mesh>
-            {/* Flask Neck */}
-            <mesh position={[0, 0.065, 0]}>
-              <cylinderGeometry args={[0.018, 0.02, 0.04, 12]} />
-              <meshStandardMaterial color="#fca5a5" roughness={0.3} />
-            </mesh>
-            {/* Cork Stopper */}
-            <mesh position={[0, 0.09, 0]}>
-              <cylinderGeometry args={[0.02, 0.016, 0.02, 10]} />
-              <meshStandardMaterial color="#a16207" roughness={0.8} />
+          </group>
+
+          {/* Top Shelf Compartment (y = 0.28): Books + Golden 16-Bit Cartridge */}
+          <group position={[-0.18, 0.44, 0]}>
+            {[
+              { x: 0.0, color: "#d36b54", h: 0.28 },
+              { x: 0.065, color: "#786c5f", h: 0.26 },
+              { x: 0.13, color: "#a8a59d", h: 0.29 },
+              { x: 0.195, color: "#d36b54", h: 0.27 },
+            ].map((book, idx) => (
+              <mesh key={idx} position={[book.x, (book.h - 0.28) / 2, 0]} castShadow>
+                <boxGeometry args={[0.055, book.h, 0.22]} />
+                <meshStandardMaterial color={book.color} roughness={0.6} />
+              </mesh>
+            ))}
+            {/* Golden 16-Bit Cartridge standing on right */}
+            <mesh position={[0.31, -0.02, 0]} rotation={[0, 0, 0.12]} castShadow>
+              <boxGeometry args={[0.05, 0.22, 0.16]} />
+              <meshStandardMaterial color="#d4af37" metalness={0.7} roughness={0.25} />
             </mesh>
           </group>
 
-          {/* Mini Bartop Arcade Cabinet on middle shelf */}
-          <group position={[0.12, 0.16, 0.06]} rotation={[0, -0.3, 0]}>
-            {/* Cabinet Body */}
-            <mesh>
-              <boxGeometry args={[0.18, 0.26, 0.18]} />
-              <meshStandardMaterial color="#1a1816" roughness={0.5} />
-            </mesh>
-            {/* Glowing Marquee Header */}
-            <mesh position={[0, 0.1, 0.092]}>
-              <planeGeometry args={[0.16, 0.04]} />
-              <meshBasicMaterial color="#f4ddb8" toneMapped={false} />
-            </mesh>
-            {/* Arcade Screen with Invader */}
-            {arcadeScreenTexture && (
-              <mesh position={[0, 0.02, 0.092]} rotation={[-0.15, 0, 0]}>
-                <planeGeometry args={[0.14, 0.11]} />
-                <meshBasicMaterial map={arcadeScreenTexture} toneMapped={false} />
+          {/* Middle Shelf Compartment (y = -0.30): Vintage Big-Box Game Cartons */}
+          <group position={[-0.20, -0.14, 0]}>
+            {[
+              { x: 0.0, color: "#991b1b", w: 0.06, h: 0.28 },
+              { x: 0.07, color: "#1e3a8a", w: 0.065, h: 0.30 },
+              { x: 0.145, color: "#065f46", w: 0.07, h: 0.27 },
+              { x: 0.225, color: "#78350f", w: 0.065, h: 0.29 },
+            ].map((box, idx) => (
+              <mesh key={idx} position={[box.x, (box.h - 0.28) / 2, 0]} castShadow>
+                <boxGeometry args={[box.w, box.h, 0.24]} />
+                <meshStandardMaterial color={box.color} roughness={0.5} />
               </mesh>
-            )}
-            {/* Joystick Control Deck */}
-            <group position={[0, -0.06, 0.105]} rotation={[0.3, 0, 0]}>
-              {/* Red Ball-Top Joystick */}
-              <mesh position={[-0.04, 0.015, 0]}>
-                <cylinderGeometry args={[0.003, 0.003, 0.025, 6]} />
-                <meshStandardMaterial color="#9ca3af" metalness={0.9} roughness={0.2} />
+            ))}
+            {/* Cartridge stack on right side of middle shelf */}
+            <group position={[0.36, -0.11, 0]}>
+              <mesh position={[0, 0, 0]} castShadow>
+                <boxGeometry args={[0.11, 0.025, 0.15]} />
+                <meshStandardMaterial color="#71717a" roughness={0.5} />
               </mesh>
-              <mesh position={[-0.04, 0.03, 0]}>
-                <sphereGeometry args={[0.01, 10, 10]} />
-                <meshStandardMaterial color="#ef4444" roughness={0.3} />
-              </mesh>
-              {/* Action Buttons */}
-              <mesh position={[0.03, 0.005, -0.008]}>
-                <cylinderGeometry args={[0.006, 0.006, 0.006, 8]} />
-                <meshStandardMaterial color="#3b82f6" roughness={0.4} />
-              </mesh>
-              <mesh position={[0.05, 0.005, 0.008]}>
-                <cylinderGeometry args={[0.006, 0.006, 0.006, 8]} />
-                <meshStandardMaterial color="#22c55e" roughness={0.4} />
+              <mesh position={[0.01, 0.028, 0]} rotation={[0, 0.1, 0]} castShadow>
+                <boxGeometry args={[0.11, 0.025, 0.15]} />
+                <meshStandardMaterial color="#52525b" roughness={0.5} />
               </mesh>
             </group>
           </group>
 
-          {/* Book rows */}
-          {[-0.4, 0.1, 0.55].map((y, rowIdx) => (
-            <group key={rowIdx} position={[-0.2, y, 0.08]}>
-              {[0, 0.08, 0.16, 0.24, 0.32].map((x, bookIdx) => (
-                <mesh key={bookIdx} position={[x, 0, 0]}>
-                  <boxGeometry args={[0.065, 0.28, 0.24]} />
-                  <meshStandardMaterial
-                    color={bookIdx % 2 === 0 ? "#d36b54" : bookIdx === 1 ? "#786c5f" : "#a8a59d"}
-                    roughness={0.6}
-                  />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          {/* Bottom Shelf Compartment (y = -0.88): Full Library Row */}
+          <group position={[-0.23, -0.73, 0]}>
+            {[
+              { x: 0.0, color: "#d36b54", h: 0.27 },
+              { x: 0.06, color: "#57534e", h: 0.29 },
+              { x: 0.12, color: "#a8a29e", h: 0.26 },
+              { x: 0.18, color: "#d36b54", h: 0.28 },
+              { x: 0.24, color: "#78716c", h: 0.30 },
+              { x: 0.30, color: "#3f3f46", h: 0.27 },
+              { x: 0.36, color: "#b45309", h: 0.28 },
+              { x: 0.42, color: "#44403c", h: 0.26 },
+            ].map((book, idx) => (
+              <mesh key={idx} position={[book.x, (book.h - 0.28) / 2, 0]} castShadow>
+                <boxGeometry args={[0.05, book.h, 0.22]} />
+                <meshStandardMaterial color={book.color} roughness={0.6} />
+              </mesh>
+            ))}
+          </group>
         </group>
       </group>
 
