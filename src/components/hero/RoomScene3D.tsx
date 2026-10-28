@@ -359,9 +359,14 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
 
     // Dynamic wall word illumination
     if (wallWordRef.current) {
-      const distToWord = Math.hypot(currentAim.x - 0, currentAim.y - 1.5);
-      const intensity = Math.max(0, 1 - distToWord / 2.0);
-      (wallWordRef.current.material as THREE.MeshBasicMaterial).opacity = 0.15 + intensity * 0.85;
+      const isPreloading = typeof document !== "undefined" && document.documentElement.dataset.preloader === "loading";
+      if (isPreloading) {
+        (wallWordRef.current.material as THREE.MeshBasicMaterial).opacity = 0;
+      } else {
+        const distToWord = Math.hypot(currentAim.x - 0, currentAim.y - 1.5);
+        const intensity = Math.max(0, 1 - distToWord / 2.0);
+        (wallWordRef.current.material as THREE.MeshBasicMaterial).opacity = 0.15 + intensity * 0.85;
+      }
     }
 
     // Dust motes: smooth gentle drift inside the light beam
@@ -415,8 +420,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       {/* Target object for spotlight and beam aiming */}
       <object3D ref={targetObjectRef} position={[0, 0, -1.8]} />
 
-      {/* Dark ambient fill */}
-      <ambientLight color="#12100e" intensity={0.7} />
+      {/* Warm ambient fill matching cozy dev room */}
+      <ambientLight color="#181512" intensity={1.1} />
 
       {/* Hanging Lamp Cord from ceiling */}
       <mesh ref={lampCordRef} position={[0, 3.35, 0.4]}>

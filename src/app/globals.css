@@ -170,11 +170,9 @@ html.lenis, html.lenis body { height: auto; }
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: radial-gradient(ellipse at 50% 50%, rgba(18, 16, 14, 0.45) 0%, rgba(7, 7, 7, 0.88) 100%);
+  background: radial-gradient(ellipse at 50% 45%, rgba(14, 12, 10, 0.22) 0%, rgba(7, 7, 7, 0.72) 100%);
   color: #e7e5df;
   overflow: hidden;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 /* Returning visitors: never render it (script in <head> sets data-preloader="skip"). */
 html[data-preloader="skip"] .site-preloader { display: none; }
@@ -203,18 +201,18 @@ nav {
   pointer-events: none;
   background: linear-gradient(
     rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.35) 50%
+    rgba(0, 0, 0, 0.25) 50%
   );
   background-size: 100% 4px;
   z-index: 5;
-  opacity: 0.65;
+  opacity: 0.45;
 }
 
 .gamer-crt-vignette {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.8) 100%);
-  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.95);
+  background: radial-gradient(circle at center, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.75);
   z-index: 6;
 }

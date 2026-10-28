@@ -184,15 +184,15 @@ export default function SitePreloader() {
       // Dynamic indie game console status
       if (statusRef.current) {
         if (rounded < 25) {
-          statusRef.current.textContent = "READING CARTRIDGE ROM [Z-ANDRIE.SYS]...";
+          statusRef.current.textContent = "BREWING PIXEL COFFEE...";
         } else if (rounded < 50) {
-          statusRef.current.textContent = "COMPILING 3D WORLD SHADERS [THREE.JS]...";
+          statusRef.current.textContent = "WAKING UP COMPANION BOT...";
         } else if (rounded < 75) {
-          statusRef.current.textContent = "CALIBRATING CRT PHOSPHOR TERMINAL...";
+          statusRef.current.textContent = "TUNING CRT TERMINAL...";
         } else if (rounded < 98) {
-          statusRef.current.textContent = "SYNCING COMPANION BOT & STEREO AUDIO...";
+          statusRef.current.textContent = "RENDERING ISOMETRIC WORLD...";
         } else {
-          statusRef.current.textContent = "SYSTEM READY // PLAYER 1 READY";
+          statusRef.current.textContent = "► READY TO PLAY! ◄";
         }
       }
     };
@@ -241,10 +241,10 @@ export default function SitePreloader() {
 
       {/* ── AMBIENT SPOTLIGHT GLOW MATCHING 3D ROOM LAMP ── */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-10"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full pointer-events-none z-10"
         style={{
           background:
-            "radial-gradient(circle, rgba(244, 221, 184, 0.14) 0%, rgba(211, 107, 84, 0.04) 45%, transparent 70%)",
+            "radial-gradient(circle, rgba(244, 221, 184, 0.12) 0%, rgba(211, 107, 84, 0.04) 45%, transparent 70%)",
         }}
       />
 
@@ -257,88 +257,107 @@ export default function SitePreloader() {
       {/* ── CENTER STAGE INDIE GAMER HUD ── */}
       <div
         ref={contentRef}
-        className="relative z-20 w-full h-full max-w-[1280px] mx-auto px-6 md:px-12 py-10 sm:py-16 flex flex-col justify-between"
+        className="relative z-20 w-full h-full max-w-[1200px] mx-auto px-6 md:px-12 py-8 sm:py-12 flex flex-col justify-between"
       >
         {/* Top Gamer Header Marquee */}
-        <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-mono uppercase tracking-[2.5px] text-[#888] pt-2">
+        <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] pt-2">
           <div className="flex items-center gap-2 border-b border-[#2b2520] pb-1">
             <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-            <span className="text-[#e7e5df]">CARTRIDGE: Z-ANDRIE.SYS</span>
+            <span className="text-[#e7e5df]">WORLD 1-1: DEV LAB</span>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-[#f4ddb8]/80">
-            <span>[ INDIE LAB // PHILIPPINES 2026 ]</span>
+            <span>[ Z-ANDRIE // INDIE ODYSSEY ]</span>
           </div>
-          <div className="flex items-center gap-2 border-b border-[#2b2520] pb-1">
-            <span className="text-[#d36b54]">CREDITS: 01</span>
+          <div className="flex items-center gap-3 border-b border-[#2b2520] pb-1">
+            <span className="text-[#d36b54]">COINS: 99</span>
             <span>•</span>
             <span className="text-[#888]">60 FPS</span>
           </div>
         </div>
 
-        {/* Centerpiece: Indie Game Title, Console Diagnostics & Start Deck */}
-        <div className="flex flex-col items-center text-center my-auto py-4">
+        {/* Centerpiece: Indie Game Title, Character/Quest Box & Start Deck */}
+        <div className="flex flex-col items-center text-center my-auto py-2">
           
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded bg-[#161311] border border-[#d36b54]/40 text-[10px] sm:text-[11px] font-mono tracking-[3px] uppercase text-[#f4ddb8] mb-4 shadow-lg">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-ping" />
-            <span>LEVEL 1 // DIGITAL ARCHIVE</span>
+          {/* Indie Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#161311]/80 border border-[#d36b54]/50 text-[10px] sm:text-[11px] font-['Silkscreen'] tracking-[3px] uppercase text-[#f4ddb8] mb-3 shadow-lg backdrop-blur-sm">
+            <span className="text-[#d36b54] animate-bounce">★</span>
+            <span>AN INDIE DEV ODYSSEY</span>
+            <span className="text-[#d36b54] animate-bounce">★</span>
           </div>
 
           {/* Stencil / Pixel Hero Title */}
-          <h1 className="font-stencil text-[52px] sm:text-[80px] md:text-[108px] lg:text-[124px] font-black uppercase text-[#e7e5df] tracking-tight leading-[0.88] drop-shadow-[0_0_35px_rgba(244,221,184,0.22)]">
+          <h1 className="font-stencil text-[48px] sm:text-[72px] md:text-[96px] lg:text-[114px] font-black uppercase text-[#e7e5df] tracking-tight leading-[0.88] drop-shadow-[0_0_25px_rgba(244,221,184,0.25)]">
             Z <span className="text-[#d36b54]">ANDRIE</span>
           </h1>
 
-          <p className="text-[12px] sm:text-[14px] md:text-[15px] font-mono tracking-[2.5px] uppercase text-[#a8a59d] mt-4 max-w-[650px]">
-            Creative Developer • Full-Stack Technologist
+          <p className="font-['Silkscreen'] text-[10px] sm:text-[11px] md:text-[12px] tracking-[2.5px] uppercase text-[#a8a59d] mt-3 max-w-[650px]">
+            [ CREATIVE FULL-STACK DEVELOPER • WORLD BUILDER ]
           </p>
 
-          {/* Retro Boot Diagnostics Terminal (Matches CRT Monitor in 3D Room!) */}
-          <div className="w-full max-w-[560px] mx-auto mt-6 p-4 rounded bg-[#0c0b0a]/90 border border-[#2b2520] font-mono text-left shadow-2xl backdrop-blur-sm">
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#201c18] text-[10px] uppercase tracking-[2px] text-[#777]">
-              <span className="flex items-center gap-1.5 text-[#4ade80]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
-                SYSTEM BOOT CONSOLE
+          {/* Authentic Indie RPG Character & Quest Card (Matching 3D Dev Room!) */}
+          <div className="w-full max-w-[480px] mx-auto mt-5 p-3.5 sm:p-4 rounded bg-[#0c0b0a]/80 border-2 border-[#382f25] shadow-[0_12px_40px_rgba(0,0,0,0.85)] backdrop-blur-md text-left">
+            
+            {/* Header: Player Profile */}
+            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-[#28221b] text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px]">
+              <span className="text-[#4ade80] flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
+                PLAYER: Z ANDRIE
               </span>
-              <span>MEM: 640KB // OK</span>
+              <span className="text-[#f4ddb8]">LVL 26</span>
             </div>
-            <div className="space-y-1.5 text-[11px] tracking-[1.5px] text-[#a8a59d]">
+
+            {/* RPG Stats Bars (HP / MP) */}
+            <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px] font-mono text-[#a8a59d] mb-2.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#d36b54] font-bold">HP</span>
+                <div className="flex-1 h-2 bg-[#1e1914] rounded-xs overflow-hidden border border-[#382f25]">
+                  <div className="h-full bg-gradient-to-r from-[#8b2b18] to-[#d36b54] w-full" />
+                </div>
+                <span className="text-[9px] text-[#f4ddb8] font-mono">100%</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#5eead4] font-bold">MP</span>
+                <div className="flex-1 h-2 bg-[#1e1914] rounded-xs overflow-hidden border border-[#382f25]">
+                  <div className="h-full bg-gradient-to-r from-[#115e59] to-[#5eead4] w-full" />
+                </div>
+                <span className="text-[9px] text-[#f4ddb8] font-mono">100%</span>
+              </div>
+            </div>
+
+            {/* Room Connections (Companion Bot & Quest) */}
+            <div className="space-y-1 text-[11px] font-mono text-[#a8a59d]">
               <div className="flex justify-between">
-                <span>&gt; ENVIRONMENT:</span>
-                <span className="text-[#f4ddb8]">ISOMETRIC DEV ROOM</span>
+                <span>COMPANION:</span>
+                <span className="text-[#f4ddb8]">BOT-01 [AWAKE]</span>
               </div>
               <div className="flex justify-between">
-                <span>&gt; DISPLAY_RIG:</span>
-                <span className="text-[#4ade80]">CRT PHOSPHOR 60FPS</span>
+                <span>LOCATION:</span>
+                <span className="text-[#e7e5df]">ISOMETRIC DEV LAB (PH)</span>
               </div>
-              <div className="flex justify-between">
-                <span>&gt; COMPANION_BOT:</span>
-                <span className="text-[#f4ddb8]">ACTIVE &amp; SYNCED</span>
-              </div>
-              <div className="flex justify-between pt-1 text-[11px] font-bold">
-                <span className="text-[#d36b54]">&gt; STATUS:</span>
+              <div className="flex justify-between pt-1 text-[10px] font-['Silkscreen']">
+                <span className="text-[#d36b54]">STATUS:</span>
                 <span ref={statusRef} className="text-[#f4ddb8] animate-pulse">
-                  READING CARTRIDGE ROM...
+                  BREWING PIXEL COFFEE...
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Segmented 24-Block XP/Asset Loading Bar */}
-          <div className="w-full max-w-[560px] mx-auto mt-5">
-            <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-mono uppercase tracking-[2px] text-[#888] mb-1.5">
-              <span className="text-[#f4ddb8] font-bold flex items-center gap-1.5">
+          {/* Segmented 24-Block XP Loading Bar */}
+          <div className="w-full max-w-[480px] mx-auto mt-4">
+            <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mb-1.5">
+              <span className="text-[#f4ddb8] flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#f4ddb8]" />
-                [ ASSET BUFFER ]
+                XP BUFFER
               </span>
-              <span className="text-[#f4ddb8] font-bold">
+              <span className="text-[#f4ddb8]">
                 [ <span ref={numRef}>000</span>% ]
               </span>
             </div>
 
             {/* Segmented Blocks */}
             <div
-              className="grid gap-[2px] p-1 bg-[#12100e] border border-[#2b2520] rounded-xs shadow-inner"
+              className="grid gap-[2px] p-1 bg-[#12100e]/80 border-2 border-[#382f25] rounded-xs shadow-inner"
               style={{ gridTemplateColumns: `repeat(${SEGMENT_COUNT}, minmax(0, 1fr))` }}
             >
               {Array.from({ length: SEGMENT_COUNT }).map((_, i) => (
@@ -354,20 +373,20 @@ export default function SitePreloader() {
             </div>
           </div>
 
-          {/* Interactive Start Deck Cue */}
-          <div className="mt-8 flex flex-col items-center gap-3">
+          {/* Interactive Start Menu Cue */}
+          <div className="mt-6 flex flex-col items-center gap-2.5">
             {isReady ? (
               <>
-                <div className="flex flex-wrap items-center justify-center gap-3.5">
+                <div className="flex flex-wrap items-center justify-center gap-3">
                   {/* Glowing Arcade Press Start Button */}
                   <button
                     type="button"
                     onClick={triggerGameStart}
-                    className="group relative px-9 sm:px-12 py-3.5 sm:py-4 rounded border-2 border-[#f4ddb8] bg-[#161311] hover:bg-[#d36b54] text-[#f4ddb8] hover:text-white hover:border-[#d36b54] active:scale-95 transition-all duration-200 font-mono text-[13px] sm:text-[15px] uppercase tracking-[4px] font-black shadow-[0_0_30px_rgba(244,221,184,0.35)] hover:shadow-[0_0_45px_rgba(211,107,84,0.7)] cursor-pointer flex items-center gap-3 animate-pulse hover:animate-none"
+                    className="group relative px-8 sm:px-10 py-3 rounded border-2 border-[#f4ddb8] bg-[#161311] hover:bg-[#d36b54] text-[#f4ddb8] hover:text-white hover:border-[#d36b54] active:scale-95 transition-all duration-200 font-['Silkscreen'] text-[12px] sm:text-[14px] uppercase tracking-[3px] font-bold shadow-[0_0_25px_rgba(244,221,184,0.35)] hover:shadow-[0_0_35px_rgba(211,107,84,0.7)] cursor-pointer flex items-center gap-2.5 animate-pulse hover:animate-none"
                   >
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80] shadow-[0_0_10px_#4ade80]" />
-                    <span>PRESS START</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-[#f4ddb8]/20 group-hover:bg-white/20 text-[#f4ddb8] group-hover:text-white border border-[#f4ddb8]/40">
+                    <span className="text-[#4ade80] animate-bounce">►</span>
+                    <span>START GAME</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f4ddb8]/20 group-hover:bg-white/20 text-[#f4ddb8] group-hover:text-white border border-[#f4ddb8]/40 font-mono">
                       SPACE
                     </span>
                   </button>
@@ -376,22 +395,22 @@ export default function SitePreloader() {
                   <button
                     type="button"
                     onClick={triggerGameStart}
-                    className="group px-5 py-3.5 rounded border border-[#3d362e] hover:border-[#f4ddb8] bg-[#12100e] text-[#a8a59d] hover:text-[#f4ddb8] transition-all duration-200 font-mono text-[11px] uppercase tracking-[2px] flex items-center gap-2 cursor-pointer"
+                    className="group px-4 py-3 rounded border border-[#382f25] hover:border-[#f4ddb8] bg-[#12100e]/80 text-[#a8a59d] hover:text-[#f4ddb8] transition-all duration-200 font-['Silkscreen'] text-[10px] sm:text-[11px] uppercase tracking-[2px] flex items-center gap-2 cursor-pointer"
                     title="Click to insert coin"
                   >
-                    <span className="w-1.5 h-4 bg-[#b88c4b] rounded-xs group-hover:bg-[#f4ddb8]" />
-                    <span>INSERT COIN (01)</span>
+                    <span>🪙</span>
+                    <span>INSERT COIN</span>
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-[2px] uppercase text-[#7a756f]">
-                  <span>[ PRESS SPACEBAR OR ENTER TO LAUNCH ]</span>
+                <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-['Silkscreen'] tracking-[2px] uppercase text-[#7a756f]">
+                  <span>[ PRESS SPACEBAR OR CLICK TO START ]</span>
                 </div>
               </>
             ) : (
-              <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[2px] text-[#666]">
+              <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#777]">
                 <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-ping" />
-                <span>BOOTING UP INDIE GAME RIG...</span>
+                <span>LOADING DEV WORLD...</span>
               </div>
             )}
           </div>
@@ -399,16 +418,16 @@ export default function SitePreloader() {
         </div>
 
         {/* Bottom Game Specs & Telemetry */}
-        <div className="w-full pt-2 flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-[11px] font-mono uppercase tracking-[2px] text-[#888] border-t border-[#1e1b18]">
+        <div className="w-full pt-2 flex flex-col sm:flex-row justify-between items-center text-[9px] sm:text-[10px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] border-t border-[#1e1b18]">
           <span className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#f4ddb8]" />
-            INDIE DEVELOPER SYSTEM • BUILD 2026
+            INDIE DEVELOPER RIG • 2026
           </span>
           <span className="hidden sm:inline-block text-[#555]">
-            [ COZY ISOMETRIC STUDIO // CRT PHOSPHOR ]
+            [ COZY ISOMETRIC LAB // CRT PHOSPHOR ]
           </span>
           <span className="text-[#f4ddb8]">
-            CONTROL: [ MOUSE • KEYBOARD • TOUCH ]
+            CONTROLS: [ MOUSE • KEYBOARD • TOUCH ]
           </span>
         </div>
       </div>
