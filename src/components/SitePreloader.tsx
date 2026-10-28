@@ -228,7 +228,7 @@ export default function SitePreloader() {
   return (
     <div
       ref={rootRef}
-      className={`site-preloader fixed inset-0 z-[100000] overflow-hidden select-none text-[#e7e5df] ${
+      className={`site-preloader fixed inset-0 z-[100000] overflow-hidden select-none text-[#e7e5df] flex flex-col items-center justify-center p-6 ${
         isReady ? "cursor-default" : "cursor-wait"
       }`}
       role="status"
@@ -247,247 +247,142 @@ export default function SitePreloader() {
         }}
       />
 
-      {/* ── CORNER HUD BRACKETS ── */}
-      <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#f4ddb8]/40 pointer-events-none z-20" />
-      <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#f4ddb8]/40 pointer-events-none z-20" />
-      <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#f4ddb8]/40 pointer-events-none z-20" />
-      <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#f4ddb8]/40 pointer-events-none z-20" />
-
-      {/* ── CENTER STAGE INDIE GAMER HUD ── */}
+      {/* ── CENTER STAGE: CLEAN & MINIMALIST INDIE GAME INTRO ── */}
       <div
         ref={contentRef}
-        className="relative z-20 w-full h-full max-w-[1200px] mx-auto px-6 md:px-12 py-8 sm:py-12 flex flex-col justify-between"
+        className="relative z-20 w-full max-w-[540px] mx-auto flex flex-col items-center text-center"
       >
-        {/* Top Gamer Header Marquee */}
-        <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] pt-2">
-          <div className="flex items-center gap-2 border-b border-[#2b2520] pb-1">
-            <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-            <span className="text-[#e7e5df]">WORLD 1-1: DEV LAB</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 text-[#f4ddb8]/80">
-            <span>[ Z-ANDRIE // INDIE ODYSSEY ]</span>
-          </div>
-          <div className="flex items-center gap-3 border-b border-[#2b2520] pb-1">
-            <span className="text-[#d36b54]">COINS: 99</span>
-            <span>•</span>
-            <span className="text-[#888]">60 FPS</span>
-          </div>
-        </div>
+        {/* Indie Title */}
+        <h1 className="font-stencil text-[56px] sm:text-[84px] md:text-[104px] font-black uppercase text-[#e7e5df] tracking-tight leading-[0.88] drop-shadow-[0_0_30px_rgba(244,221,184,0.22)]">
+          Z <span className="text-[#d36b54]">ANDRIE</span>
+        </h1>
 
-        {/* Centerpiece: Indie Game Title, Character/Quest Box & Start Deck */}
-        <div className="flex flex-col items-center text-center my-auto py-2">
-          
-          {/* Indie Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#161311]/80 border border-[#d36b54]/50 text-[10px] sm:text-[11px] font-['Silkscreen'] tracking-[3px] uppercase text-[#f4ddb8] mb-3 shadow-lg backdrop-blur-sm">
-            <span className="text-[#d36b54] animate-bounce">★</span>
-            <span>AN INDIE DEV ODYSSEY</span>
-            <span className="text-[#d36b54] animate-bounce">★</span>
+        <p className="font-['Silkscreen'] text-[11px] sm:text-[13px] tracking-[3px] uppercase text-[#a8a59d] mt-3">
+          Creative Developer
+        </p>
+
+        {/* ── THE INDIE GAME COMPANION BOT RUNNER & PIXEL LOADING BAR ── */}
+        <div className="relative w-full max-w-[420px] mx-auto mt-8 mb-4">
+          {/* Top Labels */}
+          <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mb-2 px-1">
+            <span className="text-[#f4ddb8] flex items-center gap-2">
+              <span className="text-[#d36b54] text-[12px] animate-pulse">💾</span>
+              <span>LOADING...</span>
+            </span>
+            <span className="text-[#f4ddb8] font-bold">
+              [ <span ref={numRef}>000</span>% ]
+            </span>
           </div>
 
-          {/* Stencil / Pixel Hero Title */}
-          <h1 className="font-stencil text-[48px] sm:text-[72px] md:text-[96px] lg:text-[114px] font-black uppercase text-[#e7e5df] tracking-tight leading-[0.88] drop-shadow-[0_0_25px_rgba(244,221,184,0.25)]">
-            Z <span className="text-[#d36b54]">ANDRIE</span>
-          </h1>
-
-          <p className="font-['Silkscreen'] text-[10px] sm:text-[11px] md:text-[12px] tracking-[2.5px] uppercase text-[#a8a59d] mt-3 max-w-[650px]">
-            [ CREATIVE FULL-STACK DEVELOPER • WORLD BUILDER ]
-          </p>
-
-          {/* Authentic Indie RPG Character & Quest Card (Matching 3D Dev Room!) */}
-          <div className="w-full max-w-[480px] mx-auto mt-5 p-3.5 sm:p-4 rounded bg-[#0c0b0a]/80 border-2 border-[#382f25] shadow-[0_12px_40px_rgba(0,0,0,0.85)] backdrop-blur-md text-left">
-            
-            {/* Header: Player Profile */}
-            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-[#28221b] text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px]">
-              <span className="text-[#4ade80] flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-                PLAYER: Z ANDRIE
-              </span>
-              <span className="text-[#f4ddb8]">LVL 26</span>
-            </div>
-
-            {/* RPG Stats Bars (HP / MP) */}
-            <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px] font-mono text-[#a8a59d] mb-2.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[#d36b54] font-bold">HP</span>
-                <div className="flex-1 h-2 bg-[#1e1914] rounded-xs overflow-hidden border border-[#382f25]">
-                  <div className="h-full bg-gradient-to-r from-[#8b2b18] to-[#d36b54] w-full" />
-                </div>
-                <span className="text-[9px] text-[#f4ddb8] font-mono">100%</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[#5eead4] font-bold">MP</span>
-                <div className="flex-1 h-2 bg-[#1e1914] rounded-xs overflow-hidden border border-[#382f25]">
-                  <div className="h-full bg-gradient-to-r from-[#115e59] to-[#5eead4] w-full" />
-                </div>
-                <span className="text-[9px] text-[#f4ddb8] font-mono">100%</span>
-              </div>
-            </div>
-
-            {/* Room Connections (Companion Bot & Quest) */}
-            <div className="space-y-1 text-[11px] font-mono text-[#a8a59d]">
-              <div className="flex justify-between">
-                <span>COMPANION:</span>
-                <span className="text-[#f4ddb8]">BOT-01 [AWAKE]</span>
-              </div>
-              <div className="flex justify-between">
-                <span>LOCATION:</span>
-                <span className="text-[#e7e5df]">ISOMETRIC DEV LAB (PH)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── THE INDIE GAME COMPANION BOT RUNNER & PIXEL LOADING BAR ── */}
-          <div className="relative w-full max-w-[480px] mx-auto mt-6 mb-3">
-            {/* Top Labels */}
-            <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mb-2 px-1">
-              <span className="text-[#f4ddb8] flex items-center gap-2">
-                <span className="text-[#d36b54] text-[12px] animate-pulse">💾</span>
-                <span>LOADING DEV WORLD</span>
-              </span>
-              <span className="text-[#f4ddb8] font-bold">
-                [ <span ref={numRef}>000</span>% ]
-              </span>
-            </div>
-
-            {/* The Outer Chunky Pixel Bezel Track */}
-            <div className="relative p-1 sm:p-1.5 bg-[#0e0c0a] border-2 border-[#52412e] rounded shadow-[0_0_20px_rgba(0,0,0,0.9),inset_0_2px_4px_rgba(0,0,0,0.8)]">
-              {/* Inner Recessed Channel with Pixel Ticks */}
-              <div className="relative w-full h-4 sm:h-5 bg-[#14110e] rounded-xs overflow-hidden border border-[#2a2016]">
-                {/* Background Pixel Grid Ticks */}
-                <div
-                  className="absolute inset-0 pointer-events-none opacity-25 z-10"
-                  style={{
-                    backgroundImage:
-                      "repeating-linear-gradient(90deg, #52412e 0px, #52412e 1px, transparent 1px, transparent 16px)",
-                  }}
-                />
-
-                {/* Progress Fill Bar */}
-                <div
-                  ref={progressBarRef}
-                  className="h-full bg-gradient-to-r from-[#8c2e1b] via-[#d36b54] to-[#f4ddb8] relative transition-all duration-75 ease-out shadow-[0_0_14px_#d36b54]"
-                  style={{
-                    width: "0%",
-                    backgroundImage:
-                      "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 3px, transparent 3px, transparent 6px)",
-                  }}
-                >
-                  {/* Leading Edge Spark Flare */}
-                  <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-[#ffffff] shadow-[0_0_12px_#ffffff,0_0_20px_#f4ddb8] animate-pulse" />
-                </div>
-              </div>
-
-              {/* Moving Companion Bot Sprite */}
+          {/* The Outer Chunky Pixel Bezel Track */}
+          <div className="relative p-1 bg-[#0e0c0a] border-2 border-[#52412e] rounded shadow-[0_0_20px_rgba(0,0,0,0.9),inset_0_2px_4px_rgba(0,0,0,0.8)]">
+            {/* Inner Recessed Channel with Pixel Ticks */}
+            <div className="relative w-full h-4 sm:h-5 bg-[#14110e] rounded-xs overflow-hidden border border-[#2a2016]">
+              {/* Background Pixel Grid Ticks */}
               <div
-                ref={botSpriteRef}
-                className="absolute -top-11 -translate-x-1/2 pointer-events-none transition-all duration-75 ease-out z-20 flex flex-col items-center"
-                style={{ left: "4%" }}
+                className="absolute inset-0 pointer-events-none opacity-25 z-10"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(90deg, #52412e 0px, #52412e 1px, transparent 1px, transparent 16px)",
+                }}
+              />
+
+              {/* Progress Fill Bar */}
+              <div
+                ref={progressBarRef}
+                className="h-full bg-gradient-to-r from-[#8c2e1b] via-[#d36b54] to-[#f4ddb8] relative transition-all duration-75 ease-out shadow-[0_0_14px_#d36b54]"
+                style={{
+                  width: "0%",
+                  backgroundImage:
+                    "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 3px, transparent 3px, transparent 6px)",
+                }}
               >
-                {/* Speech Bubble */}
-                {isReady ? (
-                  <div className="px-2 py-0.5 rounded bg-[#f4ddb8] text-[#0a0806] font-['Silkscreen'] text-[8px] font-bold tracking-wider mb-1 animate-bounce shadow-[0_0_10px_#f4ddb8]">
-                    READY!
-                  </div>
-                ) : (
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-ping mb-1" />
-                )}
-
-                {/* Bot Body (Matches 3D Room Companion Robot) */}
-                <div className="relative w-8 h-6 bg-[#25201a] border-2 border-[#b88c4b] rounded-xs shadow-[0_0_12px_rgba(244,221,184,0.4)] flex items-center justify-center">
-                  {/* Antenna */}
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-[2px] h-2 bg-[#8c6534]">
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-pulse" />
-                  </div>
-
-                  {/* Screen Face */}
-                  <div className="w-6 h-4 bg-[#0a0907] border border-[#4a3922] rounded-[1px] flex items-center justify-around px-0.5">
-                    {isReady ? (
-                      <>
-                        <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
-                        <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Thruster Flame */}
-                <div className="w-3 h-1 bg-gradient-to-b from-[#d36b54] to-transparent rounded-full animate-pulse" />
+                {/* Leading Edge Spark Flare */}
+                <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-[#ffffff] shadow-[0_0_12px_#ffffff,0_0_20px_#f4ddb8] animate-pulse" />
               </div>
             </div>
 
-            {/* Bottom Sub-Label: Loading Ticker & Room Connection */}
-            <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mt-2 px-1">
-              <span className="text-[#777] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
-                <span ref={statusRef}>BREWING PIXEL COFFEE...</span>
-              </span>
-              <span className="text-[#d36b54] hidden sm:inline-block">
-                [ BOT-01 COMPANION ]
-              </span>
+            {/* Moving Companion Bot Sprite */}
+            <div
+              ref={botSpriteRef}
+              className="absolute -top-11 -translate-x-1/2 pointer-events-none transition-all duration-75 ease-out z-20 flex flex-col items-center"
+              style={{ left: "4%" }}
+            >
+              {/* Speech Bubble */}
+              {isReady ? (
+                <div className="px-2 py-0.5 rounded bg-[#f4ddb8] text-[#0a0806] font-['Silkscreen'] text-[8px] font-bold tracking-wider mb-1 animate-bounce shadow-[0_0_10px_#f4ddb8]">
+                  READY!
+                </div>
+              ) : (
+                <div className="w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-ping mb-1" />
+              )}
+
+              {/* Bot Body (Matches 3D Room Companion Robot) */}
+              <div className="relative w-8 h-6 bg-[#25201a] border-2 border-[#b88c4b] rounded-xs shadow-[0_0_12px_rgba(244,221,184,0.4)] flex items-center justify-center">
+                {/* Antenna */}
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-[2px] h-2 bg-[#8c6534]">
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-pulse" />
+                </div>
+
+                {/* Screen Face */}
+                <div className="w-6 h-4 bg-[#0a0907] border border-[#4a3922] rounded-[1px] flex items-center justify-around px-0.5">
+                  {isReady ? (
+                    <>
+                      <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
+                      <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Thruster Flame */}
+              <div className="w-3 h-1 bg-gradient-to-b from-[#d36b54] to-transparent rounded-full animate-pulse" />
             </div>
           </div>
 
-          {/* Interactive Start Menu Cue */}
-          <div className="mt-5 flex flex-col items-center gap-2.5">
-            {isReady ? (
-              <>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {/* Glowing Arcade Press Start Button */}
-                  <button
-                    type="button"
-                    onClick={triggerGameStart}
-                    className="group relative px-8 sm:px-10 py-3 rounded border-2 border-[#f4ddb8] bg-[#161311] hover:bg-[#d36b54] text-[#f4ddb8] hover:text-white hover:border-[#d36b54] active:scale-95 transition-all duration-200 font-['Silkscreen'] text-[12px] sm:text-[14px] uppercase tracking-[3px] font-bold shadow-[0_0_25px_rgba(244,221,184,0.35)] hover:shadow-[0_0_35px_rgba(211,107,84,0.7)] cursor-pointer flex items-center gap-2.5 animate-pulse hover:animate-none"
-                  >
-                    <span className="text-[#4ade80] animate-bounce">►</span>
-                    <span>START GAME</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f4ddb8]/20 group-hover:bg-white/20 text-[#f4ddb8] group-hover:text-white border border-[#f4ddb8]/40 font-mono">
-                      SPACE
-                    </span>
-                  </button>
-
-                  {/* Interactive Arcade Coin Slot */}
-                  <button
-                    type="button"
-                    onClick={triggerGameStart}
-                    className="group px-4 py-3 rounded border border-[#382f25] hover:border-[#f4ddb8] bg-[#12100e]/80 text-[#a8a59d] hover:text-[#f4ddb8] transition-all duration-200 font-['Silkscreen'] text-[10px] sm:text-[11px] uppercase tracking-[2px] flex items-center gap-2 cursor-pointer"
-                    title="Click to insert coin"
-                  >
-                    <span>🪙</span>
-                    <span>INSERT COIN</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-['Silkscreen'] tracking-[2px] uppercase text-[#7a756f]">
-                  <span>[ PRESS SPACEBAR OR CLICK TO START ]</span>
-                </div>
-              </>
-            ) : (
-              <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#777]">
-                <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-ping" />
-                <span>LOADING DEV WORLD...</span>
-              </div>
-            )}
+          {/* Bottom Sub-Label: Loading Ticker */}
+          <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mt-2 px-1">
+            <span className="text-[#777] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+              <span ref={statusRef}>BREWING PIXEL COFFEE...</span>
+            </span>
+            <span className="text-[#d36b54] hidden sm:inline-block">
+              [ BOT-01 ]
+            </span>
           </div>
-
         </div>
 
-        {/* Bottom Game Specs & Telemetry */}
-        <div className="w-full pt-2 flex flex-col sm:flex-row justify-between items-center text-[9px] sm:text-[10px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] border-t border-[#1e1b18]">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f4ddb8]" />
-            INDIE DEVELOPER RIG • 2026
-          </span>
-          <span className="hidden sm:inline-block text-[#555]">
-            [ COZY ISOMETRIC LAB // CRT PHOSPHOR ]
-          </span>
-          <span className="text-[#f4ddb8]">
-            CONTROLS: [ MOUSE • KEYBOARD • TOUCH ]
-          </span>
+        {/* ── INTERACTIVE START ACTION CUE ── */}
+        <div className="mt-4 flex flex-col items-center gap-2">
+          {isReady ? (
+            <>
+              <button
+                type="button"
+                onClick={triggerGameStart}
+                className="group relative px-9 sm:px-11 py-3.5 rounded border-2 border-[#f4ddb8] bg-[#161311] hover:bg-[#d36b54] text-[#f4ddb8] hover:text-white hover:border-[#d36b54] active:scale-95 transition-all duration-200 font-['Silkscreen'] text-[13px] sm:text-[14px] uppercase tracking-[3px] font-bold shadow-[0_0_25px_rgba(244,221,184,0.35)] hover:shadow-[0_0_35px_rgba(211,107,84,0.7)] cursor-pointer flex items-center gap-2.5 animate-pulse hover:animate-none"
+              >
+                <span className="text-[#4ade80] animate-bounce">►</span>
+                <span>START GAME</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f4ddb8]/20 group-hover:bg-white/20 text-[#f4ddb8] group-hover:text-white border border-[#f4ddb8]/40 font-mono">
+                  SPACE
+                </span>
+              </button>
+
+              <div className="text-[9px] sm:text-[10px] font-['Silkscreen'] tracking-[2px] uppercase text-[#7a756f] mt-1">
+                [ PRESS SPACEBAR OR CLICK TO START ]
+              </div>
+            </>
+          ) : (
+            <div className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#777] mt-2">
+              <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-ping" />
+              <span>LOADING DEV WORLD...</span>
+            </div>
+          )}
         </div>
       </div>
 
