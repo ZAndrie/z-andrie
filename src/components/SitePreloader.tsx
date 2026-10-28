@@ -6,7 +6,6 @@ import { PRELOADER_DONE_EVENT, PRELOADER_SESSION_KEY } from "@/lib/preloader";
 
 const MIN_MS = 1400; // minimum duration to appreciate boot sequence
 const MAX_MS = 2800; // maximum cap for slower devices
-const SEGMENT_COUNT = 24; // 24-segment retro health/EXP bar
 
 /**
  * Procedural Web Audio API: 
@@ -67,12 +66,13 @@ export default function SitePreloader() {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const botSpriteRef = useRef<HTMLDivElement>(null);
   const numRef = useRef<HTMLSpanElement>(null);
   const statusRef = useRef<HTMLSpanElement>(null);
 
   const [gone, setGone] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [activeSegments, setActiveSegments] = useState(0);
   const isRevealedRef = useRef(false);
 
   // Trigger game start / system launch
@@ -177,11 +177,10 @@ export default function SitePreloader() {
     const paint = (v: number) => {
       const rounded = Math.round(v);
       if (numRef.current) numRef.current.textContent = String(rounded).padStart(3, "0");
+      if (progressBarRef.current) progressBarRef.current.style.width = `${v}%`;
+      if (botSpriteRef.current) botSpriteRef.current.style.left = `${Math.min(96, Math.max(4, v))}%`;
 
-      const segs = Math.min(SEGMENT_COUNT, Math.floor((v / 100) * SEGMENT_COUNT));
-      setActiveSegments(segs);
-
-      // Dynamic indie game console status
+      // Dynamic indie game loading status
       if (statusRef.current) {
         if (rounded < 25) {
           statusRef.current.textContent = "BREWING PIXEL COFFEE...";
@@ -334,47 +333,107 @@ export default function SitePreloader() {
                 <span>LOCATION:</span>
                 <span className="text-[#e7e5df]">ISOMETRIC DEV LAB (PH)</span>
               </div>
-              <div className="flex justify-between pt-1 text-[10px] font-['Silkscreen']">
-                <span className="text-[#d36b54]">STATUS:</span>
-                <span ref={statusRef} className="text-[#f4ddb8] animate-pulse">
-                  BREWING PIXEL COFFEE...
-                </span>
-              </div>
             </div>
           </div>
 
-          {/* Segmented 24-Block XP Loading Bar */}
-          <div className="w-full max-w-[480px] mx-auto mt-4">
-            <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mb-1.5">
-              <span className="text-[#f4ddb8] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#f4ddb8]" />
-                XP BUFFER
+          {/* ── THE INDIE GAME COMPANION BOT RUNNER & PIXEL LOADING BAR ── */}
+          <div className="relative w-full max-w-[480px] mx-auto mt-6 mb-3">
+            {/* Top Labels */}
+            <div className="flex justify-between items-center text-[10px] sm:text-[11px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mb-2 px-1">
+              <span className="text-[#f4ddb8] flex items-center gap-2">
+                <span className="text-[#d36b54] text-[12px] animate-pulse">💾</span>
+                <span>LOADING DEV WORLD</span>
               </span>
-              <span className="text-[#f4ddb8]">
+              <span className="text-[#f4ddb8] font-bold">
                 [ <span ref={numRef}>000</span>% ]
               </span>
             </div>
 
-            {/* Segmented Blocks */}
-            <div
-              className="grid gap-[2px] p-1 bg-[#12100e]/80 border-2 border-[#382f25] rounded-xs shadow-inner"
-              style={{ gridTemplateColumns: `repeat(${SEGMENT_COUNT}, minmax(0, 1fr))` }}
-            >
-              {Array.from({ length: SEGMENT_COUNT }).map((_, i) => (
+            {/* The Outer Chunky Pixel Bezel Track */}
+            <div className="relative p-1 sm:p-1.5 bg-[#0e0c0a] border-2 border-[#52412e] rounded shadow-[0_0_20px_rgba(0,0,0,0.9),inset_0_2px_4px_rgba(0,0,0,0.8)]">
+              {/* Inner Recessed Channel with Pixel Ticks */}
+              <div className="relative w-full h-4 sm:h-5 bg-[#14110e] rounded-xs overflow-hidden border border-[#2a2016]">
+                {/* Background Pixel Grid Ticks */}
                 <div
-                  key={i}
-                  className={`h-2.5 sm:h-3 rounded-[1px] transition-colors duration-100 ${
-                    i < activeSegments
-                      ? "bg-gradient-to-t from-[#d36b54] to-[#f4ddb8] shadow-[0_0_8px_#d36b54]"
-                      : "bg-[#1e1915]"
-                  }`}
+                  className="absolute inset-0 pointer-events-none opacity-25 z-10"
+                  style={{
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, #52412e 0px, #52412e 1px, transparent 1px, transparent 16px)",
+                  }}
                 />
-              ))}
+
+                {/* Progress Fill Bar */}
+                <div
+                  ref={progressBarRef}
+                  className="h-full bg-gradient-to-r from-[#8c2e1b] via-[#d36b54] to-[#f4ddb8] relative transition-all duration-75 ease-out shadow-[0_0_14px_#d36b54]"
+                  style={{
+                    width: "0%",
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 3px, transparent 3px, transparent 6px)",
+                  }}
+                >
+                  {/* Leading Edge Spark Flare */}
+                  <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-[#ffffff] shadow-[0_0_12px_#ffffff,0_0_20px_#f4ddb8] animate-pulse" />
+                </div>
+              </div>
+
+              {/* Moving Companion Bot Sprite */}
+              <div
+                ref={botSpriteRef}
+                className="absolute -top-11 -translate-x-1/2 pointer-events-none transition-all duration-75 ease-out z-20 flex flex-col items-center"
+                style={{ left: "4%" }}
+              >
+                {/* Speech Bubble */}
+                {isReady ? (
+                  <div className="px-2 py-0.5 rounded bg-[#f4ddb8] text-[#0a0806] font-['Silkscreen'] text-[8px] font-bold tracking-wider mb-1 animate-bounce shadow-[0_0_10px_#f4ddb8]">
+                    READY!
+                  </div>
+                ) : (
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-ping mb-1" />
+                )}
+
+                {/* Bot Body (Matches 3D Room Companion Robot) */}
+                <div className="relative w-8 h-6 bg-[#25201a] border-2 border-[#b88c4b] rounded-xs shadow-[0_0_12px_rgba(244,221,184,0.4)] flex items-center justify-center">
+                  {/* Antenna */}
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-[2px] h-2 bg-[#8c6534]">
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-pulse" />
+                  </div>
+
+                  {/* Screen Face */}
+                  <div className="w-6 h-4 bg-[#0a0907] border border-[#4a3922] rounded-[1px] flex items-center justify-around px-0.5">
+                    {isReady ? (
+                      <>
+                        <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
+                        <span className="text-[#f4ddb8] text-[8px] font-bold">★</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] shadow-[0_0_5px_#4ade80] animate-pulse" />
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Thruster Flame */}
+                <div className="w-3 h-1 bg-gradient-to-b from-[#d36b54] to-transparent rounded-full animate-pulse" />
+              </div>
+            </div>
+
+            {/* Bottom Sub-Label: Loading Ticker & Room Connection */}
+            <div className="flex justify-between items-center text-[9px] sm:text-[10px] font-['Silkscreen'] uppercase tracking-[2px] text-[#888] mt-2 px-1">
+              <span className="text-[#777] flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+                <span ref={statusRef}>BREWING PIXEL COFFEE...</span>
+              </span>
+              <span className="text-[#d36b54] hidden sm:inline-block">
+                [ BOT-01 COMPANION ]
+              </span>
             </div>
           </div>
 
           {/* Interactive Start Menu Cue */}
-          <div className="mt-6 flex flex-col items-center gap-2.5">
+          <div className="mt-5 flex flex-col items-center gap-2.5">
             {isReady ? (
               <>
                 <div className="flex flex-wrap items-center justify-center gap-3">
