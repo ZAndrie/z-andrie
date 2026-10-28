@@ -60,6 +60,18 @@ export default function SitePreloader() {
   const filamentPathRef = useRef<SVGPathElement>(null);
   const bulbHaloRef = useRef<HTMLDivElement>(null);
 
+  // Cord dragging & tactile physics
+  const cordRef = useRef<HTMLDivElement>(null);
+  const beadRef = useRef<HTMLButtonElement>(null);
+  const startYRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const currentPullYRef = useRef(0);
+  const isTriggeredRef = useRef(false);
+
+  const BASE_CORD_HEIGHT = 44;
+  const MAX_PULL = 60;
+  const PULL_THRESHOLD = 22;
+
   const [gone, setGone] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const isRevealedRef = useRef(false);
@@ -128,6 +140,106 @@ export default function SitePreloader() {
     }
   }, []);
 
+  // Snap cord back up with mechanical recoil and trigger the theatrical reveal
+  const snapAndReveal = useCallback(() => {
+    if (isRevealedRef.current) return;
+    gsap.timeline()
+      .to(beadRef.current, {
+        y: 0,
+        duration: 0.16,
+        ease: "back.out(2)",
+      })
+      .to(
+        cordRef.current,
+        {
+          height: BASE_CORD_HEIGHT,
+          duration: 0.16,
+          ease: "back.out(2)",
+        },
+        0
+      )
+      .add(() => {
+        triggerCurtainCall();
+      });
+  }, [BASE_CORD_HEIGHT, triggerCurtainCall]);
+
+  const handleCordPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!isReady || isRevealedRef.current || isTriggeredRef.current) return;
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    isDraggingRef.current = true;
+    startYRef.current = e.clientY;
+    currentPullYRef.current = 0;
+  };
+
+  const handleCordPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!isDraggingRef.current || isTriggeredRef.current) return;
+    const dy = e.clientY - startYRef.current;
+    const pull = Math.max(0, Math.min(MAX_PULL, dy));
+    currentPullYRef.current = pull;
+
+    if (cordRef.current) {
+      cordRef.current.style.height = `${BASE_CORD_HEIGHT + pull}px`;
+    }
+    if (beadRef.current) {
+      beadRef.current.style.transform = `translateY(${pull}px)`;
+    }
+    if (filamentPathRef.current) {
+      const extra = Math.min(1, pull / PULL_THRESHOLD);
+      filamentPathRef.current.style.filter = `drop-shadow(0 0 ${16 + extra * 14}px #ffffff) drop-shadow(0 0 ${30 + extra * 25}px #f4ddb8)`;
+    }
+
+    if (pull >= 45) {
+      isDraggingRef.current = false;
+      isTriggeredRef.current = true;
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {}
+      snapAndReveal();
+    }
+  };
+
+  const handleCordPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+
+    if (currentPullYRef.current >= PULL_THRESHOLD) {
+      isTriggeredRef.current = true;
+      snapAndReveal();
+    } else {
+      // Released without pulling past threshold: spring back to rest position
+      gsap.to(beadRef.current, {
+        y: 0,
+        duration: 0.35,
+        ease: "elastic.out(1.2, 0.4)",
+      });
+      gsap.to(cordRef.current, {
+        height: BASE_CORD_HEIGHT,
+        duration: 0.35,
+        ease: "elastic.out(1.2, 0.4)",
+      });
+    }
+  };
+
+  const handleCordClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!isReady || isRevealedRef.current || isTriggeredRef.current) return;
+    isTriggeredRef.current = true;
+
+    // Animate a crisp physical pull and recoil
+    gsap.timeline()
+      .to(beadRef.current, { y: 26, duration: 0.09, ease: "power2.in" })
+      .to(cordRef.current, { height: BASE_CORD_HEIGHT + 26, duration: 0.09, ease: "power2.in" }, 0)
+      .to(beadRef.current, { y: 0, duration: 0.15, ease: "back.out(2)" })
+      .to(cordRef.current, { height: BASE_CORD_HEIGHT, duration: 0.15, ease: "back.out(2)" }, "<")
+      .add(() => {
+        triggerCurtainCall();
+      });
+  };
+
   useEffect(() => {
     const html = document.documentElement;
     if (html.dataset.preloader !== "loading") return;
@@ -144,7 +256,6 @@ export default function SitePreloader() {
     if (!loaded) window.addEventListener("load", onLoad, { once: true });
 
     let p = 0;
-    let autoTriggerTimeout: NodeJS.Timeout | null = null;
 
     const paint = (v: number) => {
       const rounded = Math.round(v);
@@ -160,7 +271,7 @@ export default function SitePreloader() {
         } else if (rounded < 95) {
           statusRef.current.textContent = "PARTING HEAVY VELVET THEATER DRAPES...";
         } else {
-          statusRef.current.textContent = "STAGE READY • PULL CORD OR CLICK TO RAISE CURTAINS";
+          statusRef.current.textContent = "STAGE READY • PULL CORD TO ENTER";
         }
       }
 
@@ -204,10 +315,7 @@ export default function SitePreloader() {
       if (p >= 100) {
         gsap.ticker.remove(tick);
         setIsReady(true);
-        // Automatic curtain reveal fallback so visitors are never stuck
-        autoTriggerTimeout = setTimeout(() => {
-          triggerCurtainCall();
-        }, 1100);
+        // Deliberate gate: NO automatic timer! Waits for the user to pull cord or click.
       }
     };
 
@@ -215,7 +323,6 @@ export default function SitePreloader() {
 
     return () => {
       gsap.ticker.remove(tick);
-      if (autoTriggerTimeout) clearTimeout(autoTriggerTimeout);
       window.removeEventListener("load", onLoad);
       if (html.dataset.preloader === "loading") html.dataset.preloader = "done";
     };
@@ -226,9 +333,8 @@ export default function SitePreloader() {
   return (
     <div
       ref={rootRef}
-      onClick={isReady ? triggerCurtainCall : undefined}
       className={`site-preloader fixed inset-0 z-[100000] overflow-hidden select-none bg-[#070707] text-[#e7e5df] ${
-        isReady ? "cursor-pointer" : "cursor-wait"
+        isReady ? "cursor-default" : "cursor-wait"
       }`}
       role="status"
       aria-label="Theatrical Stage Loading"
@@ -308,24 +414,58 @@ export default function SitePreloader() {
               </svg>
             </div>
 
-            {/* Hanging Pull-Cord / Chain */}
-            <div className="flex flex-col items-center mt-1">
-              <div className="w-[1.5px] h-8 bg-repeating-linear-gradient(180deg, #8c6534 0, #8c6534 3px, #4a371e 3px, #4a371e 5px)" />
-              {/* Brass Toggle Bead Handle */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  triggerCurtainCall();
+            {/* Hanging Pull-Cord / Chain Assembly */}
+            <div className="relative flex flex-col items-center mt-0.5 select-none z-30">
+              {/* Stretchable Brass Ball-Chain */}
+              <div
+                ref={cordRef}
+                className="w-[2.5px] rounded-full shadow-sm origin-top transition-none"
+                style={{
+                  height: `${BASE_CORD_HEIGHT}px`,
+                  backgroundImage:
+                    "radial-gradient(circle, #e2b46c 1.2px, #6e481f 1.3px, #4a371e 2.5px)",
+                  backgroundSize: "2.5px 5.5px",
+                  backgroundRepeat: "repeat-y",
                 }}
-                className={`w-4 h-6 rounded-full border border-[#b88c4b] bg-gradient-to-b from-[#b88c4b] to-[#5a411f] shadow-lg flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-125 ${
-                  isReady ? "animate-bounce" : ""
-                }`}
-                title="Pull cord to raise curtain"
-                aria-label="Pull cord to raise curtain"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#fff4db] shadow-[0_0_6px_#fff4db]" />
-              </button>
+              />
+
+              {/* Brass Toggle Pull-Bead Handle */}
+              <div className="relative flex items-center justify-center">
+                <button
+                  ref={beadRef}
+                  type="button"
+                  onPointerDown={handleCordPointerDown}
+                  onPointerMove={handleCordPointerMove}
+                  onPointerUp={handleCordPointerUp}
+                  onPointerCancel={handleCordPointerUp}
+                  onClick={handleCordClick}
+                  disabled={!isReady}
+                  style={{ touchAction: "none" }}
+                  className={`relative w-6 h-9 rounded-full border-2 border-[#f4ddb8] bg-gradient-to-b from-[#f4ddb8] via-[#a37943] to-[#4a371e] shadow-[0_0_15px_rgba(244,221,184,0.4)] flex flex-col items-center justify-center select-none transition-shadow duration-200 ${
+                    isReady
+                      ? "cursor-grab active:cursor-grabbing hover:shadow-[0_0_25px_rgba(244,221,184,0.85)] animate-bounce"
+                      : "cursor-not-allowed opacity-50"
+                  }`}
+                  title={
+                    isReady
+                      ? "Pull down or click to turn on light and raise curtains"
+                      : "Rigging stage..."
+                  }
+                  aria-label="Theatrical lamp pull cord"
+                >
+                  {/* Decorative brass ridges */}
+                  <span className="w-3.5 h-[2px] bg-[#fff4db] rounded-full mb-1 shadow-[0_0_4px_#fff4db]" />
+                  <span className="w-2.5 h-[2px] bg-[#ffe4a0] rounded-full shadow-[0_0_3px_#ffe4a0]" />
+                </button>
+
+                {/* Animated PULL Indicator Flag (shows when ready) */}
+                {isReady && (
+                  <div className="absolute left-10 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#171411]/95 border border-[#d36b54]/60 text-[10px] font-mono tracking-widest text-[#f4ddb8] shadow-[0_0_15px_rgba(211,107,84,0.35)] whitespace-nowrap animate-pulse">
+                    <span>PULL CORD</span>
+                    <span className="text-[12px] font-bold text-[#d36b54] animate-bounce">↓</span>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
@@ -344,17 +484,22 @@ export default function SitePreloader() {
           </p>
 
           {/* Interactive Call-To-Action Cue */}
-          <div className="mt-7">
+          <div className="mt-8 flex flex-col items-center gap-2.5">
             {isReady ? (
-              <button
-                type="button"
-                onClick={triggerCurtainCall}
-                className="px-6 py-2.5 rounded-sm border border-[#f4ddb8] bg-[#161412] text-[#f4ddb8] hover:bg-[#d36b54] hover:text-white hover:border-[#d36b54] transition-all duration-300 font-mono text-[11px] sm:text-[12px] uppercase tracking-[3px] font-bold shadow-[0_0_25px_rgba(244,221,184,0.3)] animate-pulse cursor-pointer flex items-center gap-2 mx-auto"
-              >
-                <span>⚡</span>
-                <span>PULL CORD / CLICK TO RAISE CURTAINS</span>
-                <span>⚡</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleCordClick()}
+                  className="group relative px-7 sm:px-9 py-3 rounded-sm border-2 border-[#f4ddb8] bg-[#161412] text-[#f4ddb8] hover:bg-[#d36b54] hover:text-white hover:border-[#d36b54] active:scale-95 transition-all duration-300 font-mono text-[11px] sm:text-[13px] uppercase tracking-[3px] font-bold shadow-[0_0_25px_rgba(244,221,184,0.3)] hover:shadow-[0_0_35px_rgba(211,107,84,0.6)] cursor-pointer flex items-center gap-2.5 mx-auto"
+                >
+                  <span className="text-[#f4ddb8] group-hover:text-white transition-colors">⚡</span>
+                  <span>PULL CORD OR CLICK TO ENTER</span>
+                  <span className="text-[#f4ddb8] group-hover:text-white transition-colors">⚡</span>
+                </button>
+                <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[2px] text-[#8a857e]">
+                  [ PULL CORD DOWNWARD OR CLICK TO RAISE CURTAINS ]
+                </span>
+              </>
             ) : (
               <div className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[2px] text-[#666]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54] animate-ping" />

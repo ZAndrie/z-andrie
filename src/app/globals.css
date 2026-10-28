@@ -178,9 +178,10 @@ html.lenis, html.lenis body { height: auto; }
 html[data-preloader="skip"] .site-preloader { display: none; }
 /* Scroll is locked only while the intro is up. */
 html[data-preloader="loading"] { overflow: hidden; }
-/* Failsafe: if JS never runs/hydrates, the overlay hides itself after a few seconds. */
-@keyframes site-preloader-failsafe { to { visibility: hidden; opacity: 0; } }
-.site-preloader { animation: site-preloader-failsafe 0.01s linear 8s forwards; }
+/* If JS is disabled, preloader should not block content */
+@media (scripting: none) {
+  .site-preloader { display: none; }
+}
 
 /* Theatrical Velvet Stage Curtains */
 .theatre-curtain {
