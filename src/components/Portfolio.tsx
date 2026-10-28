@@ -243,12 +243,27 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [total, goToProject]);
 
-  // Keep active item scrolled into view in directory list
+  // Keep active item scrolled into view in directory list (ONLY inside list container, NEVER scroll window on load)
+  const isInitialMount = useRef(true);
   useEffect(() => {
-    if (!directoryListRef.current) return;
-    const activeEl = directoryListRef.current.children[activeIndex] as HTMLElement | undefined;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    const container = directoryListRef.current;
+    if (!container) return;
+    const activeEl = container.children[activeIndex] as HTMLElement | undefined;
     if (activeEl) {
-      activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      const elTop = activeEl.offsetTop;
+      const elHeight = activeEl.offsetHeight;
+      const cTop = container.scrollTop;
+      const cHeight = container.clientHeight;
+
+      if (elTop < cTop) {
+        container.scrollTo({ top: elTop, behavior: "smooth" });
+      } else if (elTop + elHeight > cTop + cHeight) {
+        container.scrollTo({ top: elTop + elHeight - cHeight, behavior: "smooth" });
+      }
     }
   }, [activeIndex]);
 

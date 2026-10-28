@@ -59,6 +59,9 @@ export default function SitePreloader() {
         return;
       }
       tl = gsap.timeline({ onComplete: () => setGone(true) });
+      if (!window.location.hash || window.location.hash === "#home") {
+        window.scrollTo(0, 0);
+      }
       if (reduce) {
         tl.to(root, { opacity: 0, duration: 0.3, ease: "none" });
         tl.add(() => {

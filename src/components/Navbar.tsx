@@ -62,10 +62,15 @@ export default function Navbar() {
 
     if (pathname === "/") {
       e.preventDefault();
-      const el = document.getElementById(link.id);
-      if (el) {
-        scrollToTarget(el, { duration: 1.2 });
-        history.pushState(null, "", link.href);
+      if (link.id === "home") {
+        scrollToTarget(0, { duration: 1.2 });
+        history.pushState(null, "", "/");
+      } else {
+        const el = document.getElementById(link.id);
+        if (el) {
+          scrollToTarget(el, { duration: 1.2 });
+          history.pushState(null, "", link.href);
+        }
       }
     }
   };

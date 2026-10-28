@@ -19,6 +19,11 @@ export default function SmoothScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Disable automatic browser scroll restoration so visitors always start at the top
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
@@ -36,6 +41,13 @@ export default function SmoothScroll() {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    // If opening the portfolio root without a specific non-home hash, ensure we start at the top
+    const hash = window.location.hash;
+    if (!hash || hash === "#home" || hash === "#") {
+      window.scrollTo(0, 0);
+      lenis.scrollTo(0, { immediate: true, force: true });
+    }
+
     // Pause the loop while the tab is hidden.
     const onVisibility = () => {
       if (document.hidden) lenis.stop();
@@ -45,6 +57,10 @@ export default function SmoothScroll() {
 
     // Recompute scroll coordinates on preloader completion and viewport resize
     const onPreloaderDone = () => {
+      if (!window.location.hash || window.location.hash === "#home") {
+        window.scrollTo(0, 0);
+        lenis.scrollTo(0, { immediate: true, force: true });
+      }
       ScrollTrigger.refresh();
     };
     window.addEventListener(PRELOADER_DONE_EVENT, onPreloaderDone);
