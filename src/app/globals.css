@@ -165,12 +165,12 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: clip; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
 
-/* ---------- Theatrical Stage Preloader ---------- */
+/* ---------- Indie Gamer System Preloader ---------- */
 .site-preloader {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: #070707;
+  background: #080808;
   color: #e7e5df;
   overflow: hidden;
 }
@@ -183,80 +183,79 @@ html[data-preloader="loading"] { overflow: hidden; }
   .site-preloader { display: none; }
 }
 
-/* Theatrical Velvet Stage Curtains */
-.theatre-curtain {
+/* Retro CRT Scanlines & Screen Texture */
+.gamer-scanlines {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 52%;
-  z-index: 10;
-  background: linear-gradient(180deg, #171412 0%, #0d0c0a 50%, #060505 100%);
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.42) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 5;
+  opacity: 0.85;
+}
+
+.gamer-crt-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.85) 100%);
   box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.95);
+  z-index: 6;
+}
+
+/* Horizontal Industrial Blast Shutters */
+.gamer-shutter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 52%;
+  z-index: 10;
+  background: linear-gradient(180deg, #12100e 0%, #080706 100%);
   overflow: hidden;
   will-change: transform;
 }
-.theatre-curtain--left {
-  left: 0;
-  border-right: 1px solid rgba(244, 221, 184, 0.35);
+.gamer-shutter--top {
+  top: 0;
+  border-bottom: 2px solid rgba(244, 221, 184, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95);
 }
-.theatre-curtain--right {
-  right: 0;
-  border-left: 1px solid rgba(244, 221, 184, 0.35);
+.gamer-shutter--bottom {
+  bottom: 0;
+  border-top: 2px solid rgba(244, 221, 184, 0.4);
+  box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.95);
 }
-.theatre-curtain__folds {
+.gamer-shutter__pattern {
   position: absolute;
   inset: 0;
   background-image: repeating-linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02) 0px,
-    rgba(255, 255, 255, 0.06) 28px,
-    rgba(0, 0, 0, 0.5) 56px,
-    rgba(0, 0, 0, 0.8) 84px,
-    rgba(255, 255, 255, 0.02) 112px
+    45deg,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(255, 255, 255, 0.015) 15px,
+    rgba(0, 0, 0, 0.6) 15px,
+    rgba(0, 0, 0, 0.6) 30px
   );
-  opacity: 0.92;
+  opacity: 0.8;
   pointer-events: none;
 }
-.theatre-curtain__fringe {
+.gamer-shutter__border {
   position: absolute;
-  bottom: 0;
   left: 0;
   right: 0;
-  height: 16px;
+  height: 6px;
   background: repeating-linear-gradient(
     90deg,
     #d36b54 0px,
-    #d36b54 5px,
-    #8b3320 5px,
-    #8b3320 10px,
-    #f4ddb8 10px,
-    #f4ddb8 13px
+    #d36b54 8px,
+    #221c16 8px,
+    #221c16 16px,
+    #f4ddb8 16px,
+    #f4ddb8 24px,
+    #221c16 24px,
+    #221c16 32px
   );
-  box-shadow: 0 -2px 14px rgba(211, 107, 84, 0.45);
 }
-
-/* Top Stage Pelmet / Valance Arch */
-.theatre-valance {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 58px;
-  z-index: 15;
-  background: linear-gradient(180deg, #221c17 0%, #110e0b 100%);
-  border-bottom: 2px solid rgba(244, 221, 184, 0.35);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5%;
-  will-change: transform;
-}
-.theatre-valance__fringe {
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: repeating-linear-gradient(90deg, #d36b54 0px, #d36b54 4px, #f4ddb8 4px, #f4ddb8 6px);
-}
+.gamer-shutter--top .gamer-shutter__border { bottom: 0; }
+.gamer-shutter--bottom .gamer-shutter__border { top: 0; }

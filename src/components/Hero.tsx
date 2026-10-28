@@ -93,16 +93,16 @@ export default function Hero() {
             <span>Philippines · 2026</span>
           </div>
 
-          {/* Center: Theatrical Prompts */}
+          {/* Center: Gamer & Dev Room Prompts */}
           <div className="gsap-hero-center-prompt flex flex-col items-center text-center gap-1.5 pointer-events-auto">
             <span className="text-[#e7e5df] tracking-[1.5px]">
-              Point the lamp at the wall
+              Move cursor to aim desk spotlight
             </span>
             <span className="text-[10px] text-[#a8a59d]/60 tracking-[1.2px]">
-              Hold the mouse for UV
+              Drag to explore indie dev room
             </span>
             <div className="flex items-center gap-1.5 text-[10px] text-[#a8a59d]/50 mt-1">
-              <span>Scroll to explore</span>
+              <span>Scroll to explore portfolio</span>
               <svg className="w-3 h-3 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
