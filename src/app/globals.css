@@ -170,14 +170,27 @@ html.lenis, html.lenis body { height: auto; }
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: #080808;
+  background: radial-gradient(ellipse at 50% 50%, rgba(18, 16, 14, 0.45) 0%, rgba(7, 7, 7, 0.88) 100%);
   color: #e7e5df;
   overflow: hidden;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 /* Returning visitors: never render it (script in <head> sets data-preloader="skip"). */
 html[data-preloader="skip"] .site-preloader { display: none; }
 /* Scroll is locked only while the intro is up. */
 html[data-preloader="loading"] { overflow: hidden; }
+
+/* Keep foreground hero text and navigation hidden during preloader so only the 3D room is visible */
+html[data-preloader="loading"] #home,
+html[data-preloader="loading"] nav {
+  opacity: 0;
+  pointer-events: none;
+}
+nav {
+  transition: opacity 0.6s ease;
+}
+
 /* If JS is disabled, preloader should not block content */
 @media (scripting: none) {
   .site-preloader { display: none; }
@@ -190,72 +203,18 @@ html[data-preloader="loading"] { overflow: hidden; }
   pointer-events: none;
   background: linear-gradient(
     rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.42) 50%
+    rgba(0, 0, 0, 0.35) 50%
   );
   background-size: 100% 4px;
   z-index: 5;
-  opacity: 0.85;
+  opacity: 0.65;
 }
 
 .gamer-crt-vignette {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.85) 100%);
+  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.8) 100%);
   box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.95);
   z-index: 6;
 }
-
-/* Horizontal Industrial Blast Shutters */
-.gamer-shutter {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 52%;
-  z-index: 10;
-  background: linear-gradient(180deg, #12100e 0%, #080706 100%);
-  overflow: hidden;
-  will-change: transform;
-}
-.gamer-shutter--top {
-  top: 0;
-  border-bottom: 2px solid rgba(244, 221, 184, 0.4);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95);
-}
-.gamer-shutter--bottom {
-  bottom: 0;
-  border-top: 2px solid rgba(244, 221, 184, 0.4);
-  box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.95);
-}
-.gamer-shutter__pattern {
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.015) 0px,
-    rgba(255, 255, 255, 0.015) 15px,
-    rgba(0, 0, 0, 0.6) 15px,
-    rgba(0, 0, 0, 0.6) 30px
-  );
-  opacity: 0.8;
-  pointer-events: none;
-}
-.gamer-shutter__border {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: repeating-linear-gradient(
-    90deg,
-    #d36b54 0px,
-    #d36b54 8px,
-    #221c16 8px,
-    #221c16 16px,
-    #f4ddb8 16px,
-    #f4ddb8 24px,
-    #221c16 24px,
-    #221c16 32px
-  );
-}
-.gamer-shutter--top .gamer-shutter__border { bottom: 0; }
-.gamer-shutter--bottom .gamer-shutter__border { top: 0; }

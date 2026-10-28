@@ -65,8 +65,6 @@ function playGamerStartAudio() {
 
 export default function SitePreloader() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const shutterTopRef = useRef<HTMLDivElement>(null);
-  const shutterBottomRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const numRef = useRef<HTMLSpanElement>(null);
@@ -88,14 +86,12 @@ export default function SitePreloader() {
 
     const html = document.documentElement;
     const root = rootRef.current;
-    const sTop = shutterTopRef.current;
-    const sBottom = shutterBottomRef.current;
     const content = contentRef.current;
     const flash = flashRef.current;
 
     playGamerStartAudio();
 
-    if (!root || !sTop || !sBottom || !content) {
+    if (!root || !content) {
       html.dataset.preloader = "done";
       window.dispatchEvent(new Event(PRELOADER_DONE_EVENT));
       setGone(true);
@@ -122,26 +118,29 @@ export default function SitePreloader() {
     } else {
       // 1. CRT Flash & Degauss pulse
       if (flash) {
-        tl.to(flash, { opacity: 0.95, duration: 0.08, ease: "power2.out" })
-          .to(flash, { opacity: 0, duration: 0.5, ease: "power3.inOut" }, "+=0.02");
+        tl.to(flash, { opacity: 0.9, duration: 0.08, ease: "power2.out" })
+          .to(flash, { opacity: 0, duration: 0.45, ease: "power3.inOut" }, "+=0.02");
       }
 
       // 2. HUD Content scales outward with digital CRT scanline collapse
       tl.to(content, {
         scale: 1.06,
         opacity: 0,
-        filter: "blur(3px)",
-        duration: 0.35,
+        filter: "blur(4px)",
+        duration: 0.4,
         ease: "power2.in",
       }, 0.05);
 
-      // 3. Dual Cyber Blast Shutters sweep open vertically revealing the 3D indie dev room!
-      tl.to(sTop, { yPercent: -105, duration: 0.95, ease: "power3.inOut" }, 0.1)
-        .to(sBottom, { yPercent: 105, duration: 0.95, ease: "power3.inOut" }, 0.1)
-        .add(() => {
-          html.dataset.preloader = "done";
-          window.dispatchEvent(new Event(PRELOADER_DONE_EVENT));
-        }, "<+=0.35");
+      // 3. Preloader overlay dissolves completely to seamlessly reveal the 3D room
+      tl.to(root, {
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      }, 0.15)
+      .add(() => {
+        html.dataset.preloader = "done";
+        window.dispatchEvent(new Event(PRELOADER_DONE_EVENT));
+      }, "<+=0.25");
     }
   }, []);
 
@@ -230,7 +229,7 @@ export default function SitePreloader() {
   return (
     <div
       ref={rootRef}
-      className={`site-preloader fixed inset-0 z-[100000] overflow-hidden select-none bg-[#080808] text-[#e7e5df] ${
+      className={`site-preloader fixed inset-0 z-[100000] overflow-hidden select-none text-[#e7e5df] ${
         isReady ? "cursor-default" : "cursor-wait"
       }`}
       role="status"
@@ -240,16 +239,14 @@ export default function SitePreloader() {
       <div className="gamer-scanlines" />
       <div className="gamer-crt-vignette" />
 
-      {/* ── INDUSTRIAL BLAST SHUTTERS (TOP & BOTTOM) ── */}
-      <div ref={shutterTopRef} className="gamer-shutter gamer-shutter--top">
-        <div className="gamer-shutter__pattern" />
-        <div className="gamer-shutter__border" />
-      </div>
-
-      <div ref={shutterBottomRef} className="gamer-shutter gamer-shutter--bottom">
-        <div className="gamer-shutter__pattern" />
-        <div className="gamer-shutter__border" />
-      </div>
+      {/* ── AMBIENT SPOTLIGHT GLOW MATCHING 3D ROOM LAMP ── */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-10"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(244, 221, 184, 0.14) 0%, rgba(211, 107, 84, 0.04) 45%, transparent 70%)",
+        }}
+      />
 
       {/* ── CORNER HUD BRACKETS ── */}
       <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#f4ddb8]/40 pointer-events-none z-20" />
