@@ -173,7 +173,7 @@ export default function CustomCursor() {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#f4ddb8]/60 opacity-0 will-change-transform flex items-center justify-center hidden md:flex backdrop-blur-[0.5px]"
+        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#f4ddb8]/80 opacity-0 will-change-transform flex items-center justify-center hidden md:flex backdrop-blur-[0.5px] shadow-[0_0_12px_rgba(244,221,184,0.35)]"
         style={{ transformOrigin: "center center" }}
       >
         <span
@@ -188,7 +188,7 @@ export default function CustomCursor() {
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#f4ddb8] opacity-0 will-change-transform hidden md:block shadow-[0_0_6px_#f4ddb8]"
+        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#ffffff] opacity-0 will-change-transform hidden md:block shadow-[0_0_8px_#ffffff,0_0_16px_#f4ddb8,0_0_28px_#d36b54]"
         style={{ transformOrigin: "center center" }}
       />
     </>

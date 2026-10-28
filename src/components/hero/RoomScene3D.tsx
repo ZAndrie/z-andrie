@@ -116,16 +116,17 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
 
   // Position coordinates
   const lampPos = useMemo(() => new THREE.Vector3(0, 2.5, 0.4), []);
+  const pointerVec = useMemo(() => new THREE.Vector2(), []);
 
-  // Geometry for the volumetric conical beam (open-ended cylinder with apex at origin)
+  // Geometry for the volumetric conical beam (apex at origin, base along -Z towards lookAt target)
   const beamGeometry = useMemo(() => {
     const geo = new THREE.CylinderGeometry(0.04, 1.0, 1.0, 48, 1, true);
-    geo.translate(0, 0.5, 0); // origin at top
-    geo.rotateX(Math.PI / 2); // along +Z
+    geo.translate(0, -0.5, 0); // Apex at top (0, 0, 0), base at (0, -1, 0)
+    geo.rotateX(-Math.PI / 2); // Rotate so base points down -Z (Three.js lookAt forward direction)
     return geo;
   }, []);
 
-  // Volumetric beam shader material
+  // Volumetric beam shader material (luminous, bright 2700K spotlight beam)
   const beamMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       transparent: true,
@@ -133,8 +134,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
       uniforms: {
-        uColor: { value: new THREE.Color("#f4ddb8") },
-        uOpacity: { value: 0.24 },
+        uColor: { value: new THREE.Color("#fff2db") },
+        uOpacity: { value: 0.44 },
         uTime: { value: 0 },
       },
       vertexShader: `
@@ -142,7 +143,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         varying vec3 vNormalV;
         varying vec3 vViewPos;
         void main() {
-          vAxial = position.z;
+          vAxial = -position.z; // position.z goes from 0.0 down to -1.0
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
           vViewPos = mv.xyz;
           vNormalV = normalize(normalMatrix * normal);
@@ -158,8 +159,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         varying vec3 vViewPos;
         void main() {
           float facing = abs(dot(normalize(vNormalV), normalize(-vViewPos)));
-          float core = pow(facing, 1.25);
-          float along = smoothstep(0.0, 0.08, vAxial) * pow(1.0 - clamp(vAxial, 0.0, 1.0), 1.25);
+          float core = pow(facing, 1.15);
+          float along = smoothstep(0.0, 0.05, vAxial) * pow(1.0 - clamp(vAxial, 0.0, 1.0), 1.15);
           float a = uOpacity * core * along;
           gl_FragColor = vec4(uColor * a, 1.0);
         }
@@ -313,33 +314,42 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     state.camera.position.copy(currentCamPosRef.current);
     state.camera.lookAt(currentLookAtRef.current);
 
-    // ── 2. INTERACTIVE SPOTLIGHT AIMING ──
-    // Pointer target aim: sweeps across desk and back wall
-    const aimX = pointer.x * (viewport.width * 0.42);
-    // When zoomed close to desk, spotlight dips naturally towards desk surface
-    const isDeskClose = scrollFrac > 0.08 && scrollFrac < 0.32;
-    const baseAimY = isDeskClose ? -0.1 : 0.2;
-    const aimY = baseAimY + pointer.y * (viewport.height * 0.32);
-    const aimZ = -1.8;
+    // ── 2. INTERACTIVE SPOTLIGHT AIMING (CURSOR RAYCASTING) ──
+    // Project ray from camera lens through mouse cursor position
+    const raycaster = state.raycaster;
+    pointerVec.set(pointer.x, pointer.y);
+    raycaster.setFromCamera(pointerVec, state.camera);
 
-    // Lerp target position
-    if (targetObjectRef.current) {
-      targetObjectRef.current.position.x = THREE.MathUtils.lerp(targetObjectRef.current.position.x, aimX, 0.08);
-      targetObjectRef.current.position.y = THREE.MathUtils.lerp(targetObjectRef.current.position.y, aimY, 0.08);
-      targetObjectRef.current.position.z = THREE.MathUtils.lerp(targetObjectRef.current.position.z, aimZ, 0.08);
+    // Target plane located at workspace depth (z = -1.1)
+    const targetPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 1.1);
+    const intersectPoint = new THREE.Vector3();
+    const hit = raycaster.ray.intersectPlane(targetPlane, intersectPoint);
+
+    if (!hit) {
+      intersectPoint.set(pointer.x * (viewport.width * 0.45), pointer.y * (viewport.height * 0.35), -1.1);
     }
 
-    const currentAim = targetObjectRef.current ? targetObjectRef.current.position : new THREE.Vector3(aimX, aimY, aimZ);
+    // Clamp coordinates within room bounds
+    intersectPoint.x = THREE.MathUtils.clamp(intersectPoint.x, -3.4, 3.4);
+    intersectPoint.y = THREE.MathUtils.clamp(intersectPoint.y, -1.0, 2.4);
+    intersectPoint.z = THREE.MathUtils.clamp(intersectPoint.z, -2.2, 0.2);
 
-    // Lamp assembly tilt: look towards aim
+    // Responsive tracking so light tracks cursor fluidly
+    if (targetObjectRef.current) {
+      targetObjectRef.current.position.lerp(intersectPoint, 0.18);
+    }
+
+    const currentAim = targetObjectRef.current ? targetObjectRef.current.position : intersectPoint;
+
+    // Lamp assembly tilt: look directly towards cursor target
     if (lampAssemblyRef.current) {
       lampAssemblyRef.current.lookAt(currentAim);
     }
 
-    // Volumetric beam positioning and scaling
+    // Volumetric beam positioning, orientation, and scaling
     if (beamMeshRef.current) {
       const dist = lampPos.distanceTo(currentAim);
-      const spotAngle = 0.52; // Half-angle
+      const spotAngle = 0.50; // Half-angle
       const radius = Math.tan(spotAngle) * dist;
 
       beamMeshRef.current.position.copy(lampPos);
@@ -352,9 +362,9 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       }
     }
 
-    // Spotlight pool illumination right where the beam lands
+    // Spotlight pool illumination right at the cursor position
     if (poolLightRef.current) {
-      poolLightRef.current.position.set(currentAim.x, currentAim.y, currentAim.z + 0.35);
+      poolLightRef.current.position.set(currentAim.x, currentAim.y, currentAim.z + 0.25);
     }
 
     // Dynamic wall word illumination
@@ -418,10 +428,10 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
   return (
     <>
       {/* Target object for spotlight and beam aiming */}
-      <object3D ref={targetObjectRef} position={[0, 0, -1.8]} />
+      <object3D ref={targetObjectRef} position={[0, 0, -1.1]} />
 
       {/* Warm ambient fill matching cozy dev room */}
-      <ambientLight color="#181512" intensity={1.1} />
+      <ambientLight color="#1a1714" intensity={1.15} />
 
       {/* Hanging Lamp Cord from ceiling */}
       <mesh ref={lampCordRef} position={[0, 3.35, 0.4]}>
@@ -429,38 +439,38 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         <meshStandardMaterial color="#1f1c19" roughness={0.7} />
       </mesh>
 
-      {/* Overhead Lamp Shade Assembly (Tilts towards target) */}
+      {/* Overhead Lamp Shade Assembly (Tilts towards cursor target) */}
       <group ref={lampAssemblyRef} position={lampPos}>
-        {/* Lamp Cone Shade */}
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
+        {/* Lamp Cone Shade (Open mouth faces along -Z towards cursor target) */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
           <coneGeometry args={[0.36, 0.4, 32, 1, true]} />
           <meshStandardMaterial color="#1a1715" roughness={0.4} metalness={0.7} side={THREE.DoubleSide} />
         </mesh>
 
         {/* Glowing bulb inside shade */}
-        <mesh position={[0, 0, 0.08]}>
-          <sphereGeometry args={[0.065, 16, 16]} />
-          <meshBasicMaterial color="#fff4e0" toneMapped={false} />
+        <mesh position={[0, 0, -0.06]}>
+          <sphereGeometry args={[0.07, 16, 16]} />
+          <meshBasicMaterial color="#ffffff" toneMapped={false} />
         </mesh>
-
-        {/* Overhead SpotLight */}
-        <spotLight
-          ref={spotLightRef}
-          position={[0, 0, 0.08]}
-          color="#f4ddb8"
-          intensity={6.5}
-          angle={0.52}
-          penumbra={0.65}
-          distance={15}
-          decay={1.6}
-        />
       </group>
+
+      {/* Overhead SpotLight aimed directly at target */}
+      <spotLight
+        ref={spotLightRef}
+        position={[lampPos.x, lampPos.y - 0.05, lampPos.z]}
+        color="#fff4e0"
+        intensity={14.0}
+        angle={0.52}
+        penumbra={0.45}
+        distance={16}
+        decay={1.4}
+      />
 
       {/* Volumetric Glowing Light Cone Mesh */}
       <mesh ref={beamMeshRef} geometry={beamGeometry} material={beamMaterial} renderOrder={10} raycast={() => null} />
 
-      {/* Incandescent Light Pool at Aim Point */}
-      <pointLight ref={poolLightRef} position={[0, 0, -1.5]} color="#f4ddb8" intensity={4.5} distance={5.5} decay={1.6} />
+      {/* Incandescent Light Pool at Cursor Aim Point */}
+      <pointLight ref={poolLightRef} position={[0, 0, -1.1]} color="#fff2db" intensity={8.5} distance={6.5} decay={1.5} />
 
       {/* Back Wall Plane */}
       <mesh position={[0, 1.2, -2.4]} receiveShadow>
