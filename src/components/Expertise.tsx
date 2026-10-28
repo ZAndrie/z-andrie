@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -200,7 +200,8 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
   const activeMilestone = milestones[activeMilestoneIndex] || milestones[0];
   const isEducation = activeMilestone.category === "education";
 
-  const scrollDistance = Math.max(1, totalMilestones - 1) * 540;
+  // Dynamic scrub distance: expanded scroll runway so fast scrolling does not bypass milestones
+  const scrollDistance = Math.max(1, totalMilestones - 1) * 1150 + 750;
 
   // Jump smoothly to a specific milestone
   const goToMilestone = useCallback(
@@ -212,7 +213,11 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       if (trig) {
         const start = trig.start;
         const end = trig.end;
-        const targetProgress = clamped / Math.max(1, totalMilestones - 1);
+        const leadIn = 0.05;
+        const leadOut = 0.05;
+        const usableRange = 1 - leadIn - leadOut;
+        const targetProgress =
+          leadIn + ((clamped + 0.5) / Math.max(1, totalMilestones)) * usableRange;
         const targetScroll = start + targetProgress * (end - start);
         scrollToTarget(targetScroll, { duration: 0.8 });
       }
@@ -230,12 +235,17 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         trigger: container,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.2,
+        scrub: 0.35,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           const p = self.progress;
           setTimelineProgress(p);
-          const idx = Math.min(totalMilestones - 1, Math.floor(p * totalMilestones));
+          // Lead-in (5%) and lead-out (5%) deadzones ensure milestone 0 stays firmly anchored upon entry,
+          // and the final milestone stays anchored before unpinning.
+          const leadIn = 0.05;
+          const leadOut = 0.05;
+          const effectiveP = Math.max(0, Math.min(1, (p - leadIn) / (1 - leadIn - leadOut)));
+          const idx = Math.min(totalMilestones - 1, Math.floor(effectiveP * totalMilestones));
           setActiveMilestoneIndex(idx);
         },
       });
@@ -250,6 +260,49 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     },
     { scope: pathContainerRef, dependencies: [totalMilestones] }
   );
+
+  // Touch swipe support for mobile
+  const touchStartX = useRef(0);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (diff < -50) {
+      goToMilestone(activeMilestoneIndex + 1);
+    } else if (diff > 50) {
+      goToMilestone(activeMilestoneIndex - 1);
+    }
+  };
+
+  // Keyboard Navigation: ArrowUp / ArrowDown / ArrowLeft / ArrowRight
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!pathContainerRef.current) return;
+      const rect = pathContainerRef.current.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
+      if (!inView) return;
+
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        setActiveMilestoneIndex((prev) => {
+          const next = Math.min(totalMilestones - 1, prev + 1);
+          goToMilestone(next);
+          return next;
+        });
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        setActiveMilestoneIndex((prev) => {
+          const prevIdx = Math.max(0, prev - 1);
+          goToMilestone(prevIdx);
+          return prevIdx;
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [totalMilestones, goToMilestone]);
 
   const companionTip =
     COMPANION_MILESTONE_TIPS[activeMilestoneIndex % COMPANION_MILESTONE_TIPS.length];
@@ -385,6 +438,8 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         {/* ── THEATRICAL STAGE (STICKY TOP-0) ── */}
         <div
           ref={pathStageRef}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/60 backdrop-blur-[1px] z-20"
         >
           {/* Subtle theatrical background atmosphere */}
@@ -401,14 +456,43 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
             
             {/* ── LEFT COLUMN: ROLE, CREDENTIALS & ACCOMPLISHMENTS ── */}
             <div className="md:col-span-6 lg:col-span-6 flex flex-col justify-between h-full py-2 max-w-[620px]">
-              {/* Top: Section Eyebrow (Education vs Work Experience) & Date */}
+              {/* Top: Section Eyebrow (Education vs Work Experience), Date & Controls */}
               <div>
-                <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#888] mb-1">
-                  {isEducation ? "Education & Academic Path" : "Work Experience & Appointment"}
+                <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#d36b54] mb-1 font-bold">
+                  {isEducation ? "[ EDUCATION & ACADEMIC PATH ]" : "[ WORK EXPERIENCE & APPOINTMENT ]"}
                 </span>
-                <span className="text-[12px] font-mono text-[#f4ddb8] tracking-wider block font-bold">
-                  {activeMilestone.year}
-                </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[13px] font-mono text-[#f4ddb8] tracking-wider font-bold">
+                      {activeMilestone.year}
+                    </span>
+                    <span className="text-[11px] font-mono text-[#666]">
+                      / MILESTONE {String(activeMilestoneIndex + 1).padStart(2, "0")} OF {String(totalMilestones).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  {/* Diallo-style Navigation Arrow Buttons */}
+                  <div className="inline-flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => goToMilestone(activeMilestoneIndex - 1)}
+                      disabled={activeMilestoneIndex === 0}
+                      aria-label="Previous milestone"
+                      className="w-7 h-7 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[12px] font-mono cursor-pointer"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToMilestone(activeMilestoneIndex + 1)}
+                      disabled={activeMilestoneIndex === totalMilestones - 1}
+                      aria-label="Next milestone"
+                      className="w-7 h-7 rounded-sm border border-[#2a2a2a] bg-[#111] text-[#999] hover:text-[#f4ddb8] hover:border-[#f4ddb8] disabled:opacity-30 disabled:hover:border-[#2a2a2a] disabled:hover:text-[#999] transition-colors flex items-center justify-center text-[12px] font-mono cursor-pointer"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Middle: Giant Stencil Title & Bullets */}
@@ -661,10 +745,10 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                 {isEducation ? "Education Sequence" : "Experience Sequence"}
               </span>
               <span className="hidden sm:inline-block">
-                Scroll down to traverse milestones
+                [↑ / ↓] Scroll or Arrow Keys to Traverse Milestones
               </span>
               <span>
-                {Math.round(((activeMilestoneIndex + 1) / totalMilestones) * 100)}% History
+                {Math.round(((activeMilestoneIndex + 1) / totalMilestones) * 100)}% Trajectory
               </span>
             </div>
 
