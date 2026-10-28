@@ -8,8 +8,8 @@
 export const PRELOADER_SESSION_KEY = "za:intro-seen";
 export const PRELOADER_DONE_EVENT = "preloader:done";
 
-/** Inline script (runs before paint, so returning visitors never see a flash). */
-export const preloaderInitScript = `(function(){var r=document.documentElement;try{r.dataset.preloader=sessionStorage.getItem("${PRELOADER_SESSION_KEY}")?"skip":"loading"}catch(e){r.dataset.preloader="skip"}})();`;
+/** Inline script (runs before paint, so returning visitors never see a flash, supports ?intro=1 for preview). */
+export const preloaderInitScript = `(function(){var r=document.documentElement;try{var force=window.location.search.indexOf("intro=1")!==-1;r.dataset.preloader=(!force&&sessionStorage.getItem("${PRELOADER_SESSION_KEY}"))?"skip":"loading"}catch(e){r.dataset.preloader="skip"}})();`;
 
 /**
  * Run `cb` once the page is revealed (immediately if the preloader is not
