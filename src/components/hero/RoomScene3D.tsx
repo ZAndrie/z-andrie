@@ -659,9 +659,9 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         <meshStandardMaterial color="#161412" roughness={0.8} metalness={0.05} />
       </mesh>
 
-      {/* Framed Indie Game Wall Poster */}
+      {/* Framed Indie Game Wall Poster (Comfortably spaced to the right of "Z ANDRIE") */}
       {posterTexture && (
-        <group position={[1.45, 1.45, -2.37]}>
+        <group position={[2.45, 1.35, -2.37]}>
           {/* Dark Wood Frame */}
           <mesh receiveShadow>
             <boxGeometry args={[0.84, 1.14, 0.03]} />
@@ -1073,8 +1073,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           </mesh>
         </group>
 
-        {/* Bookshelf with Books & Retro Game Collectibles (Recessed Frame, Zero Z-Fighting) */}
-        <group position={[-1.7, 0.8, -0.3]} rotation={[0, 0.24, 0]}>
+        {/* Bookshelf with Books & Retro Game Collectibles (Firmly Grounded on Floor at y = -1.2) */}
+        <group position={[-1.7, 0.38, -0.3]} rotation={[0, 0.24, 0]}>
           {/* Bookshelf Outer Wood Frame (Hollowed Structure) */}
           <group>
             {/* Left Side Panel */}
