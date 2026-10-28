@@ -20,7 +20,7 @@ export function scrollToTarget(
   options: { offset?: number; duration?: number; immediate?: boolean } = {}
 ) {
   if (instance) {
-    instance.scrollTo(target, options);
+    instance.scrollTo(target, { ...options, force: true });
     return;
   }
   // Fallback: native scrolling

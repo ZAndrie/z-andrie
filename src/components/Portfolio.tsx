@@ -214,28 +214,33 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
     { scope: containerRef, dependencies: [total] }
   );
 
+  const activeIndexRef = useRef(activeIndex);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
   // Keyboard Navigation: ArrowUp / ArrowDown / ArrowLeft / ArrowRight
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
-      if (!inView) return;
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      // Pinned works stage is active while container occupies the viewport
+      const isActive = rect.top <= 120 && rect.bottom >= 120;
+      if (!isActive) return;
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-        e.preventDefault();
-        setActiveIndex((prev) => {
-          const next = Math.min(total - 1, prev + 1);
-          goToProject(next);
-          return next;
-        });
+        const current = activeIndexRef.current;
+        if (current < total - 1) {
+          e.preventDefault();
+          goToProject(current + 1);
+        }
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-        e.preventDefault();
-        setActiveIndex((prev) => {
-          const prevIdx = Math.max(0, prev - 1);
-          goToProject(prevIdx);
-          return prevIdx;
-        });
+        const current = activeIndexRef.current;
+        if (current > 0) {
+          e.preventDefault();
+          goToProject(current - 1);
+        }
       }
     };
 

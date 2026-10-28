@@ -275,28 +275,33 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     }
   };
 
+  const activeMilestoneIndexRef = useRef(activeMilestoneIndex);
+  useEffect(() => {
+    activeMilestoneIndexRef.current = activeMilestoneIndex;
+  }, [activeMilestoneIndex]);
+
   // Keyboard Navigation: ArrowUp / ArrowDown / ArrowLeft / ArrowRight
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!pathContainerRef.current) return;
-      const rect = pathContainerRef.current.getBoundingClientRect();
-      const inView = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.3;
-      if (!inView) return;
+      const container = pathContainerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      // Pinned trajectory stage is active while container occupies the viewport
+      const isActive = rect.top <= 120 && rect.bottom >= 120;
+      if (!isActive) return;
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-        e.preventDefault();
-        setActiveMilestoneIndex((prev) => {
-          const next = Math.min(totalMilestones - 1, prev + 1);
-          goToMilestone(next);
-          return next;
-        });
+        const current = activeMilestoneIndexRef.current;
+        if (current < totalMilestones - 1) {
+          e.preventDefault();
+          goToMilestone(current + 1);
+        }
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-        e.preventDefault();
-        setActiveMilestoneIndex((prev) => {
-          const prevIdx = Math.max(0, prev - 1);
-          goToMilestone(prevIdx);
-          return prevIdx;
-        });
+        const current = activeMilestoneIndexRef.current;
+        if (current > 0) {
+          e.preventDefault();
+          goToMilestone(current - 1);
+        }
       }
     };
 
