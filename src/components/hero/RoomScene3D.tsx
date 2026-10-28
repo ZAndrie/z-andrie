@@ -126,7 +126,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     return geo;
   }, []);
 
-  // Volumetric beam shader material (luminous, bright 2700K spotlight beam)
+  // Volumetric beam shader material (moody 2700K incandescent spotlight beam)
   const beamMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       transparent: true,
@@ -134,8 +134,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
       uniforms: {
-        uColor: { value: new THREE.Color("#fff2db") },
-        uOpacity: { value: 0.44 },
+        uColor: { value: new THREE.Color("#f4ddb8") },
+        uOpacity: { value: 0.28 },
         uTime: { value: 0 },
       },
       vertexShader: `
@@ -159,8 +159,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         varying vec3 vViewPos;
         void main() {
           float facing = abs(dot(normalize(vNormalV), normalize(-vViewPos)));
-          float core = pow(facing, 1.15);
-          float along = smoothstep(0.0, 0.05, vAxial) * pow(1.0 - clamp(vAxial, 0.0, 1.0), 1.15);
+          float core = pow(facing, 1.25);
+          float along = smoothstep(0.0, 0.08, vAxial) * pow(1.0 - clamp(vAxial, 0.0, 1.0), 1.25);
           float a = uOpacity * core * along;
           gl_FragColor = vec4(uColor * a, 1.0);
         }
@@ -430,8 +430,8 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       {/* Target object for spotlight and beam aiming */}
       <object3D ref={targetObjectRef} position={[0, 0, -1.1]} />
 
-      {/* Warm ambient fill matching cozy dev room */}
-      <ambientLight color="#1a1714" intensity={1.15} />
+      {/* Warm moody ambient fill matching cozy dev room */}
+      <ambientLight color="#12100e" intensity={0.8} />
 
       {/* Hanging Lamp Cord from ceiling */}
       <mesh ref={lampCordRef} position={[0, 3.35, 0.4]}>
@@ -450,7 +450,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         {/* Glowing bulb inside shade */}
         <mesh position={[0, 0, -0.06]}>
           <sphereGeometry args={[0.07, 16, 16]} />
-          <meshBasicMaterial color="#ffffff" toneMapped={false} />
+          <meshBasicMaterial color="#fff4e0" toneMapped={false} />
         </mesh>
       </group>
 
@@ -458,19 +458,19 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       <spotLight
         ref={spotLightRef}
         position={[lampPos.x, lampPos.y - 0.05, lampPos.z]}
-        color="#fff4e0"
-        intensity={14.0}
+        color="#f4ddb8"
+        intensity={7.2}
         angle={0.52}
-        penumbra={0.45}
-        distance={16}
-        decay={1.4}
+        penumbra={0.65}
+        distance={15}
+        decay={1.6}
       />
 
       {/* Volumetric Glowing Light Cone Mesh */}
       <mesh ref={beamMeshRef} geometry={beamGeometry} material={beamMaterial} renderOrder={10} raycast={() => null} />
 
       {/* Incandescent Light Pool at Cursor Aim Point */}
-      <pointLight ref={poolLightRef} position={[0, 0, -1.1]} color="#fff2db" intensity={8.5} distance={6.5} decay={1.5} />
+      <pointLight ref={poolLightRef} position={[0, 0, -1.1]} color="#f4ddb8" intensity={4.8} distance={5.5} decay={1.6} />
 
       {/* Back Wall Plane */}
       <mesh position={[0, 1.2, -2.4]} receiveShadow>

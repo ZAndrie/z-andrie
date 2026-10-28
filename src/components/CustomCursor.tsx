@@ -188,7 +188,7 @@ export default function CustomCursor() {
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#ffffff] opacity-0 will-change-transform hidden md:block shadow-[0_0_8px_#ffffff,0_0_16px_#f4ddb8,0_0_28px_#d36b54]"
+        className="pointer-events-none fixed top-0 left-0 z-[99999] -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#f4ddb8] opacity-0 will-change-transform hidden md:block shadow-[0_0_8px_#f4ddb8,0_0_16px_rgba(244,221,184,0.6),0_0_24px_rgba(211,107,84,0.4)]"
         style={{ transformOrigin: "center center" }}
       />
     </>
