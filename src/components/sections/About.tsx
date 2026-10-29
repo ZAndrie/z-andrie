@@ -150,7 +150,7 @@ export default function About() {
           <div className="font-mono text-[10px] sm:text-[11px] text-[#777] hidden md:flex items-center gap-3 pb-1 select-none">
             <span>OPERATIVE ID: ZA-2026</span>
             <span>•</span>
-            <span>CLASS: CREATIVE DEVELOPER</span>
+            <span>CLASS: INDIE GAME DESIGN</span>
             <span>•</span>
             <span className="text-[#52ff40] flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#52ff40] animate-pulse" />
@@ -169,7 +169,7 @@ export default function About() {
           <div className="gsap-about-bio lg:col-span-7 flex flex-col justify-between gap-4 h-full">
             <div className="flex flex-col gap-3.5">
               <p className="text-[15px] sm:text-[16px] md:text-[17px] text-[var(--color-text-dark)] leading-[1.75] font-sans font-normal">
-                I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and aspiring full-stack developer based in the <strong className="font-semibold text-[#e7e5df]">Philippines</strong>. I specialize in designing and engineering digital experiences that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
+                I am <span className="font-semibold text-[var(--color-primary)]">Z Andrie</span>, a creative web designer and aspiring full-stack developer based in the <strong className="font-semibold text-[#e7e5df]">Philippines</strong>. I specialize in designing and crafting digital spaces that are not only aesthetically striking, but intuitive, accessible, and grounded in clean design principles.
               </p>
 
               <p className="text-[13px] sm:text-[14px] text-[var(--color-text-light)] leading-[1.75]">
@@ -219,7 +219,7 @@ export default function About() {
               <span className="font-mono text-[9px] uppercase tracking-[2px] text-[#888] block mb-0.5">
                 DISCIPLINE CORE:
               </span>
-              Frontend Engineering • Interactive Animations • Responsive UI/UX • Clean Architecture
+              Full-Stack Development • Quality Assurance • Responsive UI/UX • Clean Architecture
             </div>
 
             {/* Magnetic Action Buttons */}

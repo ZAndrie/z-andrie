@@ -47,6 +47,13 @@ export interface GitHubExpertiseItem {
   year: string;
   percentage: string;
   order?: number;
+  discipline?: string;
+  desc?: string;
+  tags?: string[];
+  bullets?: string[];
+  institution?: string;
+  roleType?: string;
+  spotlightWord?: string;
 }
 
 interface RawGitHubRepo {
@@ -176,6 +183,20 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
   try {
     // 1. Fetch custom projects / repository overrides from portfolio-contents repository
     let customProjects: any[] = [];
+    try {
+      const rawRes = await fetch(
+        `https://raw.githubusercontent.com/${username}/portfolio-contents/main/projects/projects.json`,
+        cacheOption
+      );
+      if (rawRes.ok) {
+        const data = await rawRes.json();
+        if (Array.isArray(data) && data.length > 0) {
+          customProjects = data;
+        }
+      }
+    } catch {
+      // continue to GitHub API check
+    }
     try {
       const contentRepo = getContentRepoName();
       const repoCandidates = Array.from(new Set([contentRepo, "portfolio-contents"]));
@@ -354,14 +375,11 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
         order: cp.order !== undefined ? cp.order : (resolvedRepoProjects.length + idx + 1),
       }));
 
-    const q1Projects = getQ1Projects();
-    const existingIds = new Set([...resolvedRepoProjects, ...standaloneProjects].map((p) => p.id));
-    const uniqueQ1 = q1Projects.filter((q) => !existingIds.has(q.id));
+    // Combine standalone projects from portfolio-contents/projects/projects.json and live GitHub repos
+    const allProjects = [...resolvedRepoProjects, ...standaloneProjects];
+    allProjects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
-    const allProjects = [...uniqueQ1, ...resolvedRepoProjects, ...standaloneProjects];
-    allProjects.sort((a, b) => a.order - b.order);
-
-    return allProjects.length > 0 ? allProjects : getFallbackProjects();
+    return allProjects;
   } catch (error) {
     console.error("Failed to fetch GitHub projects:", error);
     return getFallbackProjects();

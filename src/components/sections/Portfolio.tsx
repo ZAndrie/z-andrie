@@ -287,7 +287,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
   };
 
   const currentDisplayNumber = activeIndex + 1;
-  const companionTip = COMPANION_TIPS[activeIndex % COMPANION_TIPS.length];
+  const companionTip = `[${String(currentDisplayNumber).padStart(2, "0")}] ${activeProject.title} • ${activeProject.category || activeProject.language || "GitHub Project"}`;
 
   // Safe image resolution
   const hasImage = Boolean(activeProject.imageUrl) && !imgErrorMap[activeProject.id];

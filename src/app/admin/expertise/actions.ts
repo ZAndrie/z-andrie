@@ -112,6 +112,7 @@ export async function createExpertiseItem(data: {
 
     revalidatePath("/admin/expertise");
     revalidatePath("/expertise");
+    revalidatePath("/");
 
     return { success: true, item: newItem };
   } catch (error: any) {
@@ -177,6 +178,7 @@ export async function deleteExpertiseItem(id: string) {
 
     revalidatePath("/admin/expertise");
     revalidatePath("/expertise");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error: any) {
@@ -261,6 +263,7 @@ export async function updateExpertiseItem(id: string, data: {
 
     revalidatePath("/admin/expertise");
     revalidatePath("/expertise");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error: any) {

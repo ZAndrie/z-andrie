@@ -173,13 +173,13 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                 [ 03 // CREDENTIAL VAULT • {displayCertificates.length} ACCREDITATIONS ]
               </p>
               <h2 className="text-[32px] sm:text-[40px] md:text-[48px] font-stencil uppercase text-[#e7e5df] leading-[0.98] tracking-tight">
-                Technical <span className="text-[#f4ddb8]">Certificates</span>
+               Credentials & <span className="text-[#f4ddb8]">Certificates</span>
               </h2>
             </div>
 
             <div className="flex items-center gap-4">
               <span className="text-[11px] font-mono text-[#888] uppercase tracking-wider hidden sm:inline-block">
-                Glide sideways to explore →
+                Scroll to explore →
               </span>
 
               {/* Slider Navigation Buttons */}

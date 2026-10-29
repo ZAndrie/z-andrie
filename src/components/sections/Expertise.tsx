@@ -12,7 +12,7 @@ if (typeof window !== "undefined") {
 
 export type ResumeItem = {
   id: string;
-  year: string;
+  year?: string;
   title: string;
   subtitle?: string;
   category?: "skills" | "education" | "experience" | string;
@@ -20,9 +20,181 @@ export type ResumeItem = {
   roleType?: string;
   bullets?: string[];
   spotlightWord?: string;
+  percentage?: string;
+  discipline?: string;
+  desc?: string;
+  tags?: string[];
+  order?: number;
 };
 
-// ── 1. CORE ARCHITECTURAL PILLARS (SKILLS SECTION) ──
+// ── DYNAMIC ICON RESOLVER FOR GITHUB SKILLS ──
+function getSkillIcon(title: string) {
+  const t = (title || "").toLowerCase();
+  if (t.includes("qa") || t.includes("quality") || t.includes("test") || t.includes("audit")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    );
+  }
+  if (t.includes("ui") || t.includes("ux") || t.includes("design") || t.includes("figma") || t.includes("prototype")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+    );
+  }
+  if (t.includes("react") || t.includes("next") || t.includes("frontend") || t.includes("script") || t.includes("code")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    );
+  }
+  if (t.includes("full") || t.includes("back") || t.includes("laravel") || t.includes("php") || t.includes("sql") || t.includes("db") || t.includes("api")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <path d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7" />
+        <path d="M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4" />
+        <path d="M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4" />
+      </svg>
+    );
+  }
+  if (t.includes("defense") || t.includes("cisco") || t.includes("cyber") || t.includes("security") || t.includes("network")) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <line x1="9" y1="1" x2="9" y2="4" />
+      <line x1="15" y1="1" x2="15" y2="4" />
+      <line x1="9" y1="20" x2="9" y2="23" />
+      <line x1="15" y1="20" x2="15" y2="23" />
+      <line x1="20" y1="9" x2="23" y2="9" />
+      <line x1="20" y1="14" x2="23" y2="14" />
+      <line x1="1" y1="9" x2="4" y2="9" />
+      <line x1="1" y1="14" x2="4" y2="14" />
+    </svg>
+  );
+}
+
+// ── DYNAMIC DISCIPLINE TEXT GENERATOR ──
+function getAutoSkillDesc(title: string, subtitle?: string): string {
+  if (subtitle && subtitle.trim().length >= 20) return subtitle;
+  const t = (title || "").toLowerCase();
+  if (t.includes("qa") || t.includes("quality") || t.includes("test")) {
+    return "Executing rigorous test cases, UI auditing, functionality verification, and bug lifecycle regression tracking.";
+  }
+  if (t.includes("ui") || t.includes("ux") || t.includes("design")) {
+    return "Crafting purposeful digital spaces in Figma with seamless navigation, accessibility, and high-fidelity user flows.";
+  }
+  if (t.includes("react") || t.includes("next") || t.includes("frontend")) {
+    return "Scalable component hierarchies, server components, strict TypeScript typing, and fast interactive client flows.";
+  }
+  if (t.includes("full") || t.includes("laravel") || t.includes("backend") || t.includes("php")) {
+    return "MVC architecture, relational database schemas, secure RESTful endpoints, and full-lifecycle backend systems.";
+  }
+  if (t.includes("security") || t.includes("cisco") || t.includes("cyber") || t.includes("defense")) {
+    return "Network defense, vulnerability assessments, endpoint protection, and Cisco cybersecurity protocols.";
+  }
+  return subtitle || "Specialized technical discipline delivering robust software solutions and verified performance.";
+}
+
+// ── DYNAMIC TAGS EXTRACTOR ──
+function getAutoSkillTags(title: string, subtitle?: string, tags?: string[]): string[] {
+  if (tags && tags.length > 0) return tags;
+  if (subtitle && subtitle.includes(",")) {
+    return subtitle.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  const t = (title || "").toLowerCase();
+  if (t.includes("qa") || t.includes("quality") || t.includes("test")) {
+    return ["Test Case Design", "Functionality Audits", "UI Verification", "Bug Tracking"];
+  }
+  if (t.includes("ui") || t.includes("ux") || t.includes("design")) {
+    return ["Figma", "Design Systems", "Wireframing", "User Flows"];
+  }
+  if (t.includes("react") || t.includes("next") || t.includes("frontend")) {
+    return ["React 19", "Next.js", "TypeScript", "Tailwind CSS"];
+  }
+  if (t.includes("full") || t.includes("laravel") || t.includes("backend") || t.includes("php")) {
+    return ["PHP", "Laravel", "MySQL", "REST APIs"];
+  }
+  if (t.includes("security") || t.includes("cisco") || t.includes("cyber") || t.includes("defense")) {
+    return ["Cisco Defense", "Network Security", "Endpoint Security", "Threat Management"];
+  }
+  return [title, "Technical Stack", "Production", "Verified"];
+}
+
+// ── DYNAMIC MILESTONE ACCOMPLISHMENTS ──
+function getMilestoneAccomplishments(m: ResumeItem): string[] {
+  if (m.bullets && m.bullets.length > 0) return m.bullets;
+  const t = (m.title || "").toLowerCase();
+  const isEdu = m.category === "education";
+
+  if (t.includes("bs") || t.includes("information tech") || t.includes("college") || t.includes("computer science")) {
+    return [
+      "Rigorous academic curriculum covering advanced database architecture, software engineering, algorithms, and cybersecurity fundamentals.",
+      "Focusing on high-performance full-stack web engineering, Next.js server components, React 19, and interactive WebGL experiences.",
+      "Maintaining consistent high-standing performance across specialized computer science and IT laboratory courses.",
+      "Collaborating on full-lifecycle software prototypes solving campus-wide operational challenges.",
+    ];
+  }
+  if (t.includes("tvl") || t.includes("ict") || t.includes("senior high")) {
+    return [
+      "Comprehensive foundational training in computer programming, database administration, and hardware servicing.",
+      "Developed first-principles mastery of networking topologies, computer hardware assembly, and digital media design.",
+      "Graduated with specialized competency in software troubleshooting and technical workplace preparation.",
+    ];
+  }
+  if (t.includes("junior high") || t.includes("high school")) {
+    return [
+      "Built a strong mathematical, analytical, and logical foundation that seeded interest in computer science.",
+      "Participated in technology and science exhibitions, exploring computer software fundamentals.",
+    ];
+  }
+  if (t.includes("assistant") || t.includes("support")) {
+    return [
+      "Facilitating campus computing operations, workstation deployment, and hardware diagnostics across college computer laboratories.",
+      "Managing institutional digital inventory and hardware asset tracking for campus computing infrastructure.",
+      "Engineered automated reservation web prototypes (Library Booking, Laptop Borrowing) with role-based auth and automated cataloging.",
+      "Applied structured quality assurance testing, user feedback verification, and regression audits across academic systems.",
+    ];
+  }
+  if (m.subtitle && m.subtitle.trim().length > 15) {
+    return [
+      m.subtitle,
+      "Demonstrating consistent hands-on execution and technical problem-solving.",
+    ];
+  }
+  return [
+    isEdu
+      ? "Comprehensive study of software paradigms, logical systems, and applied computer technologies."
+      : "Directly contributing to technical systems, software architecture, and practical operational engineering.",
+  ];
+}
+
+// ── DYNAMIC SPOTLIGHT WORD ──
+function getMilestoneSpotlightWord(m: ResumeItem): string {
+  if (m.spotlightWord) return m.spotlightWord;
+  const t = (m.title || "").toLowerCase();
+  if (t.includes("bs") || t.includes("information tech")) return "BSIT";
+  if (t.includes("senior high") || t.includes("tvl") || t.includes("ict")) return "SHS ICT";
+  if (t.includes("junior high") || t.includes("digos")) return "DCNHS";
+  if (t.includes("assistant")) return "ASSISTANT";
+  if (t.includes("developer") || t.includes("engineer")) return "DEV";
+  return m.title.split(" ")[0].toUpperCase() || "COR JESU";
+}
+
+// ── SAFETY NET FALLBACKS (ONLY USED IF GITHUB REPO IS COMPLETELY EMPTY) ──
 const ARCHITECTURAL_PILLARS = [
   {
     code: "01",
@@ -79,7 +251,6 @@ const ARCHITECTURAL_PILLARS = [
   },
 ];
 
-// ── 2. EDUCATION MILESTONES (ACADEMIC TRAJECTORY) ──
 const EDUCATION_MILESTONES: ResumeItem[] = [
   {
     id: "edu-1",
@@ -90,45 +261,9 @@ const EDUCATION_MILESTONES: ResumeItem[] = [
     institution: "at Cor Jesu College",
     subtitle: "Specializing in modern full-stack development, distributed architecture, and software design.",
     spotlightWord: "BSIT",
-    bullets: [
-      "Rigorous academic curriculum covering advanced database architecture, software engineering, algorithms, and cybersecurity fundamentals.",
-      "Focusing on high-performance full-stack web engineering, Next.js server components, React 19, and interactive WebGL experiences.",
-      "Maintaining consistent high-standing performance across specialized computer science and IT laboratory courses.",
-      "Collaborating on full-lifecycle software prototypes solving campus-wide operational challenges.",
-    ],
-  },
-  {
-    id: "edu-2",
-    category: "education",
-    year: "2021 — 2023",
-    title: "TVL / ICT SPECIALIST",
-    roleType: "TECHNICAL-VOCATIONAL-LIVELIHOOD",
-    institution: "at Cor Jesu College (SHS)",
-    subtitle: "Information and Communications Technology specialization with foundational networking and systems training.",
-    spotlightWord: "TVL ICT",
-    bullets: [
-      "Comprehensive foundational training in computer programming, database administration, and hardware servicing.",
-      "Developed first-principles mastery of networking topologies, computer hardware assembly, and digital media design.",
-      "Graduated with specialized competency in software troubleshooting and technical workplace preparation.",
-    ],
-  },
-  {
-    id: "edu-3",
-    category: "education",
-    year: "2017 — 2021",
-    title: "FOUNDATIONAL EDUCATION",
-    roleType: "SECONDARY EDUCATION & SCIENCE",
-    institution: "at Digos City National High School",
-    subtitle: "Early academic foundation fostering a passion for software development and computer technologies.",
-    spotlightWord: "DCNHS",
-    bullets: [
-      "Built a strong mathematical, analytical, and logical foundation that seeded interest in computer science.",
-      "Participated in technology and science exhibitions, exploring computer software fundamentals.",
-    ],
   },
 ];
 
-// ── 3. WORK EXPERIENCE MILESTONES (PROFESSIONAL APPOINTMENTS) ──
 const EXPERIENCE_MILESTONES: ResumeItem[] = [
   {
     id: "exp-1",
@@ -139,42 +274,47 @@ const EXPERIENCE_MILESTONES: ResumeItem[] = [
     institution: "at Cor Jesu College • IT Department",
     subtitle: "Hardware diagnostics, workstation maintenance, and digital laboratory management.",
     spotlightWord: "COR JESU",
-    bullets: [
-      "Facilitating campus computing operations, workstation deployment, and hardware diagnostics across college computer laboratories.",
-      "Managing institutional digital inventory and hardware asset tracking for campus computing infrastructure.",
-      "Engineered automated reservation web prototypes (Library Booking, Laptop Borrowing) with role-based auth and automated cataloging.",
-      "Applied structured quality assurance testing, user feedback verification, and regression audits across academic systems.",
-    ],
   },
-  {
-    id: "exp-2",
-    category: "experience",
-    year: "2023 — Present",
-    title: "FULL-STACK DEVELOPER",
-    roleType: "WEB APPLICATIONS & INTERACTIVE SYSTEMS",
-    institution: "at Freelance / Academic Projects",
-    subtitle: "Engineering production web applications and responsive full-stack solutions.",
-    spotlightWord: "FULL STACK",
-    bullets: [
-      "Designed and deployed modern full-stack web applications, custom interactive portfolios, and production-ready system prototypes.",
-      "Integrated high-performance GSAP ScrollTrigger timeline choreographies, responsive Tailwind CSS layouts, and Three.js scenes with React 19.",
-      "Architected relational MySQL databases, Blade templates, and RESTful API endpoints using Laravel and PHP.",
-    ],
-  },
-];
-
-const COMPANION_MILESTONE_TIPS = [
-  "BIT  BSIT degree track specializing in full-stack software architecture.",
-  "BIT  technical-vocational ICT training in networking and system design.",
-  "BIT  foundational science & mathematics milestones shaping early logic.",
-  "BIT  student assistant post at CJC. active hardware support & systems QA.",
-  "BIT  freelance full-stack projects combining React 19, Next.js & Laravel.",
 ];
 
 export default function Expertise({ initialItems = [] }: { initialItems?: ResumeItem[] }) {
-  // ── STRICT SEQUENTIAL ORDER: (1) SKILLS (above) -> (2) EDUCATION -> (3) WORK EXPERIENCE ──
-  // Filter out any skills from the trajectory timeline (skills belong exclusively in the Skills section!)
-  // And sanitize any percentage values so arbitrary percentages (like "70%") never appear.
+  // ── 1. DYNAMIC SKILLS FROM GITHUB REPOSITORY ──
+  const customSkills = (initialItems || []).filter((i) => i.category === "skills");
+
+  const displayPillars =
+    customSkills.length > 0
+      ? customSkills.map((skill, idx) => ({
+          code: String(idx + 1).padStart(2, "0"),
+          title: skill.title,
+          discipline:
+            skill.discipline ||
+            skill.roleType ||
+            (skill.subtitle && skill.subtitle.length < 35
+              ? skill.subtitle.toUpperCase()
+              : "TECHNICAL SPECIALIZATION"),
+          desc: getAutoSkillDesc(skill.title, skill.subtitle),
+          tags: getAutoSkillTags(skill.title, skill.subtitle, skill.tags),
+          icon: getSkillIcon(skill.title),
+        }))
+      : ARCHITECTURAL_PILLARS;
+
+  // ── 2. DYNAMIC TECHNOLOGY MATRIX (DERIVED FROM GITHUB SKILLS & STACK) ──
+  const dynamicTechMatrix = Array.from(
+    new Set([
+      ...displayPillars.flatMap((p) => p.tags),
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "GSAP 3",
+      "Tailwind v4",
+      "Blade",
+      "MySQL",
+      "Figma",
+      "Git & GitHub",
+    ])
+  ).slice(0, 16);
+
+  // ── 3. DYNAMIC EDUCATION & WORK EXPERIENCE TRAJECTORY ──
   const customEdu = (initialItems || []).filter(
     (i) => i.category === "education" && !i.year?.includes("%")
   );
@@ -182,10 +322,10 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     (i) => i.category === "experience" && !i.year?.includes("%")
   );
 
-  const eduItems = customEdu.length >= 2 ? customEdu : EDUCATION_MILESTONES;
-  const expItems = customExp.length >= 1 ? customExp : EXPERIENCE_MILESTONES;
+  const eduItems = customEdu.length > 0 ? customEdu : EDUCATION_MILESTONES;
+  const expItems = customExp.length > 0 ? customExp : EXPERIENCE_MILESTONES;
 
-  // Strict order: Education first, then Work Experience
+  // Strict sequential order: Education first, then Work Experience
   const milestones: ResumeItem[] = [...eduItems, ...expItems];
   const totalMilestones = milestones.length;
 
@@ -199,6 +339,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
 
   const activeMilestone = milestones[activeMilestoneIndex] || milestones[0];
   const isEducation = activeMilestone.category === "education";
+  const activeAccomplishments = getMilestoneAccomplishments(activeMilestone);
 
   // Dynamic scrub distance: expanded scroll runway so fast scrolling does not bypass milestones
   const scrollDistance = Math.max(1, totalMilestones - 1) * 1150 + 750;
@@ -240,8 +381,6 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         onUpdate: (self) => {
           const p = self.progress;
           setTimelineProgress(p);
-          // Lead-in (5%) and lead-out (5%) deadzones ensure milestone 0 stays firmly anchored upon entry,
-          // and the final milestone stays anchored before unpinning.
           const leadIn = 0.05;
           const leadOut = 0.05;
           const effectiveP = Math.max(0, Math.min(1, (p - leadIn) / (1 - leadIn - leadOut)));
@@ -286,7 +425,6 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       const container = pathContainerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
-      // Pinned trajectory stage is active while container occupies the viewport
       const isActive = rect.top <= 120 && rect.bottom >= 120;
       if (!isActive) return;
 
@@ -309,40 +447,41 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [totalMilestones, goToMilestone]);
 
-  const companionTip =
-    COMPANION_MILESTONE_TIPS[activeMilestoneIndex % COMPANION_MILESTONE_TIPS.length];
-
   return (
     <>
       {/* ═══════════════════════════════════════════════════════════════════════
-          ORDER 1: SKILLS & ARCHITECTURAL STACK SHOWCASE
+          ORDER 1: CORE ARCHITECTURAL PILLARS (SKILLS & TECHNICAL DISCIPLINES)
+          (DYNAMIC FROM GITHUB PORTFOLIO-CONTENTS/EXPERTISE)
           ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="skills"
         ref={skillsContainerRef}
-        className="relative w-full pt-16 pb-12 px-6 md:px-12 bg-[#070707]/65 backdrop-blur-[1px] text-[#e7e5df] border-t border-[#232220]/50 select-none z-10"
+        className="py-20 md:py-24 px-[5%] md:px-[8%] bg-[#080807] text-[#e7e5df] border-t border-[#232220]/50 relative z-10 select-none"
       >
-        <div className="max-w-[1500px] mx-auto">
+        <div className="max-w-[1400px] mx-auto">
           {/* Section Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-[#232220]">
             <div>
-              <p className="text-[11px] uppercase tracking-[3px] font-mono text-[#d36b54] font-bold mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-pulse" />
+              <span className="text-[11px] font-mono uppercase tracking-[3px] text-[#d36b54] font-bold block mb-1.5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#d36b54]" />
                 [ 01 // SKILLS &amp; TECHNICAL DISCIPLINES ]
-              </p>
-              <h2 className="text-[34px] sm:text-[44px] md:text-[54px] font-stencil uppercase text-[#e7e5df] leading-[0.98] tracking-tight">
-                Skills &amp; <span className="text-[#f4ddb8]">Architectural Stack</span>
+              </span>
+              <h2 className="text-[32px] sm:text-[40px] md:text-[48px] font-stencil uppercase text-[#e7e5df] leading-none">
+                Skills &amp; Architectural Stack
               </h2>
             </div>
-
-            <p className="text-[13px] md:text-[14px] text-[#a8a59d] max-w-[500px] leading-relaxed font-sans">
-              A comprehensive breakdown of engineering disciplines, practical competencies, and specialized technologies shaping my development workflow.
+            <p className="text-[12px] font-mono text-[#888] max-w-[420px] leading-relaxed">
+              Synchronized live from GitHub portfolio repository. Technical specializations, design systems, and verified software paradigms.
             </p>
           </div>
 
-          {/* 4 Architectural Discipline Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 mb-8">
-            {ARCHITECTURAL_PILLARS.map((pillar) => (
+          {/* Dynamic Architectural Discipline Cards from GitHub */}
+          <div
+            className={`grid grid-cols-1 ${
+              displayPillars.length > 1 ? "md:grid-cols-2" : "md:grid-cols-1"
+            } gap-5 lg:gap-6 mb-8`}
+          >
+            {displayPillars.map((pillar) => (
               <div
                 key={pillar.code}
                 className="group bg-[#0e0d0c] hover:bg-[#12110f] border border-[#232220] hover:border-[#d36b54]/60 p-6 md:p-7 rounded-sm transition-all duration-300 relative flex flex-col justify-between"
@@ -399,23 +538,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
             </div>
 
             <div className="flex flex-wrap gap-2 sm:max-w-[700px]">
-              {[
-                "Next.js 16",
-                "React 19",
-                "TypeScript",
-                "GSAP 3",
-                "Tailwind v4",
-                "Three.js",
-                "PHP",
-                "Laravel",
-                "MySQL",
-                "Blade",
-                "Figma",
-                "Cisco Defense",
-                "REST APIs",
-                "Git & GitHub",
-                "System Auditing",
-              ].map((tech) => (
+              {dynamicTechMatrix.map((tech) => (
                 <span
                   key={tech}
                   className="px-3 py-1 bg-[#141413] hover:bg-[#1a1917] border border-[#262523] hover:border-[#f4ddb8] text-[11px] font-mono text-[#e7e5df] rounded-sm transition-colors cursor-default"
@@ -449,14 +572,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         >
           {/* Subtle theatrical background atmosphere */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-40"
+            className="absolute inset-0 pointer-events-none opacity-30"
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 35%, rgba(244, 221, 184, 0.08) 0%, rgba(7, 7, 7, 0.95) 75%)",
+              backgroundImage: `radial-gradient(circle at 50% 30%, rgba(244, 221, 184, 0.08) 0%, rgba(7, 7, 7, 0.98) 75%)`,
             }}
           />
 
-          {/* ── MAIN 3-COLUMN THEATRICAL TRAJECTORY GRID ── */}
+          {/* ── MAIN 3-COLUMN THEATRICAL SHOWCASE ── */}
           <div className="relative z-10 w-full max-w-[1550px] mx-auto flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-center min-h-0">
             
             {/* ── LEFT COLUMN: ROLE, CREDENTIALS & ACCOMPLISHMENTS ── */}
@@ -514,18 +636,12 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                 </div>
 
                 <div className="text-[13px] md:text-[14px] font-sans text-[#e7e5df] italic mt-1 mb-5">
-                  {activeMilestone.institution}
+                  {activeMilestone.institution || activeMilestone.subtitle || "Cor Jesu College"}
                 </div>
 
                 {/* Accomplishment Bullet Points */}
                 <ul className="flex flex-col gap-2.5 text-[12px] sm:text-[13px] text-[#a8a59d] font-sans leading-relaxed pl-1">
-                  {(activeMilestone.bullets && activeMilestone.bullets.length > 0
-                    ? activeMilestone.bullets
-                    : [
-                        activeMilestone.subtitle ||
-                          "Directly contributing to technical systems, software architecture, and practical operational engineering.",
-                      ]
-                  ).map((bullet, bIdx) => (
+                  {activeAccomplishments.map((bullet, bIdx) => (
                     <li key={bIdx} className="flex items-start gap-3">
                       <span className="text-[#d36b54] text-[14px] leading-none shrink-0 mt-0.5">•</span>
                       <span>{bullet}</span>
@@ -558,13 +674,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   className="absolute inset-0 rounded-full pointer-events-none"
                   style={{
                     background:
-                      "radial-gradient(circle at 50% 50%, rgba(244, 221, 184, 0.42) 0%, rgba(244, 221, 184, 0.18) 45%, rgba(244, 221, 184, 0.04) 70%, transparent 80%)",
+                      "radial-gradient(circle, rgba(244,221,184,0.95) 0%, rgba(220,185,135,0.75) 45%, rgba(160,110,65,0.25) 75%, transparent 100%)",
                   }}
                 />
 
-                {/* Floating Volumetric Dust Motes Simulation */}
+                {/* Film grain / Halftone texture overlay */}
                 <div
-                  className="absolute inset-0 pointer-events-none opacity-25"
+                  className="absolute inset-0 rounded-full opacity-15 pointer-events-none mix-blend-overlay"
                   style={{
                     backgroundImage:
                       "radial-gradient(rgba(244, 221, 184, 0.9) 1px, transparent 1px)",
@@ -572,13 +688,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   }}
                 />
 
-                {/* Milestone Particle Shadow Word (NO PERCENTAGES) */}
+                {/* Milestone Particle Shadow Word */}
                 <div className="relative z-10 flex flex-col items-center justify-center text-center p-4">
                   <span
                     key={`word-${activeMilestone.id}`}
                     className="font-stencil text-[44px] sm:text-[56px] md:text-[68px] font-black uppercase text-[#1a1714] tracking-wider leading-none drop-shadow-[0_2px_8px_rgba(244,221,184,0.4)] select-none transition-all duration-500 animate-in fade-in"
                   >
-                    {activeMilestone.spotlightWord || "COR JESU"}
+                    {activeMilestone.spotlightWord || getMilestoneSpotlightWord(activeMilestone)}
                   </span>
                   <span className="text-[10px] font-mono uppercase tracking-[3px] text-[#42392f] mt-1 font-bold">
                     {activeMilestone.year}
@@ -603,30 +719,32 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                     <span className="w-2 h-2 rounded-full bg-[#52ff40] shadow-[0_0_8px_#52ff40] animate-pulse" />
                   </div>
                   <div className="w-14 h-2 bg-[#121110] border-t border-[#262523]" />
+                  <div className="text-[9px] font-mono text-[#d36b54] tracking-widest uppercase font-bold mt-1">
+                    BIT v2.4
+                  </div>
                 </div>
 
-                {/* Dynamic Speech Bubble from BIT */}
-                <div className="max-w-[210px] sm:max-w-[230px] p-2.5 bg-[#121110]/95 border border-[#2b2a28] rounded-sm font-mono text-[10px] text-[#e7e5df] leading-snug shadow-lg relative">
-                  <div className="text-[9px] font-bold text-[#f4ddb8] tracking-wider mb-0.5">
-                    BIT
-                  </div>
-                  <p className="line-clamp-2 text-[#a8a59d]">
-                    {companionTip}
-                  </p>
-                  <div className="absolute -left-1.5 bottom-3 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-r-[6px] border-r-[#2b2a28]" />
+                {/* Indie Game Retro Console */}
+                <div className="w-[120px] p-2 bg-[#101010] border border-[#232220] rounded-sm font-mono text-[9px] text-[#888] leading-snug select-none text-right hidden sm:block">
+                  <div className="text-[8px] mb-1">STATUS // SYNC</div>
+                  <div className="text-[#f4ddb8]">ACTIVE RECORD</div>
+                  <div className="text-[#666]">{activeMilestone.year}</div>
                 </div>
 
               </div>
+
             </div>
 
-            {/* ── RIGHT COLUMN: VERTICAL TIMELINE ORDERED BY EDUCATION THEN WORK EXPERIENCE ── */}
-            <div className="md:col-span-2 lg:col-span-2 flex flex-col justify-between h-full py-2 pl-4 border-l border-[#1f1e1c]/80 hidden md:flex">
+            {/* ── RIGHT COLUMN: DUAL-CATEGORY DIRECTORY (EDUCATION + WORK EXPERIENCE) ── */}
+            <div className="md:col-span-2 lg:col-span-2 flex flex-col justify-between h-full py-2 pl-2 lg:pl-6 border-l border-[#1f1e1c]/80 hidden md:flex">
               
-              <div className="overflow-y-auto max-h-[62vh] pr-1 scrollbar-none">
+              {/* Header */}
+              <div>
                 <span className="block text-[11px] font-mono tracking-[3px] uppercase text-[#888] mb-4">
-                  Timeline
+                  Trajectory
                 </span>
 
+                {/* Chronological Trajectory Directory */}
                 <div className="relative flex flex-col gap-5 pl-2">
                   {/* Vertical Connector Line */}
                   <div className="absolute left-[7px] top-3 bottom-3 w-[1px] bg-[#232220]" />
@@ -639,7 +757,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   {eduItems.map((m, eduIdx) => {
                     const globalIdx = eduIdx;
                     const isActive = globalIdx === activeMilestoneIndex;
-                    const displayYear = m.year.split("—")[0].trim();
+                    const displayYear = m.year ? (m.year.includes("—") ? m.year.split("—")[0].trim() : m.year.includes("-") ? m.year.split("-")[0].trim() : m.year) : "";
                     const shortName = m.title.replace(/SPECIALIST|FOUNDATIONAL/i, "").trim();
 
                     return (
@@ -685,7 +803,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   {expItems.map((m, expIdx) => {
                     const globalIdx = eduItems.length + expIdx;
                     const isActive = globalIdx === activeMilestoneIndex;
-                    const displayYear = m.year.split("—")[0].trim();
+                    const displayYear = m.year ? (m.year.includes("—") ? m.year.split("—")[0].trim() : m.year.includes("-") ? m.year.split("-")[0].trim() : m.year) : "";
                     const shortName = m.title;
 
                     return (
@@ -725,8 +843,8 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                 </div>
               </div>
 
-              {/* Bottom Telemetry HUD */}
-              <div className="pt-3 border-t border-[#1f1e1c] font-mono text-[10px] text-[#666] flex flex-col gap-1 select-none">
+              {/* Bottom Status Tag */}
+              <div className="pt-4 border-t border-[#1f1e1c] font-mono text-[10px] text-[#666] flex flex-col gap-1 select-none">
                 <div className="flex items-center justify-between text-[#888]">
                   <span>RECORD</span>
                   <span className="text-[#f4ddb8]">
