@@ -98,14 +98,14 @@ function getSkillTags(title: string, subtitle?: string, tags?: string[]): string
 
 // ── DYNAMIC SPOTLIGHT ACRONYM ──
 function getMilestoneSpotlightWord(m: ResumeItem): string {
-  if (m.spotlightWord) return m.spotlightWord;
-  const t = (m.title || "").toLowerCase();
-  if (t.includes("bs") || t.includes("information tech")) return "BSIT";
-  if (t.includes("senior high") || t.includes("shs") || t.includes("tvl") || t.includes("ict")) return "SHS";
+  const t = `${m.title || ""} ${m.roleType || ""} ${m.subtitle || ""}`.toLowerCase();
+  if (t.includes("senior high") || t.includes("shs")) return "SHS";
   if (t.includes("junior high") || t.includes("jhs") || t.includes("digos")) return "JHS";
+  if (t.includes("bs") || t.includes("information tech") || t.includes("college")) return "BSIT";
   if (t.includes("assistant")) return "ASSISTANT";
   if (t.includes("developer") || t.includes("engineer")) return "DEV";
-  return m.title.split(" ")[0].toUpperCase() || "COR JESU";
+  if (m.spotlightWord) return m.spotlightWord;
+  return (m.title || "").split(" ")[0].toUpperCase() || "RECORD";
 }
 
 // ── SAFETY NET FALLBACKS (ONLY USED IF GITHUB REPO IS COMPLETELY EMPTY) ──
@@ -581,7 +581,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                     key={`word-${activeMilestone.id}`}
                     className="font-stencil text-[44px] sm:text-[56px] md:text-[68px] font-black uppercase text-[#1a1714] tracking-wider leading-none drop-shadow-[0_2px_8px_rgba(244,221,184,0.4)] select-none transition-all duration-500 animate-in fade-in"
                   >
-                    {activeMilestone.spotlightWord || getMilestoneSpotlightWord(activeMilestone)}
+                    {getMilestoneSpotlightWord(activeMilestone)}
                   </span>
                   <span className="text-[10px] font-mono uppercase tracking-[3px] text-[#42392f] mt-1 font-bold">
                     {activeMilestone.year}
