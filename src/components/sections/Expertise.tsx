@@ -101,8 +101,8 @@ function getMilestoneSpotlightWord(m: ResumeItem): string {
   if (m.spotlightWord) return m.spotlightWord;
   const t = (m.title || "").toLowerCase();
   if (t.includes("bs") || t.includes("information tech")) return "BSIT";
-  if (t.includes("senior high") || t.includes("tvl") || t.includes("ict")) return "SHS ICT";
-  if (t.includes("junior high") || t.includes("digos")) return "DCNHS";
+  if (t.includes("senior high") || t.includes("shs") || t.includes("tvl") || t.includes("ict")) return "SHS";
+  if (t.includes("junior high") || t.includes("jhs") || t.includes("digos")) return "JHS";
   if (t.includes("assistant")) return "ASSISTANT";
   if (t.includes("developer") || t.includes("engineer")) return "DEV";
   return m.title.split(" ")[0].toUpperCase() || "COR JESU";
