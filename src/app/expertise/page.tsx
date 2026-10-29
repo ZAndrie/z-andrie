@@ -1,4 +1,4 @@
-import Expertise from "@/components/Expertise";
+import { Expertise } from "@/components";
 import { fetchGitHubExpertise } from "@/lib/github";
 
 export const revalidate = 60;

@@ -1,4 +1,4 @@
-import Certificates from "@/components/Certificates";
+import { Certificates } from "@/components";
 import { fetchGitHubCertificates } from "@/lib/github";
 
 export const revalidate = 60;

@@ -86,13 +86,16 @@ const jsonLd = {
   ],
 };
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CustomCursor from "@/components/CustomCursor";
-import SmoothScroll from "@/components/SmoothScroll";
-import SitePreloader from "@/components/SitePreloader";
+import {
+  Navbar,
+  Footer,
+  CustomCursor,
+  SmoothScroll,
+  SitePreloader,
+  ScrollProgress,
+  BackToTop,
+} from "@/components";
 import { preloaderInitScript } from "@/lib/preloader";
-import { ScrollProgress, BackToTop } from "@/components/ClientUtilities";
 
 export default function RootLayout({
   children,

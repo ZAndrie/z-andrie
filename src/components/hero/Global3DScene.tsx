@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSyncExternalStore } from "react";
-import TechParticles from "@/components/TechParticles";
+import TechParticles from "./TechParticles";
 
 const WebGLHeroScene = dynamic(() => import("./WebGLHeroScene"), {
   ssr: false,

@@ -1,4 +1,4 @@
-import Portfolio from "@/components/Portfolio";
+import { Portfolio } from "@/components";
 import { fetchGitHubProjects } from "@/lib/github";
 
 export const revalidate = 60;

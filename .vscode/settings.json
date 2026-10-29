@@ -1,0 +1,9 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, tsconfig.json, tsconfig.*.json, next.config.*, next-env.d.ts, postcss.config.*, eslint.config.*",
+    "README.md": "LICENSE, AGENTS.md, CLAUDE.md",
+    ".gitignore": ".gitattributes, .env*"
+  }
+}
