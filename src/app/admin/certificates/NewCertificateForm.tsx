@@ -2,10 +2,16 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UploadCloud, CheckCircle2, AlertCircle, Loader2, PlusCircle } from "lucide-react";
+import { UploadCloud, CheckCircle2, AlertCircle, Loader2, PlusCircle, X } from "lucide-react";
 import { uploadCertificateToGitHub } from "./actions";
 
-export default function NewCertificateForm() {
+export default function NewCertificateForm({
+  onClose,
+  onSuccess,
+}: {
+  onClose?: () => void;
+  onSuccess?: () => void;
+}) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -69,6 +75,7 @@ export default function NewCertificateForm() {
         handleRemoveFile();
         form.reset();
         router.refresh();
+        onSuccess?.();
       } else {
         setStatusMessage({
           type: "error",
@@ -88,21 +95,33 @@ export default function NewCertificateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-[#0e0e12]/95 border border-white/10 rounded-xl p-6 shadow-2xl flex flex-col gap-4 font-mono relative overflow-hidden"
+      className="bg-[#0e0e12]/95 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-4 font-mono relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--color-primary)]/10 rounded-bl-2xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-16 h-16 bg-[var(--color-primary)]/10 rounded-bl-3xl pointer-events-none" />
 
-      <div>
-        <div className="flex items-center gap-2 text-[9px] uppercase tracking-[2px] text-gray-500 mb-1">
-          <PlusCircle size={13} className="text-[var(--color-primary)]" />
-          <span>VAULT // ARCHIVE_CREDENTIAL</span>
+      <div className="flex items-start justify-between border-b border-white/10 pb-4">
+        <div>
+          <div className="flex items-center gap-2 text-[9px] uppercase tracking-[2px] text-gray-500 mb-1">
+            <PlusCircle size={13} className="text-[var(--color-primary)]" />
+            <span>VAULT // ARCHIVE_CREDENTIAL</span>
+          </div>
+          <h3 className="font-stencil text-2xl text-white uppercase tracking-wider">
+            REGISTER AWARD
+          </h3>
+          <p className="text-[11px] text-gray-400 font-light mt-0.5">
+            Commits document directly to <code className="text-white bg-black/40 px-1 py-0.5 rounded">certificates/</code>.
+          </p>
         </div>
-        <h3 className="font-stencil text-2xl text-white uppercase tracking-wider">
-          REGISTER AWARD
-        </h3>
-        <p className="text-[11px] text-gray-400 font-light mt-1">
-          Commits document directly to <code className="text-white bg-black/40 px-1 py-0.5 rounded">certificates/</code>.
-        </p>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+            title="Close Form"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       {statusMessage && (
@@ -122,99 +141,113 @@ export default function NewCertificateForm() {
         </div>
       )}
 
-      {/* Upload Box */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400">
-          Document Artwork (Image / PDF) *
-        </label>
+      {/* Grid: 2 columns to stay compact and eliminate vertical height */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Upload Box */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400">
+            Document Artwork (Image / PDF) *
+          </label>
 
-        {previewUrl ? (
-          <div className="relative h-44 w-full bg-black border border-white/10 rounded-lg overflow-hidden">
-            {file?.type === "application/pdf" || file?.name.toLowerCase().endsWith(".pdf") ? (
-              <iframe src={previewUrl} className="w-full h-full object-cover" title="PDF Preview" />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-contain p-2 bg-black" />
-            )}
-            <button
-              type="button"
-              onClick={handleRemoveFile}
-              className="absolute top-2 right-2 bg-red-600/90 hover:bg-red-600 text-white text-[9px] font-bold px-2.5 py-1 uppercase tracking-wider rounded shadow transition-colors z-10"
-            >
-              Reset File
-            </button>
-          </div>
-        ) : (
-          <label className="border border-dashed border-white/15 hover:border-[var(--color-primary)]/50 bg-black/40 hover:bg-black/60 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group">
-            <UploadCloud size={24} className="text-gray-500 group-hover:text-[var(--color-primary)] mb-2 transition-colors" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-300 group-hover:text-white transition-colors">
-              Select Certificate File
-            </span>
-            <span className="text-[9px] text-gray-500 mt-1">PNG, JPG, WEBP, or PDF</span>
+          {previewUrl ? (
+            <div className="relative h-44 w-full bg-black border border-white/10 rounded-lg overflow-hidden">
+              {file?.type === "application/pdf" || file?.name.toLowerCase().endsWith(".pdf") ? (
+                <iframe src={previewUrl} className="w-full h-full object-cover" title="PDF Preview" />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={previewUrl} alt="Preview" className="w-full h-full object-contain p-2 bg-black" />
+              )}
+              <button
+                type="button"
+                onClick={handleRemoveFile}
+                className="absolute top-2 right-2 bg-red-600/90 hover:bg-red-600 text-white text-[9px] font-bold px-2.5 py-1 uppercase tracking-wider rounded shadow transition-colors z-10"
+              >
+                Reset File
+              </button>
+            </div>
+          ) : (
+            <label className="border border-dashed border-white/15 hover:border-[var(--color-primary)]/50 bg-black/40 hover:bg-black/60 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group">
+              <UploadCloud size={24} className="text-gray-500 group-hover:text-[var(--color-primary)] mb-2 transition-colors" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-300 group-hover:text-white transition-colors">
+                Select Certificate File
+              </span>
+              <span className="text-[9px] text-gray-500 mt-1">PNG, JPG, WEBP, or PDF</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                required
+                accept="image/png,image/jpeg,image/webp,image/jpg,application/pdf"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
+              Certificate Title *
+            </label>
             <input
-              ref={fileInputRef}
-              type="file"
+              name="title"
               required
-              accept="image/png,image/jpeg,image/webp,image/jpg,application/pdf"
-              onChange={handleFileChange}
-              className="hidden"
+              placeholder="e.g. Cisco CyberOps Associate"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
-          </label>
-        )}
-      </div>
+          </div>
 
-      <div className="flex flex-col gap-3 mt-1">
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
-            Certificate Designation / Title *
-          </label>
-          <input
-            name="title"
-            required
-            placeholder="e.g. Cisco CyberOps Associate"
-            className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
-          />
-        </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
+              Issuing Entity / Organization *
+            </label>
+            <input
+              name="issuer"
+              required
+              placeholder="e.g. Cisco, DICT, Cor Jesu College"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
+            />
+          </div>
 
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
-            Issuing Entity / Organization *
-          </label>
-          <input
-            name="issuer"
-            required
-            placeholder="e.g. Cisco, DICT, Cor Jesu College"
-            className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
-          />
-        </div>
-
-        <div>
-          <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
-            Date Issued *
-          </label>
-          <input
-            name="date"
-            required
-            placeholder="e.g. 2024 or Oct 2024"
-            className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
-          />
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
+              Date Issued *
+            </label>
+            <input
+              name="date"
+              required
+              placeholder="e.g. 2024 or Oct 2024"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
+            />
+          </div>
         </div>
       </div>
 
-      <button
-        disabled={loading || !file}
-        type="submit"
-        className="mt-2 bg-[var(--color-primary)] hover:bg-[#d0350e] text-white p-3.5 font-bold uppercase tracking-[2px] text-[11px] rounded-lg shadow-lg shadow-[var(--color-primary)]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={15} className="animate-spin" />
-            <span>COMMITTING TO GITHUB...</span>
-          </>
-        ) : (
-          "COMMIT TO GITHUB"
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10 mt-2">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-400 hover:text-white rounded-lg hover:bg-white/5"
+          >
+            Cancel
+          </button>
         )}
-      </button>
+        <button
+          disabled={loading || !file}
+          type="submit"
+          className="bg-[var(--color-primary)] hover:bg-[#d0350e] text-white px-6 py-3 font-bold uppercase tracking-[2px] text-[11px] rounded-lg shadow-lg shadow-[var(--color-primary)]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={15} className="animate-spin" />
+              <span>COMMITTING...</span>
+            </>
+          ) : (
+            "COMMIT TO GITHUB"
+          )}
+        </button>
+      </div>
     </form>
   );
 }

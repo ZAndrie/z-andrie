@@ -12,6 +12,7 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [imageUrlInput, setImageUrlInput] = useState<string>(project.imageUrl || "");
+  const [hidden, setHidden] = useState<boolean>(Boolean(project.hidden));
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +70,7 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
         imageUrl: imageUrlInput || undefined,
         fileBase64,
         fileName,
+        hidden,
       });
 
       if (res.success) {
@@ -252,6 +254,29 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
               placeholder="https://github.com/ZAndrie/repository-name"
               className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
+          </div>
+
+          {/* Visibility Setting */}
+          <div className="p-4 bg-black/40 border border-white/10 rounded-xl flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white">
+                Public Portfolio Visibility
+              </span>
+              <span className="text-[10px] text-gray-500">
+                {hidden ? "Project is currently HIDDEN from the public portfolio." : "Project is VISIBLE in Stage 03 Production."}
+              </span>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hidden}
+                onChange={(e) => setHidden(e.target.checked)}
+                className="w-4 h-4 accent-[var(--color-primary)] rounded bg-black/60 border border-white/20 cursor-pointer"
+              />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                Hide Project
+              </span>
+            </label>
           </div>
         </div>
 

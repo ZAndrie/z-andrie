@@ -3,10 +3,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteExpertiseItem, updateExpertiseItem } from "./actions";
-import { Trash2, Briefcase, GraduationCap, Wrench, Loader2, Pencil, X, Check, ExternalLink, GitBranch } from "lucide-react";
+import {
+  Trash2,
+  Briefcase,
+  GraduationCap,
+  Wrench,
+  Loader2,
+  Pencil,
+  X,
+  Check,
+  ExternalLink,
+  GitBranch,
+  PlusCircle,
+} from "lucide-react";
+import ExpertiseForm from "./ExpertiseForm";
 
 export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"all" | "skills" | "education" | "experience">("all");
+  const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
@@ -77,8 +92,8 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   const experience = items.filter((i) => i.category === "experience");
 
   const renderSection = (title: string, data: any[], icon: React.ReactNode, isSkills: boolean = false) => (
-    <div className="flex flex-col gap-4 mb-8 font-mono">
-      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+    <div className="flex flex-col gap-3 font-mono">
+      <div className="flex items-center justify-between border-b border-white/10 pb-2">
         <div className="flex items-center gap-2">
           <div className="text-[var(--color-primary)]">{icon}</div>
           <h4 className="font-stencil text-lg uppercase tracking-wider text-white">
@@ -86,75 +101,73 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
           </h4>
         </div>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {data.length === 0 ? (
-          <div className="text-[11px] text-gray-500 italic py-3 bg-black/30 px-4 rounded-xl border border-dashed border-white/10">
-            No active records indexed in this sector.
+          <div className="col-span-full text-[11px] text-gray-500 italic py-3 bg-black/30 px-4 rounded-xl border border-dashed border-white/10">
+            No active records in this category.
           </div>
         ) : (
           data.map((item) => (
             <div
               key={item.id}
-              className="border border-white/10 bg-[#0e0e12]/90 p-5 rounded-xl flex flex-col gap-2.5 group hover:border-[var(--color-primary)]/40 hover:bg-[#121217] transition-all relative shadow-[0_5px_15px_rgba(0,0,0,0.4)]"
+              className="border border-white/10 bg-[#0e0e12]/90 p-4 rounded-xl flex flex-col justify-between gap-2.5 group hover:border-[var(--color-primary)]/40 hover:bg-[#121217] transition-all relative shadow-lg"
             >
-              <div className="flex justify-between items-start">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-stencil text-xl uppercase tracking-wide text-white group-hover:text-[var(--color-primary)] transition-colors">
-                      {item.title}
-                    </span>
-                    {!isSkills && item.year && (
-                      <span className="text-[10px] text-[var(--color-primary)] font-mono font-bold bg-[var(--color-primary)]/10 px-2 py-0.5 rounded border border-[var(--color-primary)]/20">
-                        {item.year}
+              <div>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-stencil text-lg uppercase tracking-wide text-white group-hover:text-[var(--color-primary)] transition-colors">
+                        {item.title}
                       </span>
+                      {!isSkills && item.year && (
+                        <span className="text-[9px] text-[var(--color-primary)] font-mono font-bold bg-[var(--color-primary)]/10 px-2 py-0.5 rounded border border-[var(--color-primary)]/20 shrink-0">
+                          {item.year}
+                        </span>
+                      )}
+                    </div>
+                    {item.subtitle && (
+                      <span className="text-[11px] text-gray-400 font-mono">{item.subtitle}</span>
                     )}
                   </div>
-                  {item.subtitle && (
-                    <span className="text-[11px] text-gray-400 font-mono">{item.subtitle}</span>
-                  )}
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleStartEdit(item)}
+                      className="p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                      title="Edit Item"
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      disabled={deletingId === item.id}
+                      onClick={() => handleDelete(item.id, item.title)}
+                      className="p-1.5 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10 disabled:opacity-50"
+                      title="Delete Item"
+                    >
+                      {deletingId === item.id ? (
+                        <Loader2 size={13} className="animate-spin text-red-400" />
+                      ) : (
+                        <Trash2 size={13} />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    onClick={() => handleStartEdit(item)}
-                    className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
-                    title="Edit Item"
-                  >
-                    <Pencil size={14} />
-                  </button>
-                  <button
-                    disabled={deletingId === item.id}
-                    onClick={() => handleDelete(item.id, item.title)}
-                    className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10 disabled:opacity-50"
-                    title="Delete Item"
-                  >
-                    {deletingId === item.id ? (
-                      <Loader2 size={14} className="animate-spin text-red-400" />
-                    ) : (
-                      <Trash2 size={14} />
-                    )}
-                  </button>
-                </div>
+                {/* Bullets / Description */}
+                {item.bullets && item.bullets.length > 0 ? (
+                  <ul className="text-[10px] text-gray-400 pl-4 border-l border-[var(--color-primary)]/30 flex flex-col gap-0.5 mt-2 font-mono">
+                    {item.bullets.map((b: string, idx: number) => (
+                      <li key={idx} className="list-disc list-inside">
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                ) : item.desc ? (
+                  <p className="text-[10px] text-gray-400 pl-3 border-l border-[var(--color-primary)]/30 mt-2 font-mono italic line-clamp-2">
+                    {item.desc}
+                  </p>
+                ) : null}
               </div>
-
-              {/* Description / Accomplishments Display */}
-              {item.bullets && item.bullets.length > 0 ? (
-                <ul className="text-[11px] text-gray-400 pl-4 border-l-2 border-[var(--color-primary)]/40 flex flex-col gap-1 mt-1 font-mono">
-                  {item.bullets.map((b: string, idx: number) => (
-                    <li key={idx} className="list-disc list-inside">
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-              ) : item.desc ? (
-                <p className="text-[11px] text-gray-400 pl-3 border-l-2 border-[var(--color-primary)]/40 mt-1 font-mono italic">
-                  {item.desc}
-                </p>
-              ) : (
-                <span className="text-[10px] text-gray-600 font-mono">
-                  [ No custom bullet points provided ]
-                </span>
-              )}
             </div>
           ))
         )}
@@ -163,36 +176,110 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   );
 
   return (
-    <div className="flex flex-col relative font-mono">
-      {/* GitHub Repository Status Banner */}
-      <div className="mb-8 p-5 bg-[#0e0e12]/90 border border-white/10 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center text-[var(--color-primary)] shrink-0">
-            <GitBranch size={18} />
-          </div>
-          <div>
-            <h4 className="font-stencil text-base text-white uppercase tracking-wider">
-              Connected Live: Portfolio-Contents
-            </h4>
-            <p className="text-[11px] text-gray-400 font-light mt-0.5">
-              Target JSON Datastore: <code className="text-white bg-black/40 px-1 py-0.5 rounded">expertise/expertise.json</code>
-            </p>
-          </div>
+    <div className="flex flex-col gap-6 relative font-mono">
+      {/* Top Controls Bar */}
+      <div className="bg-[#0e0e12]/95 border border-white/10 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Category Tabs */}
+        <div className="flex items-center gap-1.5 p-1 bg-black/60 border border-white/10 rounded-xl overflow-x-auto w-full sm:w-auto">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+              activeTab === "all"
+                ? "bg-[var(--color-primary)] text-white shadow-md shadow-[var(--color-primary)]/20"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            ALL SECTORS ({items.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("skills")}
+            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+              activeTab === "skills"
+                ? "bg-white/15 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            SKILLS ({skills.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("education")}
+            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+              activeTab === "education"
+                ? "bg-white/15 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            EDUCATION ({education.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("experience")}
+            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 ${
+              activeTab === "experience"
+                ? "bg-white/15 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            EXPERIENCE ({experience.length})
+          </button>
         </div>
-        <a
-          href="https://github.com/ZAndrie/portfolio-contents/tree/main/expertise"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)] hover:text-white transition-colors"
-        >
-          <span>Open Datastore</span>
-          <ExternalLink size={12} />
-        </a>
+
+        {/* Action Toggle Button */}
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <a
+            href="https://github.com/ZAndrie/portfolio-contents/tree/main/expertise"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-gray-400 hover:text-white text-[10px] uppercase font-bold tracking-wider transition-colors"
+          >
+            <GitBranch size={13} className="text-[var(--color-primary)]" />
+            <span>GitHub Datastore</span>
+            <ExternalLink size={11} />
+          </a>
+
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-[1.5px] transition-all cursor-pointer ${
+              showForm
+                ? "bg-white/10 text-white border border-white/20"
+                : "bg-[var(--color-primary)] hover:bg-[#d0350e] text-white shadow-lg shadow-[var(--color-primary)]/20"
+            }`}
+          >
+            {showForm ? (
+              <>
+                <X size={13} />
+                <span>CLOSE</span>
+              </>
+            ) : (
+              <>
+                <PlusCircle size={13} />
+                <span>+ ADD ENTRY</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {renderSection("Skills & Pillars", skills, <Wrench size={16} />, true)}
-      {renderSection("Education & Academic Path", education, <GraduationCap size={16} />)}
-      {renderSection("Work Experience & Operations", experience, <Briefcase size={16} />)}
+      {/* Collapsible Form */}
+      {showForm && (
+        <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+          <ExpertiseForm
+            onClose={() => setShowForm(false)}
+            onSuccess={() => setShowForm(false)}
+          />
+        </div>
+      )}
+
+      {/* Render Active Category Sections in Compact Layout */}
+      <div className="flex flex-col gap-6">
+        {(activeTab === "all" || activeTab === "skills") &&
+          renderSection("Skills & Pillars", skills, <Wrench size={16} />, true)}
+
+        {(activeTab === "all" || activeTab === "education") &&
+          renderSection("Education & Academic Path", education, <GraduationCap size={16} />)}
+
+        {(activeTab === "all" || activeTab === "experience") &&
+          renderSection("Work Experience & Operations", experience, <Briefcase size={16} />)}
+      </div>
 
       {/* Edit Modal Dialog */}
       {editingItem && (

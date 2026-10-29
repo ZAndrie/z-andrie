@@ -44,6 +44,7 @@ export async function createProject(data: {
   fileName?: string;
   fileBase64?: string;
   order?: number;
+  hidden?: boolean;
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = getContentRepoName();
@@ -59,7 +60,7 @@ export async function createProject(data: {
   try {
     let finalImageUrl = data.imageUrl || "";
 
-    // If an image file was uploaded via base64, commit it directly to GitHub projects/ directory
+    // Upload image if file was provided
     if (data.fileBase64 && data.fileName) {
       const ext = data.fileName.split(".").pop()?.toLowerCase() || "png";
       const baseClean = data.title
@@ -78,7 +79,7 @@ export async function createProject(data: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            message: `Upload project image: ${data.title}`,
+            message: `Upload project image: ${cleanFileName}`,
             content: data.fileBase64,
             branch: "main",
           }),
@@ -91,10 +92,6 @@ export async function createProject(data: {
       }
 
       finalImageUrl = `https://raw.githubusercontent.com/${username}/${repoName}/main/${filePath}`;
-    }
-
-    if (!finalImageUrl) {
-      finalImageUrl = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200";
     }
 
     const jsonPath = await resolveProjectsJsonPath(username, repoName);
@@ -124,13 +121,13 @@ export async function createProject(data: {
       title: data.title,
       category: data.category,
       subtitle: data.subtitle,
-      imageUrl: finalImageUrl,
+      imageUrl: finalImageUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200",
       projectUrl: data.projectUrl || "",
       githubUrl: data.githubUrl || "",
-      stars: 0,
+      order: data.order !== undefined ? data.order : list.length + 1,
+      hidden: Boolean(data.hidden),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      order: list.length + 1,
     };
 
     list.push(newProject);
@@ -180,6 +177,7 @@ export async function updateProject(
     fileName?: string;
     fileBase64?: string;
     order?: number;
+    hidden?: boolean;
   }
 ) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
@@ -265,6 +263,7 @@ export async function updateProject(
         githubUrl: data.githubUrl !== undefined ? data.githubUrl : list[index].githubUrl,
         updatedAt: new Date().toISOString(),
         order: data.order ?? list[index].order,
+        hidden: data.hidden !== undefined ? data.hidden : Boolean(list[index].hidden),
       };
     } else {
       // For GitHub repos that don't have an entry in projects.json yet, record the override
@@ -278,6 +277,7 @@ export async function updateProject(
         githubUrl: data.githubUrl || "",
         updatedAt: new Date().toISOString(),
         order: data.order || (list.length + 1),
+        hidden: Boolean(data.hidden),
       });
     }
 
@@ -312,5 +312,107 @@ export async function updateProject(
   } catch (error: any) {
     console.error("Error updating project on GitHub:", error);
     return { success: false, error: error.message || "Failed to update project" };
+  }
+}
+
+export async function toggleProjectVisibility(
+  id: string,
+  hidden: boolean,
+  meta?: {
+    title?: string;
+    category?: string;
+    subtitle?: string;
+    imageUrl?: string;
+    githubUrl?: string;
+    projectUrl?: string;
+  }
+) {
+  const username = process.env.GITHUB_USERNAME || "ZAndrie";
+  const repoName = getContentRepoName();
+  const token = process.env.GITHUB_TOKEN;
+
+  if (!token) {
+    return {
+      success: false,
+      error: "GITHUB_TOKEN is missing in your environment variables. Add GITHUB_TOKEN to .env.local to commit visibility settings to GitHub.",
+    };
+  }
+
+  try {
+    const jsonPath = await resolveProjectsJsonPath(username, repoName);
+    let projectsJsonSha: string | undefined = undefined;
+    let list: any[] = [];
+
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
+        { headers: getGitHubHeaders(), cache: "no-store" }
+      );
+      if (res.ok) {
+        const jsonData = await res.json();
+        projectsJsonSha = jsonData.sha;
+        if (jsonData.content) {
+          const decoded = Buffer.from(jsonData.content, "base64").toString("utf-8");
+          list = JSON.parse(decoded);
+          if (!Array.isArray(list)) list = [];
+        }
+      }
+    } catch {
+      list = [];
+    }
+
+    const index = list.findIndex((p: any) => p.id === id);
+
+    if (index !== -1) {
+      list[index] = {
+        ...list[index],
+        hidden,
+        updatedAt: new Date().toISOString(),
+      };
+    } else {
+      list.push({
+        id,
+        title: meta?.title || id,
+        category: meta?.category || "Web Development",
+        subtitle: meta?.subtitle || "",
+        imageUrl: meta?.imageUrl || "",
+        githubUrl: meta?.githubUrl || "",
+        projectUrl: meta?.projectUrl || "",
+        hidden,
+        updatedAt: new Date().toISOString(),
+        order: list.length + 1,
+      });
+    }
+
+    const updateRes = await fetch(
+      `https://api.github.com/repos/${username}/${repoName}/contents/${jsonPath}`,
+      {
+        method: "PUT",
+        headers: {
+          ...getGitHubHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `${hidden ? "Hide" : "Show"} project in portfolio: ${meta?.title || id}`,
+          content: Buffer.from(JSON.stringify(list, null, 2)).toString("base64"),
+          sha: projectsJsonSha,
+          branch: "main",
+        }),
+      }
+    );
+
+    if (!updateRes.ok) {
+      const errData = await updateRes.json();
+      throw new Error(errData.message || `Failed to update ${jsonPath} on GitHub`);
+    }
+
+    revalidatePath("/admin/projects");
+    revalidatePath("/");
+    revalidatePath("/works");
+
+    return { success: true, hidden };
+  } catch (error: any) {
+    console.error("Error toggling project visibility:", error);
+    return { success: false, error: error.message || "Failed to toggle project visibility" };
   }
 }

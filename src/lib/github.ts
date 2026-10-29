@@ -14,6 +14,7 @@ export interface GitHubProject {
   createdAt: string;
   updatedAt: string;
   order: number;
+  hidden?: boolean;
 }
 
 export interface GitHubCertificate {
@@ -176,7 +177,11 @@ export function getContentRepoName(): string {
 }
 
 // ==========================================
-export async function fetchGitHubProjects(customUsername?: string, bypassCache: boolean = false): Promise<GitHubProject[]> {
+export async function fetchGitHubProjects(
+  customUsername?: string,
+  bypassCache: boolean = false,
+  includeHidden: boolean = false
+): Promise<GitHubProject[]> {
   const username = customUsername || process.env.GITHUB_USERNAME || "ZAndrie";
   const cacheOption = bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } };
 
@@ -351,6 +356,7 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
         createdAt: repo.created_at,
         updatedAt: override?.updatedAt || repo.pushed_at || repo.updated_at,
         order: override?.order !== undefined ? override.order : index + 1,
+        hidden: Boolean(override?.hidden),
       };
     });
 
@@ -373,11 +379,16 @@ export async function fetchGitHubProjects(customUsername?: string, bypassCache: 
         createdAt: cp.createdAt || new Date().toISOString(),
         updatedAt: cp.updatedAt || new Date().toISOString(),
         order: cp.order !== undefined ? cp.order : (resolvedRepoProjects.length + idx + 1),
+        hidden: Boolean(cp.hidden),
       }));
 
     // Combine standalone projects from portfolio-contents/projects/projects.json and live GitHub repos
     const allProjects = [...resolvedRepoProjects, ...standaloneProjects];
     allProjects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+
+    if (!includeHidden) {
+      return allProjects.filter((p) => !p.hidden);
+    }
 
     return allProjects;
   } catch (error) {
