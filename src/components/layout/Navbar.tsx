@@ -17,6 +17,29 @@ interface MenuItem {
   badge: string;
 }
 
+// Shared singleton Web Audio Context for zero-latency 8-bit sound effects
+let globalAudioCtx: AudioContext | null = null;
+
+function getSharedAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  try {
+    if (!globalAudioCtx) {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        globalAudioCtx = new AudioCtx();
+      }
+    }
+    if (globalAudioCtx && globalAudioCtx.state === "suspended") {
+      globalAudioCtx.resume();
+    }
+    return globalAudioCtx;
+  } catch {
+    return null;
+  }
+}
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,16 +136,13 @@ export default function Navbar() {
     },
   ];
 
-  // Procedural Web Audio 8-bit sound effects
+  // Procedural Web Audio 8-bit sound effects (Zero thread lag via singleton)
   const playMenuSound = useCallback(
     (type: "hover" | "select") => {
       if (!soundActive || typeof window === "undefined") return;
       try {
-        const AudioCtx =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
+        const ctx = getSharedAudioContext();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
@@ -146,7 +166,7 @@ export default function Navbar() {
           osc.stop(ctx.currentTime + 0.12);
         }
       } catch {
-        // Blocked by browser autoplay policy
+        // Audio error suppression
       }
     },
     [soundActive]
@@ -244,22 +264,26 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
-  // Trigger smooth scroll navigation to stage and close menu
+  // Trigger immediate smooth scroll navigation to stage and close menu
   const triggerNav = useCallback(
     (link: MenuItem) => {
+      // Unlock body immediately so scrolling starts without delay
+      document.body.style.overflow = "";
       setMenuOpen(false);
 
-      if (pathname === "/") {
+      if (pathname === "/" || pathname === "") {
         if (link.id === "home") {
-          scrollToTarget(0, { duration: 1.2 });
+          scrollToTarget(0, { duration: 0.65, immediate: false });
           history.pushState(null, "", "/");
         } else {
           const el = document.getElementById(link.id);
           if (el) {
-            scrollToTarget(el, { duration: 1.2 });
+            scrollToTarget(el, { duration: 0.65, immediate: false });
             history.pushState(null, "", link.href);
           }
         }
+      } else {
+        window.location.href = link.href;
       }
     },
     [pathname]
@@ -390,7 +414,7 @@ export default function Navbar() {
         role="dialog"
         aria-modal="true"
         aria-label="Indie Game Menu"
-        className={`fixed inset-0 w-screen h-screen z-[99999] bg-[#090807]/94 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto overflow-x-hidden font-mono select-none transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed inset-0 w-screen h-screen z-[99999] bg-[#090807]/94 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto overflow-x-hidden font-mono select-none transition-all duration-200 ease-out ${
           menuOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
             : "opacity-0 pointer-events-none -translate-y-3"
@@ -549,7 +573,20 @@ export default function Navbar() {
           </aside>
 
           {/* ── RIGHT COLUMN: TACTICAL STAGE SELECTION DECK (Compact & Perfectly Balanced) ── */}
-          <section className="w-full flex-1 max-w-[720px] flex flex-col justify-center space-y-1.5">
+          <section
+            onWheel={(e) => {
+              if (Math.abs(e.deltaY) > 20) {
+                if (e.deltaY > 0) {
+                  setSelectedIndex((prev) => (prev + 1) % menuItems.length);
+                  playMenuSound("hover");
+                } else {
+                  setSelectedIndex((prev) => (prev - 1 + menuItems.length) % menuItems.length);
+                  playMenuSound("hover");
+                }
+              }
+            }}
+            className="w-full flex-1 max-w-[720px] flex flex-col justify-center space-y-1.5"
+          >
             <div className="flex justify-between items-center px-1 pb-1 text-[9px] tracking-[2px] uppercase text-[#786c5f]">
               <span>SELECT STAGE DESTINATION</span>
               <span>7 STAGES READY</span>
@@ -563,8 +600,10 @@ export default function Navbar() {
                 <div
                   key={item.id}
                   onMouseEnter={() => {
-                    setSelectedIndex(idx);
-                    playMenuSound("hover");
+                    if (selectedIndex !== idx) {
+                      setSelectedIndex(idx);
+                      playMenuSound("hover");
+                    }
                   }}
                   className="w-full"
                 >
