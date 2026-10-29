@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusCircle, Edit3, FileText, CheckCircle } from "lucide-react";
+import { PlusCircle, ExternalLink, FileText, CheckCircle, Radio } from "lucide-react";
 import { fetchGitHubBlogPosts } from "@/lib/github";
 
 export const dynamic = "force-dynamic";
@@ -8,86 +8,91 @@ export default async function BlogAdminPage() {
   const posts = await fetchGitHubBlogPosts();
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex justify-between items-end">
+    <div className="flex flex-col gap-8 pb-20 font-mono">
+      {/* Header Deck */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
         <div>
-          <h1 className="text-3xl font-serif text-[var(--color-text-dark)] uppercase mb-2">
-            Blog <span className="text-[var(--color-primary)] font-light italic">Management</span>
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[3px] text-gray-500 mb-2">
+            <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+            SECTOR // SEC-05 // DEVLOGS
+          </div>
+          <h1 className="font-stencil text-4xl text-white uppercase tracking-wider mb-2">
+            DEVLOGS &amp; <span className="text-[var(--color-primary)]">FIELD NOTES</span>
           </h1>
-          <p className="text-sm font-light text-gray-500 max-w-xl">
-            Create, edit, and publish updates for your portfolio. Choose between a simple rich text editor or a modern block-based editor.
+          <p className="text-gray-400 font-mono text-[13px] leading-relaxed max-w-2xl">
+            Engineering logs, mission retrospectives, and architecture breakdowns committed to GitHub.
           </p>
         </div>
         <Link
           href="/admin/blog/new"
-          className="bg-[var(--color-primary)] text-white px-6 py-3 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--color-primary-dark)] transition-colors flex items-center gap-2"
+          className="bg-[var(--color-primary)] hover:bg-[#d0350e] text-white px-5 py-3 rounded-xl text-[11px] font-bold uppercase tracking-[2px] transition-all flex items-center gap-2 shadow-lg shadow-[var(--color-primary)]/20 shrink-0"
         >
-          <PlusCircle size={16} />
-          Create Post
+          <PlusCircle size={15} />
+          <span>COMPOSE DEVLOG</span>
         </Link>
       </div>
 
-      <div className="bg-white border border-[var(--color-border)] rounded-md overflow-hidden">
+      <div className="bg-[#0e0e12]/95 border border-white/10 rounded-xl overflow-hidden shadow-2xl">
         {posts.length === 0 ? (
-          <div className="p-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-[var(--color-light-bg)] rounded-full flex items-center justify-center mb-4 text-[var(--color-primary)]">
+          <div className="p-16 flex flex-col items-center justify-center text-center">
+            <div className="w-14 h-14 bg-black/60 border border-white/10 rounded-2xl flex items-center justify-center mb-4 text-[var(--color-primary)]">
               <FileText size={24} />
             </div>
-            <h3 className="text-lg font-bold text-[var(--color-text-dark)] mb-2">No posts yet</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-              You haven't written any blog posts or updates yet. Click the button above to create your first post.
+            <h3 className="font-stencil text-xl text-white uppercase tracking-wider mb-2">
+              NO DEVLOG ENTRIES DETECTED
+            </h3>
+            <p className="text-xs text-gray-400 max-w-md mx-auto mb-6">
+              You haven&apos;t published any devlog articles yet. Dispatch your first transmission using the compose button above.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[var(--color-light-bg)] border-b border-[var(--color-border)]">
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Title</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Status</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Editor</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Date</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-right">Actions</th>
+                <tr className="bg-black/60 border-b border-white/10">
+                  <th className="p-4 text-[10px] font-bold uppercase tracking-[2px] text-gray-400">Title &amp; Excerpt</th>
+                  <th className="p-4 text-[10px] font-bold uppercase tracking-[2px] text-gray-400">Status</th>
+                  <th className="p-4 text-[10px] font-bold uppercase tracking-[2px] text-gray-400">Format</th>
+                  <th className="p-4 text-[10px] font-bold uppercase tracking-[2px] text-gray-400">Timestamp</th>
+                  <th className="p-4 text-[10px] font-bold uppercase tracking-[2px] text-gray-400 text-right">Inspect</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {posts.map((post) => (
-                  <tr key={post.id} className="border-b border-[var(--color-border)] hover:bg-gray-50 transition-colors">
+                  <tr key={post.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-4">
-                      <div className="font-bold text-[var(--color-text-dark)] mb-1">{post.title}</div>
-                      <div className="text-xs text-gray-500 line-clamp-1">{post.excerpt}</div>
+                      <div className="font-stencil text-lg text-white mb-1 uppercase tracking-wide">{post.title}</div>
+                      <div className="text-[11px] text-gray-400 line-clamp-1 font-light">{post.excerpt}</div>
                     </td>
                     <td className="p-4">
                       {post.published ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wider">
-                          <CheckCircle size={12} /> Published
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold uppercase tracking-wider">
+                          <CheckCircle size={11} /> Published
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-50 text-yellow-600 text-[10px] font-bold uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-bold uppercase tracking-wider">
                           Draft
                         </span>
                       )}
                     </td>
                     <td className="p-4">
-                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded uppercase">
+                      <span className="text-[10px] font-mono text-gray-400 bg-black/40 border border-white/10 px-2 py-0.5 rounded uppercase">
                         {post.editorType === "json" ? "Block" : "Markdown"}
                       </span>
                     </td>
-                    <td className="p-4 text-xs text-gray-500">
+                    <td className="p-4 text-[11px] text-gray-400">
                       {new Date(post.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={post.githubUrl || `/blog/${post.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-2 text-gray-400 hover:text-[var(--color-primary)] transition-colors rounded hover:bg-[var(--color-light-bg)]"
-                          title="View on GitHub / Website"
-                        >
-                          <Edit3 size={16} />
-                        </a>
-                      </div>
+                      <a
+                        href={post.githubUrl || `/blog/${post.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 p-2 text-gray-400 hover:text-[var(--color-primary)] transition-colors rounded-lg hover:bg-white/5"
+                        title="View on GitHub / Website"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
                     </td>
                   </tr>
                 ))}

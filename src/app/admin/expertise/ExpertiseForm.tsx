@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createExpertiseItem } from "./actions";
-import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2, PlusCircle } from "lucide-react";
 
 export default function ExpertiseForm() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function ExpertiseForm() {
     if (res.success) {
       setStatusMessage({
         type: "success",
-        text: `Committed "${title}" to GitHub Portfolio-Content (expertise/)!`,
+        text: `Committed "${title}" to GitHub Portfolio-Content!`,
       });
       form.reset();
       router.refresh();
@@ -59,116 +59,131 @@ export default function ExpertiseForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 border border-[var(--color-border)] shadow-sm flex flex-col gap-4 rounded-lg">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-[#0e0e12]/95 border border-white/10 rounded-xl p-6 shadow-2xl flex flex-col gap-4 font-mono relative overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--color-primary)]/10 rounded-bl-2xl pointer-events-none" />
+
       <div>
-        <h3 className="font-serif text-lg text-[var(--color-text-dark)] uppercase">Add New Resume Item</h3>
-        <p className="text-xs text-gray-500 font-light mt-0.5">
-          Commits directly to <strong className="text-[var(--color-primary)]">Portfolio-Content (expertise/)</strong> on GitHub.
+        <div className="flex items-center gap-2 text-[9px] uppercase tracking-[2px] text-gray-500 mb-1">
+          <PlusCircle size={13} className="text-[var(--color-primary)]" />
+          <span>DISPATCH // NEW_MILESTONE</span>
+        </div>
+        <h3 className="font-stencil text-2xl text-white uppercase tracking-wider">
+          ADD RESUME ITEM
+        </h3>
+        <p className="text-[11px] text-gray-400 font-light mt-1">
+          Direct sync with <code className="text-white bg-black/40 px-1 py-0.5 rounded">expertise.json</code>.
         </p>
       </div>
 
       {statusMessage && (
         <div
-          className={`p-4 rounded-md text-xs leading-relaxed flex items-start gap-2.5 ${
+          className={`p-3 rounded-lg text-[11px] leading-relaxed flex items-start gap-2.5 ${
             statusMessage.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : "bg-red-50 text-red-800 border border-red-200"
+              ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+              : "bg-red-500/10 text-red-300 border border-red-500/30"
           }`}
         >
           {statusMessage.type === "success" ? (
-            <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
+            <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
           ) : (
-            <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+            <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
           )}
           <div>{statusMessage.text}</div>
         </div>
       )}
 
       <div className="flex flex-col gap-1">
-        <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">Category</label>
-        <select 
-          name="category" 
-          value={category} 
-          onChange={(e) => setCategory(e.target.value)} 
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)] bg-white font-sans"
+        <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
+          Category
+        </label>
+        <select
+          name="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono"
         >
-          <option value="skills">Skills</option>
-          <option value="education">Education &amp; Training</option>
-          <option value="experience">Experience</option>
+          <option value="skills" className="bg-[#0e0e12]">Skills (Stage 04 Architectural Pillars)</option>
+          <option value="education" className="bg-[#0e0e12]">Education &amp; Training (Stage 04 Timeline)</option>
+          <option value="experience" className="bg-[#0e0e12]">Experience (Stage 04 Timeline)</option>
         </select>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">Title / Name</label>
-        <input 
-          name="title" 
-          required 
-          placeholder={category === "skills" ? "e.g. QUALITY ASSURANCE or UI / UX DESIGN" : category === "education" ? "e.g. BS Information Technology" : "e.g. Freelance Web Developer"} 
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
+        <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
+          Title / Designation *
+        </label>
+        <input
+          name="title"
+          required
+          placeholder={category === "skills" ? "e.g. QUALITY ASSURANCE or UI / UX DESIGN" : category === "education" ? "e.g. Senior High School" : "e.g. Student Assistant"}
+          className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
         />
       </div>
 
       {category !== "skills" && (
         <div className="flex flex-col gap-1">
-          <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
-            Date Range / Years (e.g. 2023 - 2027 or Nov 2025)
+          <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
+            Timeline / Years *
           </label>
-          <input 
-            name="year" 
-            required={category !== "skills"} 
-            placeholder="e.g. 2023 - 2027" 
-            className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
+          <input
+            name="year"
+            required={category !== "skills"}
+            placeholder="e.g. 2021-2023 or 2023-2027"
+            className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
           />
         </div>
       )}
 
       <div className="flex flex-col gap-1">
-        <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
-          {category === "skills" ? "Tools & Focus / Subtitle (Optional)" : category === "education" ? "School / Institution (Optional)" : "Company / Organization (Optional)"}
+        <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
+          {category === "skills" ? "Tools / Subtitle (Optional)" : category === "education" ? "Institution (Optional)" : "Organization (Optional)"}
         </label>
-        <input 
-          name="subtitle" 
-          placeholder={category === "skills" ? "e.g. Manual Testing, Automation, Cypress" : category === "education" ? "e.g. Cor Jesu College" : "e.g. Tech Startup or Self-Employed"} 
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
+        <input
+          name="subtitle"
+          placeholder={category === "skills" ? "e.g. Manual Testing, Automation, Cypress" : category === "education" ? "e.g. Cor Jesu College" : "e.g. Cor Jesu College"}
+          className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
         />
       </div>
 
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
-          <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
-            Description / Key Accomplishments (Optional)
+          <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
+            Description / Bullets (Optional)
           </label>
-          <span className="text-[10px] text-gray-400 font-mono">Optional</span>
+          <span className="text-[9px] text-gray-500 font-mono">OPTIONAL</span>
         </div>
-        <p className="text-[11px] text-gray-400 font-light">
+        <p className="text-[10px] text-gray-500 font-light">
           {category === "skills"
-            ? "Optional details for this skill card. If left blank, no description is displayed."
-            : "Optional key achievements or details (separate lines for multiple bullet points). If left blank, no bullet points are displayed."}
+            ? "Optional details for skill card. If blank, no description is shown."
+            : "Optional accomplishments (1 per line). If blank, no bullets appear."}
         </p>
         <textarea
           name="desc"
           rows={3}
           placeholder={
             category === "skills"
-              ? "e.g. Focus on end-to-end usability, responsive layout design, and design systems."
-              : "e.g. Specialized in computer systems diagnostics.\nAssisted university students and faculty with hardware labs."
+              ? "Focus on unit testing, usability, and end-to-end verification."
+              : "Specialized in computer systems diagnostics.\nAssisted students and faculty."
           }
-          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)] font-sans resize-y"
+          className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)] resize-y"
         />
       </div>
 
       <button
         disabled={loading}
         type="submit"
-        className="mt-2 bg-[var(--color-primary)] text-white p-4 font-bold uppercase tracking-[2px] text-[11px] rounded hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="mt-2 bg-[var(--color-primary)] hover:bg-[#d0350e] text-white p-3.5 font-bold uppercase tracking-[2px] text-[11px] rounded-lg shadow-lg shadow-[var(--color-primary)]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
       >
         {loading ? (
           <>
-            <Loader2 size={16} className="animate-spin" />
-            <span>Committing to GitHub...</span>
+            <Loader2 size={15} className="animate-spin" />
+            <span>COMMITTING TO GITHUB...</span>
           </>
         ) : (
-          "Save & Commit to GitHub"
+          "SAVE TO GITHUB"
         )}
       </button>
     </form>

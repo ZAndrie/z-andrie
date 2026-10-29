@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { UploadButton } from "@/utils/uploadthing";
+import { Loader2 } from "lucide-react";
 
 const ClassicEditor = dynamic(() => import("@/components/admin/ClassicEditor"), { ssr: false });
 
@@ -42,7 +43,7 @@ export default function NewPostForm() {
         const error = await response.json();
         alert("Error saving post: " + error.message);
       }
-    } catch (error) {
+    } catch {
       alert("Something went wrong!");
     } finally {
       setIsSubmitting(false);
@@ -50,52 +51,53 @@ export default function NewPostForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-4xl">
-      <div className="bg-white p-6 rounded-md border border-[var(--color-border)] flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-4xl font-mono">
+      <div className="bg-[#0e0e12]/95 p-6 rounded-xl border border-white/10 flex flex-col gap-5 shadow-xl">
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Post Title
+          <label className="block text-[10px] font-bold uppercase tracking-[2px] text-gray-400 mb-2">
+            Post Title / Header
           </label>
           <input
             type="text"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-3 border border-[var(--color-border)] rounded bg-[var(--color-light-bg)] text-sm focus:outline-none focus:border-[var(--color-primary)]"
-            placeholder="E.g., My Awesome New Project"
+            className="w-full p-3 border border-white/10 rounded-lg bg-black/60 text-white font-mono text-xs focus:outline-none focus:border-[var(--color-primary)] placeholder:text-gray-600"
+            placeholder="e.g. Architectural Overview: Next.js 15 & Three.js"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Short Summary
+          <label className="block text-[10px] font-bold uppercase tracking-[2px] text-gray-400 mb-2">
+            Field Excerpt / Summary
           </label>
           <textarea
             required
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
-            className="w-full p-3 border border-[var(--color-border)] rounded bg-[var(--color-light-bg)] text-sm focus:outline-none focus:border-[var(--color-primary)] h-24 resize-none"
-            placeholder="A brief summary of this post..."
+            className="w-full p-3 border border-white/10 rounded-lg bg-black/60 text-white font-mono text-xs focus:outline-none focus:border-[var(--color-primary)] h-24 resize-none placeholder:text-gray-600"
+            placeholder="A brief high-level overview of the devlog entry..."
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Cover Image
+          <label className="block text-[10px] font-bold uppercase tracking-[2px] text-gray-400 mb-2">
+            Cover Imagery
           </label>
           {coverImage ? (
-            <div className="relative w-full h-[200px] rounded overflow-hidden mb-2">
+            <div className="relative w-full h-[220px] rounded-lg overflow-hidden border border-white/10 mb-2 bg-black">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coverImage} alt="Cover" className="object-cover w-full h-full" />
               <button
                 type="button"
                 onClick={() => setCoverImage(null)}
-                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded text-xs font-bold"
+                className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors"
               >
-                Remove
+                Reset Image
               </button>
             </div>
           ) : (
-            <div className="p-4 border border-dashed border-gray-300 rounded bg-gray-50 flex justify-center">
+            <div className="p-6 border border-dashed border-white/15 rounded-xl bg-black/40 flex justify-center">
               <UploadButton
                 endpoint="imageUploader"
                 onClientUploadComplete={(res) => {
@@ -104,7 +106,7 @@ export default function NewPostForm() {
                   }
                 }}
                 onUploadError={(error: Error) => {
-                  alert(`ERROR! ${error.message}`);
+                  alert(`Upload Error: ${error.message}`);
                 }}
               />
             </div>
@@ -112,34 +114,41 @@ export default function NewPostForm() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-md border border-[var(--color-border)]">
-        <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-6">
-          Post Content
+      <div className="bg-[#0e0e12]/95 p-6 rounded-xl border border-white/10 shadow-xl">
+        <label className="block text-[10px] font-bold uppercase tracking-[2px] text-gray-400 mb-4">
+          Article Body / Transmission Content
         </label>
-        <div className="min-h-[400px]">
+        <div className="min-h-[400px] text-white">
           <ClassicEditor value={content} onChange={setContent} />
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-md border border-[var(--color-border)] flex items-center justify-between">
-        <label className="flex items-center gap-3 cursor-pointer">
+      <div className="bg-[#0e0e12]/95 p-6 rounded-xl border border-white/10 flex items-center justify-between shadow-xl">
+        <label className="flex items-center gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="w-5 h-5 accent-[var(--color-primary)]"
+            className="w-4 h-4 accent-[var(--color-primary)] rounded bg-black/60 border border-white/20"
           />
-          <span className="text-sm font-bold text-[var(--color-text-dark)] uppercase tracking-wide">
-            Publish immediately
+          <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+            Broadcast &amp; Publish Immediately
           </span>
         </label>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[var(--color-primary)] text-white px-8 py-3 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50"
+          className="bg-[var(--color-primary)] hover:bg-[#d0350e] text-white px-6 py-3 rounded-lg text-[11px] font-bold uppercase tracking-[2px] shadow-lg shadow-[var(--color-primary)]/20 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
         >
-          {isSubmitting ? "Saving..." : "Save Post"}
+          {isSubmitting ? (
+            <>
+              <Loader2 size={14} className="animate-spin" />
+              <span>COMMITTING...</span>
+            </>
+          ) : (
+            "PUBLISH DEVLOG"
+          )}
         </button>
       </div>
     </form>

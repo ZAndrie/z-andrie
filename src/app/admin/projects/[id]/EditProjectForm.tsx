@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UploadCloud, CheckCircle2, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
+import { UploadCloud, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { updateProject } from "../actions";
 import { GitHubProject } from "@/lib/github";
@@ -64,27 +64,25 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
         title,
         category,
         subtitle,
-        projectUrl,
-        githubUrl: githubUrl || project.githubUrl,
-        imageUrl: fileBase64 ? undefined : (imageUrlInput.trim() || project.imageUrl),
-        fileName,
+        projectUrl: projectUrl || undefined,
+        githubUrl: githubUrl || undefined,
+        imageUrl: imageUrlInput || undefined,
         fileBase64,
-        order: project.order,
+        fileName,
       });
 
       if (res.success) {
         setStatusMessage({
           type: "success",
-          text: `Successfully updated "${title}"! Saved to GitHub projects/projects.json.`,
+          text: "Project updates committed directly to GitHub repository!",
         });
-        setTimeout(() => {
-          router.push("/admin/projects");
-          router.refresh();
-        }, 800);
+        setFile(null);
+        setPreviewUrl("");
+        router.refresh();
       } else {
         setStatusMessage({
           type: "error",
-          text: res.error || "Failed to update project on GitHub.",
+          text: res.error || "Failed to commit changes to GitHub.",
         });
       }
     } catch (err: any) {
@@ -100,34 +98,37 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
   const displayImage = previewUrl || imageUrlInput;
 
   return (
-    <div className="max-w-3xl mx-auto w-full flex flex-col gap-6">
-      <Link
-        href="/admin/projects"
-        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-[var(--color-primary)] transition-colors self-start"
+    <div className="max-w-3xl mx-auto w-full flex flex-col gap-6 font-mono">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#0e0e12]/95 border border-white/10 rounded-xl p-8 shadow-2xl flex flex-col gap-5 relative overflow-hidden"
       >
-        <ArrowLeft size={14} /> Back to Projects List
-      </Link>
+        <div className="absolute top-0 right-0 w-16 h-16 bg-[var(--color-primary)]/10 rounded-bl-3xl pointer-events-none" />
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 border border-[var(--color-border)] shadow-sm flex flex-col gap-5 rounded-lg">
         <div>
-          <h3 className="font-serif text-2xl text-[var(--color-text-dark)] uppercase">Edit Project</h3>
-          <p className="text-xs text-gray-500 font-light mt-1">
-            Updating: <strong className="text-[var(--color-text-dark)]">{project.title}</strong> ({project.id})
+          <div className="text-[10px] text-[var(--color-primary)] font-bold uppercase tracking-[2px] mb-1">
+            RECORD ID: {project.id}
+          </div>
+          <h3 className="font-stencil text-2xl text-white uppercase tracking-wider">
+            MODIFY ENTRY SPECIFICATIONS
+          </h3>
+          <p className="text-xs text-gray-400 font-light mt-1">
+            Target Record: <strong className="text-white">{project.title}</strong>
           </p>
         </div>
 
         {statusMessage && (
           <div
-            className={`p-4 rounded-md text-xs leading-relaxed flex items-start gap-2.5 ${
+            className={`p-4 rounded-lg text-[11px] leading-relaxed flex items-start gap-2.5 ${
               statusMessage.type === "success"
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
+                ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                : "bg-red-500/10 text-red-300 border border-red-500/30"
             }`}
           >
             {statusMessage.type === "success" ? (
-              <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
+              <CheckCircle2 size={16} className="text-emerald-400 shrink-0 mt-0.5" />
             ) : (
-              <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+              <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
             )}
             <div>{statusMessage.text}</div>
           </div>
@@ -135,33 +136,33 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
 
         {/* Project Image */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-gray-600">
-            Project Cover Image
+          <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400">
+            Project Cover Imagery
           </label>
 
           {displayImage ? (
-            <div className="relative h-60 w-full bg-gray-100 border border-[var(--color-border)] rounded overflow-hidden">
+            <div className="relative h-60 w-full bg-black border border-white/10 rounded-lg overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={displayImage} alt="Uploaded" className="w-full h-full object-cover" />
+              <img src={displayImage} alt="Cover Preview" className="w-full h-full object-cover" />
               <button
                 type="button"
                 onClick={() => {
                   handleRemoveFile();
                   setImageUrlInput("");
                 }}
-                className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider rounded shadow hover:bg-black transition-colors z-10"
+                className="absolute top-3 right-3 bg-red-600/90 hover:bg-red-600 text-white text-[9px] font-bold px-3 py-1 uppercase tracking-wider rounded shadow transition-colors z-10"
               >
                 Change Image
               </button>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <label className="border-2 border-dashed border-gray-300 hover:border-[var(--color-primary)] bg-gray-50 hover:bg-gray-100/80 rounded p-6 flex flex-col items-center justify-center cursor-pointer transition-all group">
-                <UploadCloud size={28} className="text-gray-400 group-hover:text-[var(--color-primary)] mb-2 transition-colors" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700 group-hover:text-[var(--color-primary)] transition-colors">
-                  Upload Replacement Image
+              <label className="border border-dashed border-white/15 hover:border-[var(--color-primary)]/50 bg-black/40 hover:bg-black/60 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group">
+                <UploadCloud size={28} className="text-gray-500 group-hover:text-[var(--color-primary)] mb-2 transition-colors" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-300 group-hover:text-white transition-colors">
+                  Upload Replacement Cover
                 </span>
-                <span className="text-[10px] text-gray-400 mt-0.5">PNG, JPG, or WEBP (Commits to GitHub)</span>
+                <span className="text-[10px] text-gray-500 mt-0.5">PNG, JPG, or WEBP (Commits to GitHub)</span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -171,9 +172,9 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
                 />
               </label>
               <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-gray-200" />
-                <span className="flex-shrink mx-2 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Or Image URL</span>
-                <div className="flex-grow border-t border-gray-200" />
+                <div className="flex-grow border-t border-white/10" />
+                <span className="flex-shrink mx-2 text-[9px] uppercase tracking-widest text-gray-600 font-semibold">Or Image URL</span>
+                <div className="flex-grow border-t border-white/10" />
               </div>
               <input
                 type="url"
@@ -183,7 +184,7 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
                   if (file) handleRemoveFile();
                 }}
                 placeholder="https://example.com/project-preview.png"
-                className="border border-[var(--color-border)] rounded p-2.5 text-xs focus:outline-none focus:border-[var(--color-primary)]"
+                className="bg-black/50 border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
               />
             </div>
           )}
@@ -191,44 +192,44 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
 
         <div className="flex flex-col gap-4 mt-2">
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
               Project Title *
             </label>
             <input
               name="title"
               defaultValue={project.title}
               required
-              className="w-full border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
               Category *
             </label>
             <input
               name="category"
               defaultValue={project.category}
               required
-              className="w-full border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">
-              Subtitle / Short Description *
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
+              Mission Subtitle / Description *
             </label>
             <textarea
               name="subtitle"
               defaultValue={project.subtitle}
               required
               rows={3}
-              className="w-full border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)] resize-none"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)] resize-none"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
               Live Deployment URL (Optional)
             </label>
             <input
@@ -236,12 +237,12 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
               type="url"
               defaultValue={project.projectUrl || ""}
               placeholder="https://myproject.vercel.app"
-              className="w-full border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">
+            <label className="text-[10px] font-bold uppercase tracking-[2px] text-gray-400 block mb-1">
               GitHub Repository URL (Optional)
             </label>
             <input
@@ -249,7 +250,7 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
               type="url"
               defaultValue={project.githubUrl || ""}
               placeholder="https://github.com/ZAndrie/repository-name"
-              className="w-full border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
         </div>
@@ -257,22 +258,22 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
         <div className="flex gap-4 mt-4">
           <Link
             href="/admin/projects"
-            className="flex-1 bg-gray-100 text-[var(--color-text-dark)] p-4 font-bold uppercase tracking-[2px] text-[11px] rounded hover:bg-gray-200 transition-colors text-center"
+            className="flex-1 bg-white/5 border border-white/10 text-gray-300 p-3.5 font-bold uppercase tracking-[2px] text-[11px] rounded-lg hover:bg-white/10 hover:text-white transition-colors text-center"
           >
-            Cancel
+            Abort / Cancel
           </Link>
           <button
             disabled={loading}
             type="submit"
-            className="flex-1 bg-[var(--color-text-dark)] text-white p-4 font-bold uppercase tracking-[2px] text-[11px] rounded hover:bg-[var(--color-primary)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 bg-[var(--color-primary)] hover:bg-[#d0350e] text-white p-3.5 font-bold uppercase tracking-[2px] text-[11px] rounded-lg shadow-lg shadow-[var(--color-primary)]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                <span>Saving to GitHub...</span>
+                <span>SAVING TO GITHUB...</span>
               </>
             ) : (
-              "Save Changes"
+              "COMMIT CHANGES"
             )}
           </button>
         </div>
@@ -280,4 +281,3 @@ export default function EditProjectForm({ project }: { project: GitHubProject })
     </div>
   );
 }
-
