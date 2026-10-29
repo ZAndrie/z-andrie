@@ -87,102 +87,16 @@ function getSkillIcon(title: string) {
   );
 }
 
-// ── DYNAMIC DISCIPLINE TEXT GENERATOR ──
-function getAutoSkillDesc(title: string, subtitle?: string): string {
-  if (subtitle && subtitle.trim().length >= 20) return subtitle;
-  const t = (title || "").toLowerCase();
-  if (t.includes("qa") || t.includes("quality") || t.includes("test")) {
-    return "Executing rigorous test cases, UI auditing, functionality verification, and bug lifecycle regression tracking.";
-  }
-  if (t.includes("ui") || t.includes("ux") || t.includes("design")) {
-    return "Crafting purposeful digital spaces in Figma with seamless navigation, accessibility, and high-fidelity user flows.";
-  }
-  if (t.includes("react") || t.includes("next") || t.includes("frontend")) {
-    return "Scalable component hierarchies, server components, strict TypeScript typing, and fast interactive client flows.";
-  }
-  if (t.includes("full") || t.includes("laravel") || t.includes("backend") || t.includes("php")) {
-    return "MVC architecture, relational database schemas, secure RESTful endpoints, and full-lifecycle backend systems.";
-  }
-  if (t.includes("security") || t.includes("cisco") || t.includes("cyber") || t.includes("defense")) {
-    return "Network defense, vulnerability assessments, endpoint protection, and Cisco cybersecurity protocols.";
-  }
-  return subtitle || "Specialized technical discipline delivering robust software solutions and verified performance.";
-}
-
-// ── DYNAMIC TAGS EXTRACTOR ──
-function getAutoSkillTags(title: string, subtitle?: string, tags?: string[]): string[] {
+// ── TAGS RESOLVER (STRICTLY FROM USER INPUT) ──
+function getSkillTags(title: string, subtitle?: string, tags?: string[]): string[] {
   if (tags && tags.length > 0) return tags;
   if (subtitle && subtitle.includes(",")) {
     return subtitle.split(",").map((s) => s.trim()).filter(Boolean);
   }
-  const t = (title || "").toLowerCase();
-  if (t.includes("qa") || t.includes("quality") || t.includes("test")) {
-    return ["Test Case Design", "Functionality Audits", "UI Verification", "Bug Tracking"];
-  }
-  if (t.includes("ui") || t.includes("ux") || t.includes("design")) {
-    return ["Figma", "Design Systems", "Wireframing", "User Flows"];
-  }
-  if (t.includes("react") || t.includes("next") || t.includes("frontend")) {
-    return ["React 19", "Next.js", "TypeScript", "Tailwind CSS"];
-  }
-  if (t.includes("full") || t.includes("laravel") || t.includes("backend") || t.includes("php")) {
-    return ["PHP", "Laravel", "MySQL", "REST APIs"];
-  }
-  if (t.includes("security") || t.includes("cisco") || t.includes("cyber") || t.includes("defense")) {
-    return ["Cisco Defense", "Network Security", "Endpoint Security", "Threat Management"];
-  }
-  return [title, "Technical Stack", "Production", "Verified"];
+  return [title];
 }
 
-// ── DYNAMIC MILESTONE ACCOMPLISHMENTS ──
-function getMilestoneAccomplishments(m: ResumeItem): string[] {
-  if (m.bullets && m.bullets.length > 0) return m.bullets;
-  const t = (m.title || "").toLowerCase();
-  const isEdu = m.category === "education";
-
-  if (t.includes("bs") || t.includes("information tech") || t.includes("college") || t.includes("computer science")) {
-    return [
-      "Rigorous academic curriculum covering advanced database architecture, software engineering, algorithms, and cybersecurity fundamentals.",
-      "Focusing on high-performance full-stack web engineering, Next.js server components, React 19, and interactive WebGL experiences.",
-      "Maintaining consistent high-standing performance across specialized computer science and IT laboratory courses.",
-      "Collaborating on full-lifecycle software prototypes solving campus-wide operational challenges.",
-    ];
-  }
-  if (t.includes("tvl") || t.includes("ict") || t.includes("senior high")) {
-    return [
-      "Comprehensive foundational training in computer programming, database administration, and hardware servicing.",
-      "Developed first-principles mastery of networking topologies, computer hardware assembly, and digital media design.",
-      "Graduated with specialized competency in software troubleshooting and technical workplace preparation.",
-    ];
-  }
-  if (t.includes("junior high") || t.includes("high school")) {
-    return [
-      "Built a strong mathematical, analytical, and logical foundation that seeded interest in computer science.",
-      "Participated in technology and science exhibitions, exploring computer software fundamentals.",
-    ];
-  }
-  if (t.includes("assistant") || t.includes("support")) {
-    return [
-      "Facilitating campus computing operations, workstation deployment, and hardware diagnostics across college computer laboratories.",
-      "Managing institutional digital inventory and hardware asset tracking for campus computing infrastructure.",
-      "Engineered automated reservation web prototypes (Library Booking, Laptop Borrowing) with role-based auth and automated cataloging.",
-      "Applied structured quality assurance testing, user feedback verification, and regression audits across academic systems.",
-    ];
-  }
-  if (m.subtitle && m.subtitle.trim().length > 15) {
-    return [
-      m.subtitle,
-      "Demonstrating consistent hands-on execution and technical problem-solving.",
-    ];
-  }
-  return [
-    isEdu
-      ? "Comprehensive study of software paradigms, logical systems, and applied computer technologies."
-      : "Directly contributing to technical systems, software architecture, and practical operational engineering.",
-  ];
-}
-
-// ── DYNAMIC SPOTLIGHT WORD ──
+// ── DYNAMIC SPOTLIGHT ACRONYM ──
 function getMilestoneSpotlightWord(m: ResumeItem): string {
   if (m.spotlightWord) return m.spotlightWord;
   const t = (m.title || "").toLowerCase();
@@ -200,52 +114,13 @@ const ARCHITECTURAL_PILLARS = [
     code: "01",
     title: "User-Centered Interaction",
     discipline: "UI/UX DESIGN & PROTOTYPING",
-    desc: "Crafting purposeful digital spaces in Figma with seamless navigation, accessibility, and high-fidelity user flows.",
-    tags: ["Figma", "Design Systems", "Wireframing", "User Flows"],
+    desc: "",
+    tags: ["UI/UX Design", "Prototyping"],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
         <rect x="2" y="3" width="20" height="14" rx="2" />
         <line x1="8" y1="21" x2="16" y2="21" />
         <line x1="12" y1="17" x2="12" y2="21" />
-      </svg>
-    ),
-  },
-  {
-    code: "02",
-    title: "Clean Code Architecture",
-    discipline: "REACT 19 & NEXT.js 16 (APP ROUTER)",
-    desc: "Scalable server components, strict TypeScript typing, Turbopack bundling, and robust component hierarchies.",
-    tags: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <polyline points="16 18 22 12 16 6" />
-        <polyline points="8 6 2 12 8 18" />
-      </svg>
-    ),
-  },
-  {
-    code: "03",
-    title: "Modern Full-Stack",
-    discipline: "PHP & LARAVEL WEB FRAMEWORK",
-    desc: "MVC architecture, Blade templates, relational MySQL databases, and secure RESTful API endpoints.",
-    tags: ["PHP", "Laravel", "Blade", "MySQL", "REST APIs"],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <path d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7" />
-        <path d="M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4" />
-        <path d="M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4" />
-      </svg>
-    ),
-  },
-  {
-    code: "04",
-    title: "Performance & Defense",
-    discipline: "GSAP MOTION & CISCO CYBERSECURITY",
-    desc: "60fps ScrollTrigger timeline scrubbing, WebGL particle physics, regression QA auditing, and Cisco security practices.",
-    tags: ["GSAP ScrollTrigger", "Three.js", "QA Auditing", "Cisco Defense"],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
       </svg>
     ),
   },
@@ -259,7 +134,6 @@ const EDUCATION_MILESTONES: ResumeItem[] = [
     title: "BS INFORMATION TECH",
     roleType: "SOFTWARE & WEB SYSTEMS SPECIALIZATION",
     institution: "at Cor Jesu College",
-    subtitle: "Specializing in modern full-stack development, distributed architecture, and software design.",
     spotlightWord: "BSIT",
   },
 ];
@@ -272,7 +146,6 @@ const EXPERIENCE_MILESTONES: ResumeItem[] = [
     title: "STUDENT ASSISTANT",
     roleType: "IT FACILITIES & LAB OPERATIONS",
     institution: "at Cor Jesu College • IT Department",
-    subtitle: "Hardware diagnostics, workstation maintenance, and digital laboratory management.",
     spotlightWord: "COR JESU",
   },
 ];
@@ -292,13 +165,14 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
             (skill.subtitle && skill.subtitle.length < 35
               ? skill.subtitle.toUpperCase()
               : "TECHNICAL SPECIALIZATION"),
-          desc: getAutoSkillDesc(skill.title, skill.subtitle),
-          tags: getAutoSkillTags(skill.title, skill.subtitle, skill.tags),
+          // Strictly from user: only show description if user entered desc or long subtitle
+          desc: skill.desc || (skill.subtitle && skill.subtitle.length >= 20 ? skill.subtitle : ""),
+          tags: getSkillTags(skill.title, skill.subtitle, skill.tags),
           icon: getSkillIcon(skill.title),
         }))
       : ARCHITECTURAL_PILLARS;
 
-  // ── 2. DYNAMIC TECHNOLOGY MATRIX (DERIVED FROM GITHUB SKILLS & STACK) ──
+  // ── 2. DYNAMIC TECHNOLOGY MATRIX (FROM LIVE SKILLS & CORE STACK) ──
   const dynamicTechMatrix = Array.from(
     new Set([
       ...displayPillars.flatMap((p) => p.tags),
@@ -339,7 +213,14 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
 
   const activeMilestone = milestones[activeMilestoneIndex] || milestones[0];
   const isEducation = activeMilestone.category === "education";
-  const activeAccomplishments = getMilestoneAccomplishments(activeMilestone);
+
+  // STRICTLY USER SUPPLIED: Only show bullet points or description if the user entered them!
+  const milestoneBullets: string[] =
+    activeMilestone.bullets && activeMilestone.bullets.length > 0
+      ? activeMilestone.bullets
+      : activeMilestone.desc
+      ? activeMilestone.desc.split("\n").map((l) => l.trim()).filter(Boolean)
+      : [];
 
   // Dynamic scrub distance: expanded scroll runway so fast scrolling does not bypass milestones
   const scrollDistance = Math.max(1, totalMilestones - 1) * 1150 + 750;
@@ -506,9 +387,11 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   <h3 className="text-[18px] sm:text-[20px] font-stencil uppercase text-[#e7e5df] tracking-wide mb-2.5">
                     {pillar.title}
                   </h3>
-                  <p className="text-[13px] text-[#a8a59d] leading-relaxed font-sans">
-                    {pillar.desc}
-                  </p>
+                  {pillar.desc && (
+                    <p className="text-[13px] text-[#a8a59d] leading-relaxed font-sans">
+                      {pillar.desc}
+                    </p>
+                  )}
                 </div>
 
                 {/* Tech Tags */}
@@ -632,22 +515,26 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                 </h2>
 
                 <div className="text-[12px] md:text-[13px] font-mono uppercase tracking-[2px] text-[#d36b54] font-bold mt-2">
-                  {activeMilestone.roleType || (isEducation ? "ACADEMIC PROGRAM" : "PROFESSIONAL ROLE")}
+                  {activeMilestone.roleType || (isEducation ? "ACADEMIC PROGRAM" : "WORK EXPERIENCE")}
                 </div>
 
-                <div className="text-[13px] md:text-[14px] font-sans text-[#e7e5df] italic mt-1 mb-5">
-                  {activeMilestone.institution || activeMilestone.subtitle || "Cor Jesu College"}
-                </div>
+                {activeMilestone.subtitle && (
+                  <div className="text-[13px] md:text-[14px] font-sans text-[#e7e5df] italic mt-1 mb-4">
+                    {activeMilestone.subtitle}
+                  </div>
+                )}
 
-                {/* Accomplishment Bullet Points */}
-                <ul className="flex flex-col gap-2.5 text-[12px] sm:text-[13px] text-[#a8a59d] font-sans leading-relaxed pl-1">
-                  {activeAccomplishments.map((bullet, bIdx) => (
-                    <li key={bIdx} className="flex items-start gap-3">
-                      <span className="text-[#d36b54] text-[14px] leading-none shrink-0 mt-0.5">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Accomplishment Bullet Points (Strictly from user input) */}
+                {milestoneBullets.length > 0 && (
+                  <ul className="flex flex-col gap-2.5 text-[12px] sm:text-[13px] text-[#a8a59d] font-sans leading-relaxed pl-1 mt-2">
+                    {milestoneBullets.map((bullet, bIdx) => (
+                      <li key={bIdx} className="flex items-start gap-3">
+                        <span className="text-[#d36b54] text-[14px] leading-none shrink-0 mt-0.5">•</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* Bottom: Milestone ID Tag */}

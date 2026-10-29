@@ -22,12 +22,21 @@ export default function ExpertiseForm() {
     const title = (formData.get("title") as string).trim();
     const year = (formData.get("year") as string)?.trim() || "";
     const subtitle = (formData.get("subtitle") as string)?.trim() || undefined;
+    const desc = (formData.get("desc") as string)?.trim() || "";
+    const bullets = desc
+      ? desc
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+      : [];
 
     const res = await createExpertiseItem({
       category,
       title,
       subtitle,
       year,
+      desc,
+      bullets,
       percentage: "100%",
       order: 0,
     });
@@ -121,6 +130,30 @@ export default function ExpertiseForm() {
           name="subtitle" 
           placeholder={category === "skills" ? "e.g. Manual Testing, Automation, Cypress" : category === "education" ? "e.g. Cor Jesu College" : "e.g. Tech Startup or Self-Employed"} 
           className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)]" 
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <label className="text-[11px] uppercase tracking-wider text-gray-500 font-bold">
+            Description / Key Accomplishments (Optional)
+          </label>
+          <span className="text-[10px] text-gray-400 font-mono">Optional</span>
+        </div>
+        <p className="text-[11px] text-gray-400 font-light">
+          {category === "skills"
+            ? "Optional details for this skill card. If left blank, no description is displayed."
+            : "Optional key achievements or details (separate lines for multiple bullet points). If left blank, no bullet points are displayed."}
+        </p>
+        <textarea
+          name="desc"
+          rows={3}
+          placeholder={
+            category === "skills"
+              ? "e.g. Focus on end-to-end usability, responsive layout design, and design systems."
+              : "e.g. Specialized in computer systems diagnostics.\nAssisted university students and faculty with hardware labs."
+          }
+          className="border border-[var(--color-border)] rounded p-3 text-sm focus:outline-none focus:border-[var(--color-primary)] font-sans resize-y"
         />
       </div>
 

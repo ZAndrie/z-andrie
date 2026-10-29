@@ -41,6 +41,8 @@ export async function createExpertiseItem(data: {
   year?: string;
   percentage?: string;
   order?: number;
+  desc?: string;
+  bullets?: string[];
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = getContentRepoName();
@@ -84,6 +86,8 @@ export async function createExpertiseItem(data: {
       year: data.year || "",
       percentage: data.percentage || "100%",
       order: list.length + 1,
+      desc: data.desc || "",
+      bullets: data.bullets || (data.desc ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean) : []),
     };
 
     list.push(newItem);
@@ -192,8 +196,10 @@ export async function updateExpertiseItem(id: string, data: {
   title: string;
   subtitle?: string;
   year: string;
-  percentage: string;
+  percentage?: string;
   order?: number;
+  desc?: string;
+  bullets?: string[];
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = getContentRepoName();
@@ -236,7 +242,14 @@ export async function updateExpertiseItem(id: string, data: {
       title: data.title,
       subtitle: data.subtitle || "",
       year: data.year,
-      percentage: data.percentage,
+      percentage: data.percentage || "100%",
+      desc: data.desc !== undefined ? data.desc : list[index].desc || "",
+      bullets:
+        data.bullets !== undefined
+          ? data.bullets
+          : data.desc !== undefined
+          ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean)
+          : list[index].bullets || [],
     };
 
     const updateRes = await fetch(
