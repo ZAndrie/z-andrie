@@ -36,6 +36,17 @@ export default function SmoothScroll() {
     });
     setLenis(lenis);
 
+    // Stop Lenis immediately if the preloader is currently active
+    const isPreloading =
+      typeof document !== "undefined" &&
+      document.documentElement.dataset.preloader === "loading";
+
+    if (isPreloading) {
+      lenis.stop();
+      window.scrollTo(0, 0);
+      lenis.scrollTo(0, { immediate: true, force: true });
+    }
+
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
@@ -50,13 +61,19 @@ export default function SmoothScroll() {
 
     // Pause the loop while the tab is hidden.
     const onVisibility = () => {
-      if (document.hidden) lenis.stop();
+      const stillPreloading =
+        typeof document !== "undefined" &&
+        document.documentElement.dataset.preloader === "loading";
+
+      if (document.hidden || stillPreloading) lenis.stop();
       else lenis.start();
     };
     document.addEventListener("visibilitychange", onVisibility);
 
     // Recompute scroll coordinates on preloader completion and viewport resize
     const onPreloaderDone = () => {
+      // Resume smooth scrolling once preloader is finished
+      lenis.start();
       if (!window.location.hash || window.location.hash === "#home") {
         window.scrollTo(0, 0);
         lenis.scrollTo(0, { immediate: true, force: true });

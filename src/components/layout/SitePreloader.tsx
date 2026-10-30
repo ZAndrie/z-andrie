@@ -144,6 +144,40 @@ export default function SitePreloader() {
     }
   }, []);
 
+  // Intercept and lock scroll events completely while preloader is active
+  useEffect(() => {
+    if (gone) return;
+
+    window.scrollTo(0, 0);
+
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const preventKeyScroll = (e: KeyboardEvent) => {
+      const scrollKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+      if (scrollKeys.includes(e.key)) {
+        if (e.key === " " && isReady) {
+          // Allow spacebar to trigger game start
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    window.addEventListener("wheel", preventScroll, { passive: false });
+    window.addEventListener("touchmove", preventScroll, { passive: false });
+    window.addEventListener("keydown", preventKeyScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", preventScroll);
+      window.removeEventListener("touchmove", preventScroll);
+      window.removeEventListener("keydown", preventKeyScroll);
+    };
+  }, [gone, isReady]);
+
   // Keyboard accessibility: Spacebar or Enter launches the game when ready
   useEffect(() => {
     if (!isReady || isRevealedRef.current) return;

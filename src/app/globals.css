@@ -176,17 +176,31 @@ html.lenis, html.lenis body { height: auto; }
 }
 /* Returning visitors: never render it (script in <head> sets data-preloader="skip"). */
 html[data-preloader="skip"] .site-preloader { display: none; }
-/* Scroll is locked only while the intro is up. */
-html[data-preloader="loading"] { overflow: hidden; }
-
-/* Keep foreground hero text and navigation hidden during preloader so only the 3D room is visible */
-html[data-preloader="loading"] #home,
-html[data-preloader="loading"] nav {
-  opacity: 0;
-  pointer-events: none;
+/* Scroll is strictly locked completely while the intro/preloader is active */
+html[data-preloader="loading"],
+html[data-preloader="loading"] body {
+  overflow: hidden !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
 }
-nav {
-  transition: opacity 0.6s ease;
+
+/* Keep all content sections, navigation, and footer hidden during preloader so ONLY the 3D room is visible */
+html[data-preloader="loading"] section,
+html[data-preloader="loading"] nav,
+html[data-preloader="loading"] footer,
+html[data-preloader="loading"] .scroll-progress,
+html[data-preloader="loading"] .back-to-top {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+section,
+nav,
+footer {
+  transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
 /* If JS is disabled, preloader should not block content */
