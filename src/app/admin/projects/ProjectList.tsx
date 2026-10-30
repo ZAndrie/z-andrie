@@ -16,6 +16,7 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
+  Info,
   GitBranch,
 } from "lucide-react";
 import { GitHubProject } from "@/lib/github";
@@ -29,7 +30,7 @@ export default function ProjectList({ projects: initialProjects }: { projects: G
   const [statusFilter, setStatusFilter] = useState<"all" | "visible" | "hidden">("all");
   const [showDispatchForm, setShowDispatchForm] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [feedbackMessage, setFeedbackMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
 
   // Quick stats
   const totalCount = projects.length;
@@ -76,11 +77,23 @@ export default function ProjectList({ projects: initialProjects }: { projects: G
     setTogglingId(null);
 
     if (res.success) {
-      setFeedbackMessage({
-        type: "success",
-        text: `Project "${project.title}" is now ${nextHidden ? "HIDDEN from" : "VISIBLE in"} public portfolio!`,
-      });
-      setTimeout(() => setFeedbackMessage(null), 4000);
+      if (res.syncedToGitHub) {
+        setFeedbackMessage({
+          type: "success",
+          text: res.message || `Project "${project.title}" is now ${nextHidden ? "HIDDEN from" : "VISIBLE in"} public portfolio and committed to GitHub!`,
+        });
+      } else if (res.warning) {
+        setFeedbackMessage({
+          type: "info",
+          text: `Project "${project.title}" is now ${nextHidden ? "HIDDEN" : "VISIBLE"} locally! (${res.warning})`,
+        });
+      } else {
+        setFeedbackMessage({
+          type: "info",
+          text: res.message || `Project "${project.title}" is now ${nextHidden ? "HIDDEN from" : "VISIBLE in"} public portfolio locally. (Add GITHUB_TOKEN to .env.local to also push live to GitHub)`,
+        });
+      }
+      setTimeout(() => setFeedbackMessage(null), 6000);
     } else {
       // Revert optimistic update
       setProjects((prev) =>
@@ -88,7 +101,7 @@ export default function ProjectList({ projects: initialProjects }: { projects: G
       );
       setFeedbackMessage({
         type: "error",
-        text: res.error || "Failed to update project visibility on GitHub.",
+        text: res.error || "Failed to update project visibility.",
       });
     }
   };
@@ -208,12 +221,16 @@ export default function ProjectList({ projects: initialProjects }: { projects: G
             className={`p-3 rounded-xl text-xs flex items-center justify-between gap-3 animate-in fade-in ${
               feedbackMessage.type === "success"
                 ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                : feedbackMessage.type === "info"
+                ? "bg-cyan-500/10 text-cyan-300 border border-cyan-500/30"
                 : "bg-red-500/10 text-red-300 border border-red-500/30"
             }`}
           >
             <div className="flex items-center gap-2">
               {feedbackMessage.type === "success" ? (
                 <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
+              ) : feedbackMessage.type === "info" ? (
+                <Info size={15} className="text-cyan-400 shrink-0" />
               ) : (
                 <AlertCircle size={15} className="text-red-400 shrink-0" />
               )}
@@ -272,12 +289,12 @@ export default function ProjectList({ projects: initialProjects }: { projects: G
                     >
                       {/* Mini Thumbnail */}
                       <td className="p-3 pl-5">
-                        <div className="w-14 h-10 bg-black rounded-lg overflow-hidden border border-white/10 shrink-0">
+                        <div className="w-20 h-11 bg-black/80 rounded-lg overflow-hidden border border-white/15 shrink-0 flex items-center justify-center p-0.5 shadow-sm">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={p.imageUrl}
                             alt={p.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover rounded-md"
                             onError={(e) => {
                               (e.target as HTMLElement).setAttribute(
                                 "src",

@@ -2,6 +2,45 @@
 
 import { revalidatePath } from "next/cache";
 import { getContentRepoName } from "@/lib/github";
+import fs from "fs";
+import path from "path";
+
+function saveLocalHiddenProjectId(id: string, hidden: boolean) {
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", "project-settings.json");
+    let hiddenIds: string[] = [];
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.hiddenProjectIds)) {
+        hiddenIds = data.hiddenProjectIds;
+      }
+    }
+    const set = new Set(hiddenIds);
+    const cleanId = id.replace(/^gh-/, "");
+
+    if (hidden) {
+      set.add(id);
+      set.add(cleanId);
+    } else {
+      set.delete(id);
+      set.delete(cleanId);
+      for (const item of Array.from(set)) {
+        if (item === id || item === cleanId || `gh-${item}` === id) {
+          set.delete(item);
+        }
+      }
+    }
+
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(filePath, JSON.stringify({ hiddenProjectIds: Array.from(set) }, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to write to project-settings.json:", err);
+  }
+}
 
 function getGitHubHeaders() {
   const token = process.env.GITHUB_TOKEN;
@@ -184,10 +223,19 @@ export async function updateProject(
   const repoName = getContentRepoName();
   const token = process.env.GITHUB_TOKEN;
 
+  if (data.hidden !== undefined) {
+    saveLocalHiddenProjectId(id, data.hidden);
+  }
+
   if (!token) {
+    revalidatePath("/admin/projects");
+    revalidatePath(`/admin/projects/${id}`);
+    revalidatePath("/works");
+    revalidatePath("/");
     return {
-      success: false,
-      error: "GITHUB_TOKEN is missing in your environment variables.",
+      success: true,
+      syncedToGitHub: false,
+      message: "Visibility and changes saved locally! Add GITHUB_TOKEN to .env.local to commit to GitHub.",
     };
   }
 
@@ -326,19 +374,36 @@ export async function toggleProjectVisibility(
     githubUrl?: string;
     projectUrl?: string;
   }
-) {
-  const username = process.env.GITHUB_USERNAME || "ZAndrie";
-  const repoName = getContentRepoName();
-  const token = process.env.GITHUB_TOKEN;
+): Promise<{
+  success: boolean;
+  hidden?: boolean;
+  syncedToGitHub?: boolean;
+  message?: string;
+  warning?: string;
+  error?: string;
+}> {
+  // 1. ALWAYS persist locally first so visibility changes take immediate effect
+  saveLocalHiddenProjectId(id, hidden);
 
+  revalidatePath("/admin/projects");
+  revalidatePath("/");
+  revalidatePath("/works");
+
+  const token = process.env.GITHUB_TOKEN;
   if (!token) {
+    // Succeeded locally, non-blocking notice for remote sync
     return {
-      success: false,
-      error: "GITHUB_TOKEN is missing in your environment variables. Add GITHUB_TOKEN to .env.local to commit visibility settings to GitHub.",
+      success: true,
+      hidden,
+      syncedToGitHub: false,
+      message: `Project visibility saved locally! (Add GITHUB_TOKEN to .env.local to commit live to GitHub)`,
     };
   }
 
+  // 2. If GITHUB_TOKEN is present, also commit to portfolio-contents repo
   try {
+    const username = process.env.GITHUB_USERNAME || "ZAndrie";
+    const repoName = getContentRepoName();
     const jsonPath = await resolveProjectsJsonPath(username, repoName);
     let projectsJsonSha: string | undefined = undefined;
     let list: any[] = [];
@@ -402,17 +467,28 @@ export async function toggleProjectVisibility(
     );
 
     if (!updateRes.ok) {
-      const errData = await updateRes.json();
-      throw new Error(errData.message || `Failed to update ${jsonPath} on GitHub`);
+      const errData = await updateRes.json().catch(() => ({}));
+      return {
+        success: true,
+        hidden,
+        syncedToGitHub: false,
+        warning: `Saved locally, but remote GitHub sync reported: ${errData.message || updateRes.status}`,
+      };
     }
 
-    revalidatePath("/admin/projects");
-    revalidatePath("/");
-    revalidatePath("/works");
-
-    return { success: true, hidden };
+    return {
+      success: true,
+      hidden,
+      syncedToGitHub: true,
+      message: `Project visibility updated and committed to GitHub!`,
+    };
   } catch (error: any) {
-    console.error("Error toggling project visibility:", error);
-    return { success: false, error: error.message || "Failed to toggle project visibility" };
+    console.error("Error toggling project visibility on GitHub:", error);
+    return {
+      success: true,
+      hidden,
+      syncedToGitHub: false,
+      warning: error.message || "Failed to commit visibility to GitHub, but saved locally.",
+    };
   }
 }

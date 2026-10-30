@@ -1,4 +1,19 @@
 import { certificatesData } from "@/data/certificates";
+import fs from "fs";
+import path from "path";
+
+function getLocalHiddenProjectIds(): Set<string> {
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", "project-settings.json");
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      return new Set(data.hiddenProjectIds || []);
+    }
+  } catch {
+    // fallback
+  }
+  return new Set();
+}
 
 export interface GitHubProject {
   id: string;
@@ -283,6 +298,8 @@ export async function fetchGitHubProjects(
       }
     }
 
+    const localHiddenIds = getLocalHiddenProjectIds();
+
     const projectPromises = projectRepos.map(async (repo, index) => {
       const defaultTitle = formatTitle(repo.name);
       const defaultCategory = determineCategory(repo.language, repo.topics);
@@ -342,6 +359,12 @@ export async function fetchGitHubProjects(
           (cp.githubUrl && cp.githubUrl.toLowerCase() === repo.html_url.toLowerCase())
       );
 
+      const isHidden =
+        Boolean(override?.hidden) ||
+        localHiddenIds.has(`gh-${repo.id}`) ||
+        localHiddenIds.has(repo.name) ||
+        localHiddenIds.has(String(repo.id));
+
       return {
         id: `gh-${repo.id}`,
         title: override?.title || defaultTitle,
@@ -356,7 +379,7 @@ export async function fetchGitHubProjects(
         createdAt: repo.created_at,
         updatedAt: override?.updatedAt || repo.pushed_at || repo.updated_at,
         order: override?.order !== undefined ? override.order : index + 1,
-        hidden: Boolean(override?.hidden),
+        hidden: isHidden,
       };
     });
 
@@ -379,7 +402,7 @@ export async function fetchGitHubProjects(
         createdAt: cp.createdAt || new Date().toISOString(),
         updatedAt: cp.updatedAt || new Date().toISOString(),
         order: cp.order !== undefined ? cp.order : (resolvedRepoProjects.length + idx + 1),
-        hidden: Boolean(cp.hidden),
+        hidden: Boolean(cp.hidden) || localHiddenIds.has(cp.id),
       }));
 
     // Combine standalone projects from portfolio-contents/projects/projects.json and live GitHub repos
