@@ -320,7 +320,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/35 z-20 will-change-transform"
       >
         {/* Theatrical background atmosphere */}
         <div

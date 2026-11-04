@@ -163,7 +163,7 @@ export default function Contact() {
     <section
       ref={containerRef}
       id="contact"
-      className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/90 text-[#e7e5df] border-t border-white/[0.08] relative overflow-hidden z-10 select-none"
+      className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/45 text-[#e7e5df] border-t border-white/[0.08] relative overflow-hidden z-10 select-none"
     >
       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row justify-between gap-12 lg:gap-16">
         

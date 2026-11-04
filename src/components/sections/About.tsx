@@ -108,7 +108,7 @@ export default function About() {
     <section
       ref={containerRef}
       id="about"
-      className="py-20 md:py-28 px-6 md:px-12 bg-[#070707]/90 text-[#e7e5df] border-t border-white/[0.08] relative overflow-hidden select-none z-10"
+      className="py-20 md:py-28 px-6 md:px-12 bg-[#070707]/45 text-[#e7e5df] border-t border-white/[0.08] relative overflow-hidden select-none z-10"
     >
       <div className="max-w-[1400px] mx-auto relative z-10">
         

@@ -337,7 +337,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       <section
         id="skills"
         ref={skillsContainerRef}
-        className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/90 text-[#e7e5df] border-t border-white/[0.08] relative z-10 select-none"
+        className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/45 text-[#e7e5df] border-t border-white/[0.08] relative z-10 select-none"
       >
         <div className="max-w-[1400px] mx-auto">
           {/* Section Header */}
@@ -444,7 +444,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         {/* ── STICKY SHOWCASE VIEWPORT ── */}
         <div
           ref={pathStageRef}
-          className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
+          className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/35 z-20 will-change-transform"
         >
           {/* Subtle Ambient Glow */}
           <div

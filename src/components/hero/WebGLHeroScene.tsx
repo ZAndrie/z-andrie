@@ -72,7 +72,7 @@ export default function WebGLHeroScene({ onTelemetryUpdate }: WebGLHeroSceneProp
         }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.2;
+          gl.toneMappingExposure = 1.35;
           gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
         }}
       >

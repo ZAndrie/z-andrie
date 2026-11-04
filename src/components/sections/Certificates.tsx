@@ -153,7 +153,7 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/35 z-20 will-change-transform"
       >
         <div
           className="absolute inset-0 pointer-events-none opacity-30"

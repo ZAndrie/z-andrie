@@ -4,6 +4,7 @@ import React, { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { emitTelemetry } from "@/lib/telemetry";
+import { getLenis } from "@/lib/smoothScroll";
 
 interface RoomSceneProps {
   pointerRef: React.MutableRefObject<{ x: number; y: number; active: boolean }>;
@@ -171,7 +172,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       side: THREE.DoubleSide,
       uniforms: {
         uColor: { value: new THREE.Color("#f4ddb8") },
-        uOpacity: { value: 0.28 },
+        uOpacity: { value: 0.45 },
         uTime: { value: 0 },
       },
       vertexShader: `
@@ -484,7 +485,13 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     // ── 1. SCROLL-DRIVEN CINEMATIC CAMERA CHOREOGRAPHY ──
     let scrollFrac = 0;
     if (typeof window !== "undefined") {
-      scrollFrac = Math.max(0, Math.min(1, window.scrollY / (maxScrollRef.current || 1)));
+      const lenis = getLenis();
+      if (lenis && typeof lenis.progress === "number" && !isNaN(lenis.progress)) {
+        scrollFrac = lenis.progress;
+      } else {
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        scrollFrac = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+      }
     }
 
     // Find bounding camera waypoints
@@ -658,7 +665,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       <object3D ref={targetObjectRef} position={[0, 0, -1.1]} />
 
       {/* Warm moody ambient fill matching cozy dev room */}
-      <ambientLight color="#12100e" intensity={0.8} />
+      <ambientLight color="#181512" intensity={1.2} />
 
       {/* Hanging Lamp Cord from ceiling */}
       <mesh ref={lampCordRef} position={[0, 3.35, 0.4]}>
@@ -686,18 +693,18 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         ref={spotLightRef}
         position={[lampPos.x, lampPos.y - 0.05, lampPos.z]}
         color="#f4ddb8"
-        intensity={7.2}
-        angle={0.52}
-        penumbra={0.65}
-        distance={15}
-        decay={1.6}
+        intensity={9.8}
+        angle={0.55}
+        penumbra={0.6}
+        distance={18}
+        decay={1.4}
       />
 
       {/* Volumetric Glowing Light Cone Mesh */}
       <mesh ref={beamMeshRef} geometry={beamGeometry} material={beamMaterial} renderOrder={10} raycast={() => null} />
 
       {/* Incandescent Light Pool at Cursor Aim Point */}
-      <pointLight ref={poolLightRef} position={[0, 0, -1.1]} color="#f4ddb8" intensity={4.8} distance={5.5} decay={1.6} />
+      <pointLight ref={poolLightRef} position={[0, 0, -1.1]} color="#f4ddb8" intensity={6.5} distance={6.0} decay={1.4} />
 
       {/* Back Wall Plane */}
       <mesh position={[0, 1.2, -2.4]} receiveShadow>
