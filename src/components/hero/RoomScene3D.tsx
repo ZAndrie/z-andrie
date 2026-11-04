@@ -119,6 +119,37 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
   const currentCamPosRef = useRef(new THREE.Vector3(0, 1.05, 5.8));
   const currentLookAtRef = useRef(new THREE.Vector3(0, 0.05, -1.0));
 
+  // Reusable scratch 3D vectors & plane to eliminate per-frame GC allocations
+  const targetPosScratch = useMemo(() => new THREE.Vector3(), []);
+  const targetLookScratch = useMemo(() => new THREE.Vector3(), []);
+  const targetPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 1.1), []);
+  const intersectPoint = useMemo(() => new THREE.Vector3(), []);
+  const tempBeamDir = useMemo(() => new THREE.Vector3(), []);
+  const tempMotePos = useMemo(() => new THREE.Vector3(), []);
+  const tempToMote = useMemo(() => new THREE.Vector3(), []);
+
+  // Cached scroll height to eliminate DOM layout thrashing in useFrame
+  const maxScrollRef = useRef(1);
+  const lastTelemetryTime = useRef(0);
+
+  useEffect(() => {
+    const updateMaxScroll = () => {
+      if (typeof window !== "undefined") {
+        maxScrollRef.current = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight
+        );
+      }
+    };
+    updateMaxScroll();
+    window.addEventListener("resize", updateMaxScroll, { passive: true });
+    window.addEventListener("preloader:done", updateMaxScroll);
+    return () => {
+      window.removeEventListener("resize", updateMaxScroll);
+      window.removeEventListener("preloader:done", updateMaxScroll);
+    };
+  }, []);
+
   // Position coordinates
   const lampPos = useMemo(() => new THREE.Vector3(0, 2.5, 0.4), []);
   const pointerVec = useMemo(() => new THREE.Vector2(), []);
@@ -453,8 +484,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     // ── 1. SCROLL-DRIVEN CINEMATIC CAMERA CHOREOGRAPHY ──
     let scrollFrac = 0;
     if (typeof window !== "undefined") {
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      scrollFrac = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+      scrollFrac = Math.max(0, Math.min(1, window.scrollY / (maxScrollRef.current || 1)));
     }
 
     // Find bounding camera waypoints
@@ -474,25 +504,25 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     // Smooth cosine easing for natural dolly movement
     const ease = 0.5 - 0.5 * Math.cos(segFrac * Math.PI);
 
-    const targetPos = new THREE.Vector3(
+    targetPosScratch.set(
       THREE.MathUtils.lerp(p1.pos[0], p2.pos[0], ease),
       THREE.MathUtils.lerp(p1.pos[1], p2.pos[1], ease),
       THREE.MathUtils.lerp(p1.pos[2], p2.pos[2], ease)
     );
 
-    const targetLook = new THREE.Vector3(
+    targetLookScratch.set(
       THREE.MathUtils.lerp(p1.look[0], p2.look[0], ease),
       THREE.MathUtils.lerp(p1.look[1], p2.look[1], ease),
       THREE.MathUtils.lerp(p1.look[2], p2.look[2], ease)
     );
 
     // Subtle interactive mouse parallax
-    targetPos.x += pointer.x * 0.16;
-    targetPos.y += pointer.y * 0.1;
+    targetPosScratch.x += pointer.x * 0.16;
+    targetPosScratch.y += pointer.y * 0.1;
 
     // Smooth cinematic lerp (damping)
-    currentCamPosRef.current.lerp(targetPos, 0.05);
-    currentLookAtRef.current.lerp(targetLook, 0.05);
+    currentCamPosRef.current.lerp(targetPosScratch, 0.05);
+    currentLookAtRef.current.lerp(targetLookScratch, 0.05);
 
     state.camera.position.copy(currentCamPosRef.current);
     state.camera.lookAt(currentLookAtRef.current);
@@ -503,9 +533,6 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     pointerVec.set(pointer.x, pointer.y);
     raycaster.setFromCamera(pointerVec, state.camera);
 
-    // Target plane located at workspace depth (z = -1.1)
-    const targetPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 1.1);
-    const intersectPoint = new THREE.Vector3();
     const hit = raycaster.ray.intersectPlane(targetPlane, intersectPoint);
 
     if (!hit) {
@@ -562,13 +589,13 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       }
     }
 
-    // Dust motes: smooth gentle drift inside the light beam
+    // Dust motes: smooth gentle drift inside the light beam (zero allocations in loop)
     if (dustRef.current) {
       const posAttr = dustRef.current.geometry.attributes.position as THREE.BufferAttribute;
       const posArray = posAttr.array as Float32Array;
 
       // Beam direction unit vector
-      const beamDir = new THREE.Vector3().subVectors(currentAim, lampPos).normalize();
+      tempBeamDir.subVectors(currentAim, lampPos).normalize();
 
       for (let i = 0; i < dustCount; i++) {
         const i3 = i * 3;
@@ -580,10 +607,10 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
         posArray[i3 + 2] = dustOffsets[i3 + 2] + Math.sin(time * 0.25 * spd + i * 0.1) * 0.12;
 
         // Check if mote is inside the light cone
-        const motePos = new THREE.Vector3(posArray[i3], posArray[i3 + 1], posArray[i3 + 2]);
-        const toMote = motePos.sub(lampPos);
-        const distMote = toMote.length();
-        const cosAngle = toMote.normalize().dot(beamDir);
+        tempMotePos.set(posArray[i3], posArray[i3 + 1], posArray[i3 + 2]);
+        tempToMote.subVectors(tempMotePos, lampPos);
+        const distMote = tempToMote.length();
+        const cosAngle = tempToMote.normalize().dot(tempBeamDir);
 
         // Hide motes outside the spotlight beam
         const inCone = cosAngle > 0.86 && distMote < 6.0;
@@ -608,17 +635,20 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
       if (mat) mat.opacity = pulse;
     }
 
-    // Telemetry broadcast (updates Hero HUD and coordinates)
-    const telemetryPayload = {
-      x: Math.round(pointer.x * 100) / 100,
-      y: Math.round(pointer.y * 100) / 100,
-      focus: Math.round(Math.max(0, Math.min(100, (1 - Math.hypot(pointer.x, pointer.y)) * 100))),
-      target: p1.targetName,
-    };
+    // Telemetry broadcast: throttled to 10 FPS to eliminate continuous React re-renders in Hero
+    if (time - lastTelemetryTime.current > 0.1) {
+      lastTelemetryTime.current = time;
+      const telemetryPayload = {
+        x: Math.round(pointer.x * 100) / 100,
+        y: Math.round(pointer.y * 100) / 100,
+        focus: Math.round(Math.max(0, Math.min(100, (1 - Math.hypot(pointer.x, pointer.y)) * 100))),
+        target: p1.targetName,
+      };
 
-    emitTelemetry(telemetryPayload);
-    if (onTelemetryUpdate) {
-      onTelemetryUpdate(telemetryPayload);
+      emitTelemetry(telemetryPayload);
+      if (onTelemetryUpdate) {
+        onTelemetryUpdate(telemetryPayload);
+      }
     }
   });
 

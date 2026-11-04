@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { scrollToTarget } from "@/lib/smoothScroll";
 
 export function Preloader() {
@@ -65,49 +65,81 @@ export function Preloader() {
 }
 
 export function ScrollProgress() {
-  const [width, setWidth] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
+  const maxScrollRef = useRef(1);
 
   useEffect(() => {
+    const updateMax = () => {
+      if (typeof window !== "undefined") {
+        maxScrollRef.current = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight
+        );
+      }
+    };
+    updateMax();
+
+    let ticking = false;
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      setWidth(scrollPercent);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (barRef.current) {
+            const frac = Math.max(0, Math.min(1, window.scrollY / (maxScrollRef.current || 1)));
+            barRef.current.style.transform = `scaleX(${frac})`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateMax, { passive: true });
+    window.addEventListener("preloader:done", updateMax);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateMax);
+      window.removeEventListener("preloader:done", updateMax);
+    };
   }, []);
 
   return (
     <div
-      className="fixed top-0 left-0 h-[4px] bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] z-[9999] transition-[width] duration-100"
-      style={{ width: `${width}%` }}
-    ></div>
+      ref={barRef}
+      className="fixed top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[var(--color-primary)] via-[#f4ddb8] to-[#d36b54] z-[9999] will-change-transform origin-left pointer-events-none"
+      style={{ transform: "scaleX(0)" }}
+    />
   );
 }
 
 export function BackToTop() {
   const [show, setShow] = useState(false);
+  const showRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setShow(window.scrollY > 300);
+      const isPast = window.scrollY > 300;
+      if (isPast !== showRef.current) {
+        showRef.current = isPast;
+        setShow(isPast);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
-    scrollToTarget(0, { duration: 1.4 });
+    scrollToTarget(0, { duration: 1.0 });
   };
 
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-[30px] right-[30px] w-[50px] h-[50px] bg-[var(--color-primary)] text-white border-none rounded-full text-[24px] cursor-pointer flex items-center justify-center transition-all duration-300 z-[999] hover:-translate-y-[5px] ${
-        show ? "opacity-100 visible" : "opacity-0 invisible"
+      aria-label="Scroll to top"
+      className={`fixed bottom-[30px] right-[30px] w-[46px] h-[46px] bg-[#d36b54] text-white border border-white/20 rounded-full text-[20px] cursor-pointer flex items-center justify-center transition-all duration-300 z-[999] hover:-translate-y-[4px] shadow-lg shadow-black/50 ${
+        show ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-4"
       }`}
     >
       ↑

@@ -18,12 +18,13 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [activeModalCert, setActiveModalCert] = useState<Certificate | null>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
+  const progressLineRef = useRef<HTMLDivElement>(null);
+  const activeCardIndexRef = useRef(0);
 
   const scrollDistance = Math.max(1, totalCards - 1) * 340;
 
@@ -34,6 +35,7 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
   const goToCard = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(totalCards - 1, index));
+      activeCardIndexRef.current = clamped;
       setActiveCardIndex(clamped);
 
       const trig = triggerRef.current;
@@ -66,13 +68,18 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
           trigger: container,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.35,
+          scrub: true,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = self.progress;
-            setScrollProgress(p);
+            if (progressLineRef.current) {
+              progressLineRef.current.style.transform = `scaleX(${Math.max(0.04, p)})`;
+            }
             const idx = Math.min(totalCards - 1, Math.floor(p * totalCards));
-            setActiveCardIndex(idx);
+            if (idx !== activeCardIndexRef.current) {
+              activeCardIndexRef.current = idx;
+              setActiveCardIndex(idx);
+            }
           },
         },
       });
@@ -88,7 +95,6 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
     { scope: containerRef, dependencies: [totalCards] }
   );
 
-  const activeCardIndexRef = useRef(activeCardIndex);
   useEffect(() => {
     activeCardIndexRef.current = activeCardIndex;
   }, [activeCardIndex]);
@@ -147,7 +153,7 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/65 backdrop-blur-[2px] z-20"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
       >
         <div
           className="absolute inset-0 pointer-events-none opacity-30"
@@ -371,11 +377,13 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
             </span>
           </div>
 
+          {/* GSAP Progress Line (GPU accelerated scaleX) */}
           <div className="w-full h-[2px] bg-white/[0.08] relative overflow-hidden rounded-full">
             <div
-              className="h-full bg-gradient-to-r from-[#d36b54] to-[#f4ddb8] transition-all duration-150 ease-out rounded-full"
+              ref={progressLineRef}
+              className="h-full w-full bg-gradient-to-r from-[#d36b54] to-[#f4ddb8] will-change-transform origin-left rounded-full"
               style={{
-                width: `${Math.max(4, Math.round(scrollProgress * 100))}%`,
+                transform: "scaleX(0.04)",
               }}
             />
           </div>

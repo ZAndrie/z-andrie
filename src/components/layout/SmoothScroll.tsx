@@ -28,10 +28,13 @@ export default function SmoothScroll() {
     if (reduce) return;
 
     const lenis = new Lenis({
-      duration: 1.15,
+      duration: 0.95,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
       smoothWheel: true,
-      // Touch devices keep native momentum scrolling (smoother and cheaper).
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.2,
       syncTouch: false,
     });
     setLenis(lenis);

@@ -152,13 +152,15 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
   const total = items.length;
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const directoryListRef = useRef<HTMLUListElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const telemetryStampRef = useRef<HTMLDivElement>(null);
+  const activeIndexRef = useRef(0);
 
   const activeProject = items[activeIndex] || items[0];
 
@@ -169,6 +171,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
   const goToProject = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(total - 1, index));
+      activeIndexRef.current = clamped;
       setActiveIndex(clamped);
 
       const trig = triggerRef.current;
@@ -193,13 +196,21 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
         trigger: container,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.2,
+        scrub: true,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           const p = self.progress;
-          setScrollProgress(p);
+          if (progressBarRef.current) {
+            progressBarRef.current.style.transform = `scaleX(${Math.max(0.04, p)})`;
+          }
+          if (telemetryStampRef.current) {
+            telemetryStampRef.current.textContent = `x ${((p * 1.8) - 0.9).toFixed(2)} y ${(1.21 - p * 0.45).toFixed(2)} 2700K`;
+          }
           const idx = Math.min(total - 1, Math.floor(p * total));
-          setActiveIndex(idx);
+          if (idx !== activeIndexRef.current) {
+            activeIndexRef.current = idx;
+            setActiveIndex(idx);
+          }
         },
       });
 
@@ -214,7 +225,6 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
     { scope: containerRef, dependencies: [total] }
   );
 
-  const activeIndexRef = useRef(activeIndex);
   useEffect(() => {
     activeIndexRef.current = activeIndex;
   }, [activeIndex]);
@@ -265,9 +275,9 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
       const cHeight = container.clientHeight;
 
       if (elTop < cTop) {
-        container.scrollTo({ top: elTop, behavior: "smooth" });
+        container.scrollTop = elTop;
       } else if (elTop + elHeight > cTop + cHeight) {
-        container.scrollTo({ top: elTop + elHeight - cHeight, behavior: "smooth" });
+        container.scrollTop = elTop + elHeight - cHeight;
       }
     }
   }, [activeIndex]);
@@ -310,7 +320,7 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/60 backdrop-blur-[1px] z-20"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[90px] pb-5 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
       >
         {/* Theatrical background atmosphere */}
         <div
@@ -592,8 +602,8 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                   {String(currentDisplayNumber).padStart(2, "0")} / {String(total).padStart(2, "0")}
                 </span>
               </div>
-              <div className="text-[9px] tracking-wider text-[#555]">
-                x {((scrollProgress * 1.8) - 0.9).toFixed(2)} y {(1.21 - scrollProgress * 0.45).toFixed(2)} 2700K
+              <div ref={telemetryStampRef} className="text-[9px] tracking-wider text-[#555]">
+                x -0.90 y 1.21 2700K
               </div>
             </div>
 
@@ -616,12 +626,13 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
             </span>
           </div>
 
-          {/* GSAP Progress Line */}
+          {/* GSAP Progress Line (GPU accelerated scaleX) */}
           <div className="w-full h-[2px] bg-[#1a1918] relative overflow-hidden rounded-full">
             <div
-              className="absolute top-0 left-0 bottom-0 bg-[#d36b54] transition-all duration-150 ease-out"
+              ref={progressBarRef}
+              className="absolute top-0 left-0 bottom-0 w-full bg-[#d36b54] will-change-transform origin-left"
               style={{
-                width: `${Math.max(4, Math.round(scrollProgress * 100))}%`,
+                transform: "scaleX(0.04)",
               }}
             />
           </div>

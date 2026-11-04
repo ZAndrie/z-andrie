@@ -222,12 +222,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
   const totalMilestones = Math.max(1, orderedMilestones.length);
 
   const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
-  const [timelineProgress, setTimelineProgress] = useState(0);
 
   const skillsContainerRef = useRef<HTMLElement>(null);
   const pathContainerRef = useRef<HTMLElement>(null);
   const pathStageRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
+  const timelineProgressRef = useRef<HTMLDivElement>(null);
+  const activeMilestoneIndexRef = useRef(0);
 
   const activeMilestone = orderedMilestones[activeMilestoneIndex] || orderedMilestones[0];
   const isEducation = activeMilestone?.category === "education";
@@ -237,6 +238,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
   const goToMilestone = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(totalMilestones - 1, index));
+      activeMilestoneIndexRef.current = clamped;
       setActiveMilestoneIndex(clamped);
 
       const trig = triggerRef.current;
@@ -260,13 +262,18 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         trigger: container,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.3,
+        scrub: true,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           const p = self.progress;
-          setTimelineProgress(p);
+          if (timelineProgressRef.current) {
+            timelineProgressRef.current.style.transform = `scaleX(${Math.max(0.04, p)})`;
+          }
           const idx = Math.min(totalMilestones - 1, Math.floor(p * totalMilestones));
-          setActiveMilestoneIndex(idx);
+          if (idx !== activeMilestoneIndexRef.current) {
+            activeMilestoneIndexRef.current = idx;
+            setActiveMilestoneIndex(idx);
+          }
         },
       });
 
@@ -280,6 +287,10 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     },
     { scope: pathContainerRef, dependencies: [totalMilestones] }
   );
+
+  useEffect(() => {
+    activeMilestoneIndexRef.current = activeMilestoneIndex;
+  }, [activeMilestoneIndex]);
 
   const displayPillars = skillItems.map((item, idx) => ({
     code: `0${idx + 1}`,
@@ -326,7 +337,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
       <section
         id="skills"
         ref={skillsContainerRef}
-        className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/75 backdrop-blur-[2px] text-[#e7e5df] border-t border-white/[0.08] relative z-10 select-none"
+        className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/90 text-[#e7e5df] border-t border-white/[0.08] relative z-10 select-none"
       >
         <div className="max-w-[1400px] mx-auto">
           {/* Section Header */}
@@ -433,7 +444,7 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
         {/* ── STICKY SHOWCASE VIEWPORT ── */}
         <div
           ref={pathStageRef}
-          className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/65 backdrop-blur-[2px] z-20"
+          className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/80 z-20 will-change-transform"
         >
           {/* Subtle Ambient Glow */}
           <div
@@ -699,11 +710,13 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
               </span>
             </div>
 
+            {/* GSAP Progress Line (GPU accelerated scaleX) */}
             <div className="w-full h-[2px] bg-white/[0.08] relative overflow-hidden rounded-full">
               <div
-                className="h-full bg-gradient-to-r from-[#d36b54] to-[#f4ddb8] transition-all duration-150 ease-out rounded-full"
+                ref={timelineProgressRef}
+                className="h-full w-full bg-gradient-to-r from-[#d36b54] to-[#f4ddb8] will-change-transform origin-left rounded-full"
                 style={{
-                  width: `${Math.max(4, Math.round(timelineProgress * 100))}%`,
+                  transform: "scaleX(0.04)",
                 }}
               />
             </div>

@@ -1,26 +1,27 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { whenRevealed } from "@/lib/preloader";
-import { subscribeTelemetry, TelemetryData } from "@/lib/telemetry";
+import { subscribeTelemetry } from "@/lib/telemetry";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
+  const focusTextRef = useRef<HTMLSpanElement>(null);
+  const targetTextRef = useRef<HTMLSpanElement>(null);
 
-  // Real-time telemetry state from 3D stage
-  const [telemetry, setTelemetry] = useState<TelemetryData>({
-    x: 0,
-    y: 0,
-    focus: 0,
-    target: "ISOMETRIC OVERVIEW",
-  });
-
-  // Subscribe to live telemetry broadcast
+  // Subscribe to live telemetry broadcast with direct DOM updates (zero React re-renders)
   useEffect(() => {
-    return subscribeTelemetry(setTelemetry);
+    return subscribeTelemetry((data) => {
+      if (focusTextRef.current) {
+        focusTextRef.current.textContent = `FOCUS ${data.focus}%`;
+      }
+      if (targetTextRef.current) {
+        targetTextRef.current.textContent = data.target;
+      }
+    });
   }, []);
 
   // GSAP Entrance Animations
@@ -114,9 +115,9 @@ export default function Hero() {
 
           {/* Right: Telemetry Coordinates */}
           <div className="text-right flex items-center gap-4 text-[10px] md:text-[11px]">
-            <span>FOCUS {telemetry.focus}%</span>
-            <span className="text-[#ffffff]">
-              {telemetry.target}
+            <span ref={focusTextRef}>FOCUS 100%</span>
+            <span ref={targetTextRef} className="text-[#ffffff]">
+              ISOMETRIC OVERVIEW
             </span>
           </div>
 

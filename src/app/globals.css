@@ -172,6 +172,13 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: clip; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
 
+/* Hardware accelerated compositor promotion for sticky showcase stages */
+.sticky {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 /* ---------- Modern Sleek Preloader ---------- */
 .site-preloader {
   position: fixed;
