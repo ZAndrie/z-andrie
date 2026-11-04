@@ -59,7 +59,7 @@ export default function Contact() {
       ease: "power3.out",
     }, "-=0.6");
 
-    // 2. Magnetic Physics on Submit Button (Desktop pointer only)
+    // 2. Magnetic Physics on Submit Button
     const btn = submitBtnRef.current;
     if (btn && window.matchMedia("(hover: hover)").matches) {
       const xTo = gsap.quickTo(btn, "x", { duration: 0.35, ease: "power2.out" });
@@ -103,37 +103,42 @@ export default function Contact() {
 
       let success = false;
 
-      // 1. Try server-side route
+      // Primary: Call the internal Contact API route
       try {
-        const response = await fetch("/api/contact", {
+        const res = await fetch("/api/contact", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, message }),
         });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
+        if (res.ok) {
           success = true;
         }
-      } catch (serverErr) {
-        console.warn("Server route error, trying direct fallback:", serverErr);
+      } catch {
+        // Fallback below
       }
 
-      // 2. Direct Formspree fallback if needed
+      // Fallback: If local API fails or mail service is unconfigured, submit via FormSubmit.co
       if (!success) {
-        const directRes = await fetch("https://formspree.io/f/xqpkvwqz", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ name, email, message, _replyto: email }),
-        });
-
-        if (directRes.ok) {
-          success = true;
+        try {
+          const fallbackRes = await fetch("https://formsubmit.co/ajax/zandriebarraba.1305@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              message,
+              _subject: `New Portfolio Message from ${name}`,
+              _template: "table",
+            }),
+          });
+          if (fallbackRes.ok) {
+            success = true;
+          }
+        } catch {
+          // If network is completely offline
         }
       }
 
@@ -142,12 +147,12 @@ export default function Contact() {
         form.reset();
       } else {
         setSubmitStatus("error");
-        setErrorMessage("Failed to send message. Please try again.");
+        setErrorMessage("Failed to send message. Please reach out via email directly.");
       }
     } catch (error: unknown) {
       console.error("Network error:", error);
       setSubmitStatus("error");
-      setErrorMessage("Network error. Please try again.");
+      setErrorMessage("Network error. Please try again or email directly.");
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSubmitStatus("idle"), 10000);
@@ -158,127 +163,123 @@ export default function Contact() {
     <section
       ref={containerRef}
       id="contact"
-      className="pt-[90px] md:pt-[120px] pb-[50px] px-[5%] md:px-[8%] bg-[#070707]/70 backdrop-blur-[1px] text-[#e7e5df] border-t border-[#232220]/50 relative overflow-hidden z-10"
+      className="py-20 md:py-28 px-6 md:px-12 bg-[#070709]/75 backdrop-blur-[2px] text-[#e7e5df] border-t border-white/[0.08] relative overflow-hidden z-10 select-none"
     >
-      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row justify-between gap-[50px] lg:gap-[80px]">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row justify-between gap-12 lg:gap-16">
         
-        {/* Left: Giant Kinetic Headline & Contact Details */}
-        <div className="flex-1 max-w-[800px]">
-          <p className="gsap-contact-eyebrow text-[var(--color-primary)] text-[13px] uppercase tracking-[3px] font-mono font-bold mb-[20px] flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"></span>
-            HAVE AN IDEA OR OPPORTUNITY?
-          </p>
+        {/* Left: Headline & Contact Details */}
+        <div className="flex-1 max-w-[720px]">
+          <div className="gsap-contact-eyebrow inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[10px] font-mono tracking-[2px] uppercase text-[#a8a59d] mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
+            <span>07 / Initiate Contact</span>
+          </div>
 
-          <h2 className="text-[48px] sm:text-[68px] md:text-[88px] lg:text-[104px] font-serif uppercase leading-[0.92] tracking-[-0.02em] select-none">
+          <h2 className="text-[44px] sm:text-[64px] md:text-[80px] lg:text-[92px] font-heading font-bold uppercase leading-[0.92] tracking-[-0.03em] select-none text-white">
             <span className="gsap-contact-h1 block">Let&apos;s Work</span>
-            <span className="gsap-contact-h2 block italic text-[var(--color-primary)]">Together</span>
+            <span className="gsap-contact-h2 block text-[#d36b54]">Together</span>
           </h2>
+
+          <p className="text-[15px] sm:text-[16px] text-[#9ca3af] font-sans leading-relaxed mt-5 max-w-[500px]">
+            Have an upcoming project, freelance contract, or technical advisory requirement? Let&apos;s discuss how we can build something exceptional.
+          </p>
           
-          <div className="mt-[45px] grid grid-cols-1 sm:grid-cols-2 gap-[25px] pt-8 border-t border-[#333]">
-            <div className="gsap-contact-item">
-              <p className="text-[10px] text-[var(--color-text-light)] uppercase font-mono tracking-[2px] mb-[6px]">EMAIL</p>
-              <a href="mailto:zandriebarraba.1305@gmail.com" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-white/[0.08]">
+            <div className="gsap-contact-item p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <p className="text-[10px] text-[#9ca3af] uppercase font-mono tracking-[2px] mb-1">DIRECT EMAIL</p>
+              <a href="mailto:zandriebarraba.1305@gmail.com" className="text-[14px] font-semibold text-white hover:text-[#d36b54] transition-colors break-all">
                 zandriebarraba.1305@gmail.com
               </a>
             </div>
-            <div className="gsap-contact-item">
-              <p className="text-[10px] text-[var(--color-text-light)] uppercase font-mono tracking-[2px] mb-[6px]">PHONE</p>
-              <a href="tel:+639285893984" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors">
+
+            <div className="gsap-contact-item p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <p className="text-[10px] text-[#9ca3af] uppercase font-mono tracking-[2px] mb-1">PHONE / MOBILE</p>
+              <a href="tel:+639285893984" className="text-[14px] font-semibold text-white hover:text-[#d36b54] transition-colors">
                 +63 928 589 3984
               </a>
             </div>
-            <div className="gsap-contact-item">
-              <p className="text-[10px] text-[var(--color-text-light)] uppercase font-mono tracking-[2px] mb-[6px]">GITHUB</p>
-              <a href="https://github.com/ZAndrie" target="_blank" rel="noreferrer" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-1.5">
+
+            <div className="gsap-contact-item p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <p className="text-[10px] text-[#9ca3af] uppercase font-mono tracking-[2px] mb-1">GITHUB REPOSITORIES</p>
+              <a href="https://github.com/ZAndrie" target="_blank" rel="noreferrer" className="text-[14px] font-semibold text-white hover:text-[#d36b54] transition-colors inline-flex items-center gap-1.5">
                 <span>github.com/ZAndrie</span>
-                <span className="text-[var(--color-primary)]">↗</span>
+                <span className="text-[#d36b54]">↗</span>
               </a>
             </div>
-            <div className="gsap-contact-item">
-              <p className="text-[10px] text-[var(--color-text-light)] uppercase font-mono tracking-[2px] mb-[6px]">LINKEDIN</p>
-              <a href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" target="_blank" rel="noreferrer" className="text-[14px] md:text-[15px] font-bold hover:text-[var(--color-primary)] transition-colors inline-flex items-center gap-1.5">
+
+            <div className="gsap-contact-item p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <p className="text-[10px] text-[#9ca3af] uppercase font-mono tracking-[2px] mb-1">LINKEDIN NETWORK</p>
+              <a href="https://www.linkedin.com/in/z-andrie-barraba-474428401/" target="_blank" rel="noreferrer" className="text-[14px] font-semibold text-white hover:text-[#d36b54] transition-colors inline-flex items-center gap-1.5">
                 <span>in/z-andrie-barraba</span>
-                <span className="text-[var(--color-primary)]">↗</span>
+                <span className="text-[#d36b54]">↗</span>
               </a>
             </div>
           </div>
         </div>
 
-        {/* Right: Minimal Form & QR Code */}
-        <div className="gsap-contact-form w-full lg:w-[420px] flex flex-col gap-[30px]">
-          
-          <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
-            <div>
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                required
-                className="w-full p-[14px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                required
-                className="w-full p-[14px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] placeholder-[#666]"
-              />
-            </div>
-            <div>
-              <textarea
-                name="message"
-                placeholder="Your Message..."
-                required
-                rows={4}
-                className="w-full p-[14px] border-b border-[#333] bg-transparent text-[13px] tracking-[0.5px] transition-all duration-300 focus:outline-none focus:border-[var(--color-primary)] resize-y min-h-[95px] placeholder-[#666]"
-              ></textarea>
-            </div>
-            
-            <button
-              ref={submitBtnRef}
-              type="submit"
-              disabled={isSubmitting}
-              className="mt-[6px] w-full bg-[var(--color-primary)] text-white p-[16px] text-[11px] uppercase font-bold tracking-[2px] transition-all duration-300 hover:bg-[var(--color-secondary)] disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-xl rounded-sm"
-            >
-              {isSubmitting ? "SENDING MESSAGE..." : "START A PROJECT ↗"}
-            </button>
-            
-            {submitStatus === "success" && (
-              <div className="text-[11px] text-green-400 mt-1 uppercase tracking-[1px] bg-green-950/40 border border-green-800/60 p-3 rounded-sm font-mono">
-                ✓ Message sent! Delivered directly to my Gmail.
-              </div>
-            )}
-            {submitStatus === "error" && (
-              <div className="text-[11px] text-red-400 mt-1 uppercase tracking-[1px] bg-red-950/40 border border-red-800/60 p-3 rounded-sm font-mono">
-                {errorMessage || "An error occurred. Please try again."}
-              </div>
-            )}
-          </form>
+        {/* Right: Modern Glass Form */}
+        <div className="gsap-contact-form w-full lg:w-[460px]">
+          <div className="p-7 rounded-2xl bg-[#0c0c0f]/80 backdrop-blur-xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.5)]">
+            <h3 className="font-heading font-bold text-xl uppercase tracking-tight text-white mb-2">
+              Send a Message
+            </h3>
+            <p className="text-xs text-[#9ca3af] font-sans mb-6">
+              Fill in your details below and I&apos;ll get back to you within 24 hours.
+            </p>
 
-          {/* Contact vCard QR Code */}
-          <div className="border border-[#333] p-[20px] flex items-center gap-[20px] rounded-sm bg-white/[0.02]">
-            <div className="w-[72px] h-[72px] bg-white flex items-center justify-center p-[4px] rounded-sm shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BEGIN%3AVCARD%0AVERSION%3A3.0%0AN%3ABarraba%3BZ%20Andrie%0AFN%3AZ%20Andrie%20Barraba%0AEMAIL%3Azandriebarraba.1305%40gmail.com%0ATEL%3A%2B639285893984%0AEND%3AVCARD"
-                alt="Z Andrie Contact QR Code"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div>
-              <p className="text-[11px] uppercase font-mono tracking-[2px] font-bold mb-[4px] text-[var(--color-primary)]">
-                QUICK VCARD QR
-              </p>
-              <p className="text-[12px] text-[#888] leading-[1.5]">
-                Scan with any mobile camera to instantly save contact details to your phonebook.
-              </p>
-            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[13px] text-white transition-all duration-200 focus:outline-none focus:border-[#d36b54] focus:bg-white/[0.05] placeholder-[#666]"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[13px] text-white transition-all duration-200 focus:outline-none focus:border-[#d36b54] focus:bg-white/[0.05] placeholder-[#666]"
+                />
+              </div>
+
+              <div>
+                <textarea
+                  name="message"
+                  placeholder="Tell me about your project..."
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[13px] text-white transition-all duration-200 focus:outline-none focus:border-[#d36b54] focus:bg-white/[0.05] resize-y min-h-[100px] placeholder-[#666]"
+                />
+              </div>
+              
+              <button
+                ref={submitBtnRef}
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3.5 px-6 rounded-full bg-[#d36b54] hover:bg-[#b5543f] text-white text-[12px] font-mono uppercase font-semibold tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(211,107,84,0.3)] hover:shadow-[0_0_25px_rgba(211,107,84,0.5)] cursor-pointer"
+              >
+                {isSubmitting ? "TRANSMITTING..." : "SEND MESSAGE →"}
+              </button>
+              
+              {submitStatus === "success" && (
+                <div className="text-[12px] text-emerald-400 p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/60 font-mono text-center">
+                  ✓ Message sent! I&apos;ll be in touch shortly.
+                </div>
+              )}
+              {submitStatus === "error" && (
+                <div className="text-[12px] text-red-400 p-3 rounded-xl bg-red-950/40 border border-red-800/60 font-mono text-center">
+                  {errorMessage || "Failed to send message. Please email directly."}
+                </div>
+              )}
+            </form>
           </div>
-          
         </div>
-        
+
       </div>
     </section>
   );

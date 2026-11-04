@@ -5,254 +5,81 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { scrollToTarget } from "@/lib/smoothScroll";
 
-interface MenuItem {
+interface NavLink {
   id: string;
   num: string;
-  stage: string;
   name: string;
-  tag: string;
   href: string;
-  intel: string;
-  objective: string;
-  badge: string;
 }
 
-// Shared singleton Web Audio Context for zero-latency 8-bit sound effects
-let globalAudioCtx: AudioContext | null = null;
-
-function getSharedAudioContext(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  try {
-    if (!globalAudioCtx) {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
-        globalAudioCtx = new AudioCtx();
-      }
-    }
-    if (globalAudioCtx && globalAudioCtx.state === "suspended") {
-      globalAudioCtx.resume();
-    }
-    return globalAudioCtx;
-  } catch {
-    return null;
-  }
-}
+const NAV_LINKS: NavLink[] = [
+  { id: "works", num: "01", name: "Works", href: "/#works" },
+  { id: "about", num: "02", name: "About", href: "/#about" },
+  { id: "expertise", num: "03", name: "Expertise", href: "/#expertise" },
+  { id: "certificates", num: "04", name: "Credentials", href: "/#certificates" },
+  { id: "blog", num: "05", name: "Devlogs", href: "/#blog" },
+  { id: "contact", num: "06", name: "Contact", href: "/#contact" },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [soundActive, setSoundActive] = useState(true);
-  const [uvActive, setUvActive] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [localTime, setLocalTime] = useState("");
   const pathname = usePathname();
 
-  const menuItems: MenuItem[] = [
-    {
-      id: "home",
-      num: "01",
-      stage: "STAGE 01",
-      name: "DEV ROOM",
-      tag: "Spawn Point",
-      href: "/#home",
-      intel:
-        "The creative isometric command chamber. Features real-time raycast spotlight tracking, glowing CRT terminal, and companion BOT-01.",
-      objective: "Explore isometric workspace & dynamic cursor lighting",
-      badge: "ACTIVE SPAWN",
-    },
-    {
-      id: "about",
-      num: "02",
-      stage: "STAGE 02",
-      name: "PHILOSOPHY",
-      tag: "Craft & Ethos",
-      href: "/#about",
-      intel:
-        "Design manifesto and developer ethos. Explores how spatial computing, intuitive interactions, and playful engineering shape digital spaces.",
-      objective: "Inspect design principles & developer bio",
-      badge: "CORE MANIFESTO",
-    },
-    {
-      id: "works",
-      num: "03",
-      stage: "STAGE 03",
-      name: "PRODUCTION",
-      tag: "Shipped Works",
-      href: "/#works",
-      intel:
-        "Curated production vault containing 18 deployed web applications, interactive 3D experiments, creative tools, and client deliverables.",
-      objective: "Browse 18 case studies & live interactive demos",
-      badge: "18 MISSIONS",
-    },
-    {
-      id: "expertise",
-      num: "04",
-      stage: "STAGE 04",
-      name: "SKILL TREE",
-      tag: "Tech Stack",
-      href: "/#expertise",
-      intel:
-        "Technical skill matrix covering Three.js/R3F, GLSL shaders, React 19, Next.js App Router, TypeScript, and full-stack architecture.",
-      objective: "Analyze tech stack proficiency & frameworks",
-      badge: "LVL 99 MASTERED",
-    },
-    {
-      id: "certificates",
-      num: "05",
-      stage: "STAGE 05",
-      name: "CREDENTIALS",
-      tag: "Trophy Vault",
-      href: "/#certificates",
-      intel:
-        "Verified academic honors, engineering diplomas, hackathon accolades, and industry-recognized development certifications.",
-      objective: "Inspect verified credentials & award archive",
-      badge: "VERIFIED HONORS",
-    },
-    {
-      id: "blog",
-      num: "06",
-      stage: "STAGE 06",
-      name: "DEVLOGS",
-      tag: "Field Notes",
-      href: "/#blog",
-      intel:
-        "In-depth architectural breakdowns, creative devlogs, 3D shader deep-dives, and performance optimization post-mortems.",
-      objective: "Read technical writeups & engineering logs",
-      badge: "PUBLIC ARCHIVE",
-    },
-    {
-      id: "contact",
-      num: "07",
-      stage: "STAGE 07",
-      name: "CO-OP LOBBY",
-      tag: "Initiate Comms",
-      href: "/#contact",
-      intel:
-        "Direct comms link for client inquiries, freelance collaborations, creative tech contracts, or technical advisory consultations.",
-      objective: "Transmit project brief & start multiplayer co-op",
-      badge: "LOBBY OPEN",
-    },
-  ];
-
-  // Procedural Web Audio 8-bit sound effects (Zero thread lag via singleton)
-  const playMenuSound = useCallback(
-    (type: "hover" | "select") => {
-      if (!soundActive || typeof window === "undefined") return;
-      try {
-        const ctx = getSharedAudioContext();
-        if (!ctx) return;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        if (type === "hover") {
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(520, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(780, ctx.currentTime + 0.035);
-          gain.gain.setValueAtTime(0.025, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.035);
-        } else {
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.06);
-          gain.gain.setValueAtTime(0.06, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.12);
-        }
-      } catch {
-        // Audio error suppression
-      }
-    },
-    [soundActive]
-  );
-
-  // Scroll detection & active section spy
+  // Scroll listener for sticky compact navbar
   useEffect(() => {
-    const sectionIds = ["home", "about", "works", "skills", "expertise", "certificates", "blog", "contact"];
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
-
-      const scrollPos = window.scrollY + 200;
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i];
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          if (scrollPos >= top) {
-            const mapped = id === "skills" ? "expertise" : id;
-            setActiveSection(mapped);
-            break;
-          }
-        }
-      }
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Sync selected index with active section when opening menu
+  // Update Philippine local time clock (GMT+8)
   useEffect(() => {
-    if (menuOpen) {
-      const idx = menuItems.findIndex((item) => item.id === activeSection);
-      if (idx !== -1) setSelectedIndex(idx);
-    }
-  }, [menuOpen, activeSection]);
-
-  // Global toggle listener: ESC or M key toggles menu
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-
-      if (e.key === "Escape") {
-        setMenuOpen((prev) => !prev);
-      } else if (e.key === "m" || e.key === "M") {
-        setMenuOpen((prev) => !prev);
-      }
+    const updateTime = () => {
+      try {
+        const now = new Date();
+        const formatted = new Intl.DateTimeFormat("en-US", {
+          timeZone: "Asia/Manila",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }).format(now);
+        setLocalTime(formatted);
+      } catch {}
     };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    updateTime();
+    const interval = setInterval(updateTime, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Keyboard navigation inside game pause menu (Up / Down / Enter / Space)
+  // Section Observer for active link highlight
   useEffect(() => {
-    if (!menuOpen) return;
-
-    const handleMenuKeys = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % menuItems.length);
-        playMenuSound("hover");
-      } else if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + menuItems.length) % menuItems.length);
-        playMenuSound("hover");
-      } else if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        const target = menuItems[selectedIndex];
-        if (target) {
-          playMenuSound("select");
-          triggerNav(target);
+    const sections = ["home", "about", "works", "expertise", "certificates", "blog", "contact"];
+    const handleIntersect: IntersectionObserverCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
         }
-      }
+      });
     };
 
-    window.addEventListener("keydown", handleMenuKeys);
-    return () => window.removeEventListener("keydown", handleMenuKeys);
-  }, [menuOpen, selectedIndex, menuItems, playMenuSound]);
+    const observer = new IntersectionObserver(handleIntersect, {
+      rootMargin: "-25% 0px -65% 0px",
+    });
 
-  // Lock background scroll when fullscreen menu is open
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Prevent background scroll when mobile menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
@@ -264,21 +91,21 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
-  // Trigger immediate smooth scroll navigation to stage and close menu
-  const triggerNav = useCallback(
-    (link: MenuItem) => {
-      // Unlock body immediately so scrolling starts without delay
-      document.body.style.overflow = "";
+  // Smooth navigation handler
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, link: NavLink | { id: string; href: string }) => {
+      e.preventDefault();
       setMenuOpen(false);
+      document.body.style.overflow = "";
 
       if (pathname === "/" || pathname === "") {
         if (link.id === "home") {
-          scrollToTarget(0, { duration: 0.65, immediate: false });
+          scrollToTarget(0, { duration: 0.7 });
           history.pushState(null, "", "/");
         } else {
           const el = document.getElementById(link.id);
           if (el) {
-            scrollToTarget(el, { duration: 0.65, immediate: false });
+            scrollToTarget(el, { duration: 0.7 });
             history.pushState(null, "", link.href);
           }
         }
@@ -289,430 +116,207 @@ export default function Navbar() {
     [pathname]
   );
 
-  // Click handler wrapper
-  const handleNavClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, link: MenuItem) => {
-      e.preventDefault();
-      playMenuSound("select");
-      triggerNav(link);
-    },
-    [triggerNav, playMenuSound]
-  );
-
   // Hide public navbar on admin and login routes
   if (pathname.startsWith("/admin") || pathname.startsWith("/login")) {
     return null;
   }
 
-  const currentItem = menuItems[selectedIndex] || menuItems[0];
-
   return (
     <>
-      {/* ── 1. MINIMAL TOP NAVIGATION BAR ── */}
-      <nav
-        className={`fixed top-0 left-0 right-0 w-full z-[1000] transition-all duration-300 font-mono select-none ${
-          scrolled
-            ? "py-3 px-6 md:px-12 bg-[#070707]/90 backdrop-blur-md border-b border-[#232220]"
-            : "py-5 px-6 md:px-12 bg-transparent"
+      {/* ── 1. SLEEK FLOATING GLASSMORPHISM NAVBAR ── */}
+      <header
+        className={`fixed top-0 left-0 right-0 w-full z-[1000] transition-all duration-300 select-none ${
+          scrolled ? "py-3 px-4 md:px-8" : "py-5 px-6 md:px-12"
         }`}
       >
-        <div className="max-w-[1600px] mx-auto flex justify-between items-center">
-          {/* Left: Text Brand & Stencil Role */}
+        <div className="max-w-[1400px] mx-auto flex justify-between items-center">
+          
+          {/* Brand Logo */}
           <Link
             href="/#home"
-            onClick={(e) => handleNavClick(e, menuItems[0])}
-            className="group flex flex-col text-left cursor-pointer"
-            title="Z Andrie – Creative Developer"
+            onClick={(e) => handleNavClick(e, { id: "home", href: "/#home" })}
+            className="group flex items-center gap-3 cursor-pointer"
+            title="Z Andrie – Creative Technologist"
           >
-            <span className="text-[20px] md:text-[22px] font-bold tracking-[1.5px] uppercase text-[#e7e5df] font-stencil group-hover:text-[var(--color-primary)] transition-colors duration-200">
-              Z ANDRIE
-            </span>
-            <span className="text-[10px] md:text-[11px] tracking-[2px] uppercase text-[#a8a59d] -mt-1 font-mono">
-              Creative Developer
-            </span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#d36b54] to-[#f4ddb8] flex items-center justify-center text-[#0a0a0c] font-heading font-black text-xs shadow-[0_0_15px_rgba(211,107,84,0.35)] group-hover:scale-105 transition-transform">
+              Z
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[14px] md:text-[15px] font-heading font-bold tracking-tight text-[#ffffff] group-hover:text-[#d36b54] transition-colors leading-none">
+                Z ANDRIE
+              </span>
+              <span className="text-[10px] font-mono tracking-widest text-[#9ca3af] uppercase mt-0.5">
+                Creative Dev
+              </span>
+            </div>
           </Link>
 
-          {/* Right Controls: Sound Toggle, UV Mode, and Game Pause Menu Button */}
-          <div className="flex items-center gap-4 sm:gap-6 text-[11px] font-mono tracking-[1.5px] uppercase text-[#a8a59d]">
-            {/* Sound Toggle */}
-            <button
-              type="button"
-              data-magnetic
-              onClick={() => setSoundActive(!soundActive)}
-              className="hidden sm:flex items-center gap-1.5 hover:text-[#e7e5df] transition-colors cursor-pointer"
-              title="Toggle Ambient Audio"
-            >
-              <span className="flex items-end gap-[2px] h-3 w-3" aria-hidden="true">
-                <span className={`w-[2px] bg-[#d36b54] ${soundActive ? "h-2.5 animate-pulse" : "h-1"}`}></span>
-                <span className={`w-[2px] bg-[#d36b54] ${soundActive ? "h-3 animate-pulse" : "h-1"}`}></span>
-                <span className={`w-[2px] bg-[#d36b54] ${soundActive ? "h-1.5 animate-pulse" : "h-1"}`}></span>
+          {/* Desktop Navigation Links (Floating Glass Pill) */}
+          <nav className="hidden lg:flex items-center gap-1 p-1.5 rounded-full bg-[#0a0a0d]/75 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] font-mono text-[11px] tracking-wider uppercase">
+            {NAV_LINKS.map((link) => {
+              const isActive = activeSection === link.id;
+              return (
+                <Link
+                  key={link.id}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link)}
+                  className={`px-4 py-2 rounded-full transition-all duration-200 relative ${
+                    isActive
+                      ? "text-[#ffffff] bg-white/[0.1] font-semibold shadow-sm"
+                      : "text-[#9ca3af] hover:text-[#ffffff] hover:bg-white/[0.04]"
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className={`text-[9px] ${isActive ? "text-[#d36b54]" : "text-[#666]"}`}>
+                      {link.num}
+                    </span>
+                    <span>{link.name}</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right Action Deck: Status Pill & Contact CTA */}
+          <div className="flex items-center gap-3 font-mono text-[11px]">
+            {/* Live Availability Pill */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-[#a8a59d]">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span>Sound {soundActive ? "on" : "off"}</span>
-            </button>
+              <span className="text-[10px] tracking-wider uppercase text-[#d1d5db]">
+                Available
+              </span>
+            </div>
 
-            {/* UV Mode Toggle */}
-            <button
-              type="button"
-              data-magnetic
-              onClick={() => setUvActive(!uvActive)}
-              className={`px-2 py-0.5 border text-[10px] tracking-[1px] rounded-[2px] transition-colors cursor-pointer ${
-                uvActive
-                  ? "border-[#9333ea] text-[#c084fc] bg-[#581c87]/30"
-                  : "border-[#e7e5df]/20 text-[#a8a59d] hover:border-[#e7e5df]"
-              }`}
-              title="Toggle Blacklight / UV inspection"
+            {/* Let's Talk CTA */}
+            <Link
+              href="/#contact"
+              onClick={(e) => handleNavClick(e, { id: "contact", href: "/#contact" })}
+              className="px-4 py-2 rounded-full bg-[#d36b54] hover:bg-[#b5543f] text-[#ffffff] font-semibold text-[11px] tracking-wider uppercase transition-all duration-200 shadow-[0_0_20px_rgba(211,107,84,0.3)] hover:shadow-[0_0_25px_rgba(211,107,84,0.5)] cursor-pointer flex items-center gap-1.5"
             >
-              UV
-            </button>
+              <span>Let&apos;s Talk</span>
+              <span>↗</span>
+            </Link>
 
-            {/* Indie Game Menu Toggle Button */}
+            {/* Mobile / Tablet Menu Button */}
             <button
               type="button"
-              data-magnetic
-              onClick={() => {
-                playMenuSound(menuOpen ? "hover" : "select");
-                setMenuOpen(!menuOpen);
-              }}
-              className={`group flex items-center gap-2.5 px-3 py-1.5 border rounded-[3px] transition-all duration-200 cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.5)] ${
-                menuOpen
-                  ? "border-[var(--color-primary)] bg-[#1e1713] text-[#f4ddb8]"
-                  : "border-[#3e3b36] hover:border-[var(--color-primary)] bg-[#141210]/70 hover:bg-[#1a1714] text-[#e7e5df]"
-              }`}
-              aria-label="Toggle game menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="lg:hidden p-2 rounded-full bg-[#0e0e12]/80 border border-white/[0.1] text-white hover:border-[#d36b54] transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
               aria-expanded={menuOpen}
             >
-              <div className="flex flex-col gap-[3px] w-3.5 justify-center" aria-hidden="true">
+              <div className="w-4 h-4 flex flex-col justify-center gap-1">
                 <span
-                  className={`h-[1.5px] bg-current transition-all duration-300 ${
-                    menuOpen ? "rotate-45 translate-y-[4.5px] w-3.5" : "w-3.5"
+                  className={`h-0.5 bg-current transition-all duration-300 ${
+                    menuOpen ? "rotate-45 translate-y-1 w-4" : "w-4"
                   }`}
                 />
                 <span
-                  className={`h-[1.5px] bg-current transition-all duration-300 ${
-                    menuOpen ? "opacity-0" : "w-2.5 group-hover:w-3.5"
+                  className={`h-0.5 bg-current transition-all duration-300 ${
+                    menuOpen ? "opacity-0" : "w-3"
                   }`}
                 />
                 <span
-                  className={`h-[1.5px] bg-current transition-all duration-300 ${
-                    menuOpen ? "-rotate-45 -translate-y-[4.5px] w-3.5" : "w-3.5"
+                  className={`h-0.5 bg-current transition-all duration-300 ${
+                    menuOpen ? "-rotate-45 -translate-y-1 w-4" : "w-4"
                   }`}
                 />
               </div>
-              <span className="font-bold tracking-[2px] text-[11px]">
-                {menuOpen ? "CLOSE" : "GAME MENU"}
-              </span>
-              <span className="hidden md:inline-block text-[9px] px-1 py-0.2 rounded border border-[#3e3b36] text-[#786c5f] group-hover:border-[var(--color-primary)] group-hover:text-[#f4ddb8]">
-                ESC
-              </span>
             </button>
           </div>
-        </div>
-      </nav>
 
-      {/* ── 2. ORIGINAL FULLSCREEN INDIE GAMER TERMINAL ── */}
+        </div>
+      </header>
+
+      {/* ── 2. SLEEK MODERN OVERLAY DRAWER (MOBILE & COMPACT) ── */}
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Indie Game Menu"
-        className={`fixed inset-0 w-screen h-screen z-[99999] bg-[#090807]/94 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto overflow-x-hidden font-mono select-none transition-all duration-200 ease-out ${
+        aria-label="Site Navigation"
+        className={`fixed inset-0 z-[99999] bg-[#070709]/95 backdrop-blur-2xl transition-all duration-300 ease-out flex flex-col justify-between p-6 md:p-12 ${
           menuOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
-            : "opacity-0 pointer-events-none -translate-y-3"
+            : "opacity-0 pointer-events-none -translate-y-4"
         }`}
       >
-        {/* Subtle CRT Scanline overlay texture */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"
-          aria-hidden="true"
-        />
-
-        {/* ── TOP HUD HEADER BAR ── */}
-        <header className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-4 flex justify-between items-center border-b border-[#23201d]">
+        {/* Top Header in Drawer */}
+        <div className="w-full max-w-[1200px] mx-auto flex justify-between items-center border-b border-white/[0.08] pb-6">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 text-[11px] md:text-[12px] tracking-[2px] uppercase text-[#f4ddb8] font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#f4ddb8] shadow-[0_0_8px_#f4ddb8] animate-pulse" />
-              GAME MENU
-            </span>
-            <span className="text-[#3e3b36]">|</span>
-            <span className="hidden sm:inline-block text-[11px] tracking-[1.5px] uppercase text-[#786c5f]">
-              MISSION STAGE SELECTOR // V2.6
+            <div className="w-7 h-7 rounded-full bg-[#d36b54] flex items-center justify-center text-black font-heading font-bold text-xs">
+              Z
+            </div>
+            <span className="font-heading font-bold text-base text-white tracking-tight">
+              NAVIGATION
             </span>
           </div>
 
-          {/* Right: Controls & Close Button */}
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-3 text-[10px] text-[#786c5f] tracking-[1.5px]">
-              <span>
-                <kbd className="px-1 py-0.5 rounded border border-[#3e3b36] bg-[#141210] text-[#a8a59d]">W/S</kbd> or{" "}
-                <kbd className="px-1 py-0.5 rounded border border-[#3e3b36] bg-[#141210] text-[#a8a59d]">↑/↓</kbd> NAVIGATE
-              </span>
-              <span>
-                <kbd className="px-1 py-0.5 rounded border border-[#3e3b36] bg-[#141210] text-[#a8a59d]">ENTER</kbd> DEPLOY
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                playMenuSound("select");
-                setMenuOpen(false);
-              }}
-              className="group flex items-center gap-2 text-[11px] md:text-[12px] tracking-[2px] uppercase text-[#e7e5df] hover:text-[var(--color-primary)] transition-colors cursor-pointer px-3 py-1 border border-[#3e3b36] hover:border-[var(--color-primary)] rounded bg-[#161311]"
-            >
-              <span>CLOSE MENU</span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] bg-[#221c17] text-[#f4ddb8] border border-[#3e3b36]">
-                ESC
-              </span>
-            </button>
-          </div>
-        </header>
-
-        {/* ── MAIN 2-COLUMN SPLIT: BALANCED INTEL HUD & STAGE SELECT ── */}
-        <main className="relative z-10 w-full max-w-[1600px] mx-auto flex-1 flex flex-col lg:flex-row gap-6 md:gap-8 px-6 md:px-12 py-4 my-auto items-center justify-center">
-          
-          {/* ── LEFT COLUMN: BALANCED PLAYER CARD & LIVE MISSION INTEL (Zero Gaps) ── */}
-          <aside className="hidden lg:flex lg:w-[420px] xl:w-[460px] flex-col gap-3.5 p-5 rounded-[4px] border border-[#23201d] bg-[#110e0c]/85 backdrop-blur-md relative overflow-hidden shrink-0 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-            {/* Corner Decorative Tech Marks */}
-            <div className="absolute top-2 left-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
-            <div className="absolute top-2 right-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
-            <div className="absolute bottom-2 left-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
-            <div className="absolute bottom-2 right-2 text-[#3e3b36] text-[10px]" aria-hidden="true">+</div>
-
-            {/* 1. Player & Companion Status Header */}
-            <div className="flex justify-between items-center pb-2.5 border-b border-[#23201d]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded border border-[#3e3b36] bg-[#1a1714] flex items-center justify-center text-xs font-mono text-[#f4ddb8]">
-                  [•_•]
-                </div>
-                <div>
-                  <h2 className="text-[12px] font-bold tracking-[1.5px] uppercase text-[#e7e5df]">
-                    Z ANDRIE
-                  </h2>
-                  <p className="text-[9px] tracking-[1.5px] uppercase text-[#786c5f]">
-                    LVL 26 • CREATIVE DEV
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#22c55e]/30 bg-[#22c55e]/10 text-[9px] text-[#4ade80]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-ping" />
-                BOT-01 ONLINE
-              </div>
-            </div>
-
-            {/* 2. Dynamic Stage Intel Card */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[10px] tracking-[2px] uppercase">
-                <span className="text-[#d36b54] font-bold">
-                  &gt;&gt; STAGE INTEL
-                </span>
-                <span className="px-1.5 py-0.5 rounded border border-[#3e3b36] text-[#f4ddb8] bg-[#1c1814] text-[9px]">
-                  {currentItem.badge}
-                </span>
-              </div>
-
-              <div>
-                <span className="text-[9px] text-[#786c5f] tracking-[1.5px] uppercase block">
-                  {currentItem.stage}
-                </span>
-                <h3 className="text-xl md:text-2xl font-stencil font-bold tracking-[1px] uppercase text-[#f4ddb8] leading-tight">
-                  {currentItem.name}
-                </h3>
-              </div>
-
-              <p className="text-[11px] text-[#a8a59d] leading-relaxed font-mono border-l-2 border-[#d36b54] pl-2.5 py-0.5">
-                {currentItem.intel}
-              </p>
-            </div>
-
-            {/* 3. Mission Objective Box */}
-            <div className="p-2.5 rounded border border-[#26221d] bg-[#14110e]/95 space-y-1">
-              <span className="text-[8px] tracking-[1.5px] text-[#786c5f] uppercase block font-bold">
-                MISSION OBJECTIVE
-              </span>
-              <p className="text-[10px] md:text-[11px] text-[#e7e5df] font-mono leading-snug">
-                {currentItem.objective}
-              </p>
-            </div>
-
-            {/* 4. Live System Telemetry Strip */}
-            <div className="grid grid-cols-3 gap-2 py-2 border-y border-[#23201d] text-center text-[9px] font-mono uppercase text-[#786c5f]">
-              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
-                <span className="block text-[#a8a59d] font-bold">STATUS</span>
-                <span className="text-[#4ade80]">READY</span>
-              </div>
-              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
-                <span className="block text-[#a8a59d] font-bold">LIGHT</span>
-                <span className="text-[#f4ddb8]">2700K</span>
-              </div>
-              <div className="p-1 rounded bg-[#141210] border border-[#23201d]">
-                <span className="block text-[#a8a59d] font-bold">AUDIO</span>
-                <span className={soundActive ? "text-[#4ade80]" : "text-[#786c5f]"}>
-                  {soundActive ? "SFX ON" : "MUTED"}
-                </span>
-              </div>
-            </div>
-
-            {/* 5. Direct Deploy Action Bar */}
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[9px] tracking-[1.5px] text-[#786c5f] uppercase">
-                WARP TO SECTOR
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  playMenuSound("select");
-                  triggerNav(currentItem);
-                }}
-                className="px-3.5 py-1.5 rounded-[2px] bg-[#d36b54] hover:bg-[#e0755e] text-[#120f0c] text-[10px] md:text-[11px] font-bold tracking-[2px] uppercase transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-[0_0_14px_rgba(211,107,84,0.3)]"
-              >
-                <span>DEPLOY TO STAGE</span>
-                <span>►</span>
-              </button>
-            </div>
-          </aside>
-
-          {/* ── RIGHT COLUMN: TACTICAL STAGE SELECTION DECK (Compact & Perfectly Balanced) ── */}
-          <section
-            onWheel={(e) => {
-              if (Math.abs(e.deltaY) > 20) {
-                if (e.deltaY > 0) {
-                  setSelectedIndex((prev) => (prev + 1) % menuItems.length);
-                  playMenuSound("hover");
-                } else {
-                  setSelectedIndex((prev) => (prev - 1 + menuItems.length) % menuItems.length);
-                  playMenuSound("hover");
-                }
-              }
-            }}
-            className="w-full flex-1 max-w-[720px] flex flex-col justify-center space-y-1.5"
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            className="px-3.5 py-1.5 rounded-full border border-white/[0.1] text-gray-400 hover:text-white font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer"
           >
-            <div className="flex justify-between items-center px-1 pb-1 text-[9px] tracking-[2px] uppercase text-[#786c5f]">
-              <span>SELECT STAGE DESTINATION</span>
-              <span>7 STAGES READY</span>
-            </div>
+            Close ✕
+          </button>
+        </div>
 
-            {menuItems.map((item, idx) => {
-              const isSelected = selectedIndex === idx;
-              const isActiveSection = activeSection === item.id;
+        {/* Center: Large Clean Typography Links */}
+        <div className="w-full max-w-[1200px] mx-auto py-8 flex flex-col gap-4 font-heading">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.id}
+              href={link.href}
+              onClick={(e) => handleNavClick(e, link)}
+              className="group flex items-baseline justify-between py-2 border-b border-white/[0.05] hover:border-[#d36b54] transition-colors"
+            >
+              <span className="text-[32px] sm:text-[44px] md:text-[56px] font-bold uppercase text-gray-300 group-hover:text-white group-hover:translate-x-2 transition-all">
+                {link.name}
+              </span>
+              <span className="font-mono text-xs text-[#d36b54] opacity-80 group-hover:opacity-100">
+                {link.num} ↗
+              </span>
+            </Link>
+          ))}
+        </div>
 
-              return (
-                <div
-                  key={item.id}
-                  onMouseEnter={() => {
-                    if (selectedIndex !== idx) {
-                      setSelectedIndex(idx);
-                      playMenuSound("hover");
-                    }
-                  }}
-                  className="w-full"
-                >
-                  <Link
-                    href={item.href}
-                    prefetch={true}
-                    onClick={(e) => handleNavClick(e, item)}
-                    className={`group w-full flex items-center justify-between py-2 px-3.5 sm:py-2.5 sm:px-4 md:py-2.5 md:px-5 rounded-[3px] border transition-all duration-150 cursor-pointer ${
-                      isSelected
-                        ? "border-[#d36b54] bg-[#1a1512] shadow-[0_0_16px_rgba(211,107,84,0.16)] translate-x-1.5"
-                        : "border-[#23201d] hover:border-[#3e3b36] bg-[#110e0c]/60"
-                    }`}
-                  >
-                    {/* Left: Stage number + Title */}
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      {/* Selection cursor indicator */}
-                      <span
-                        className={`text-[11px] font-mono transition-all duration-150 w-4 text-center ${
-                          isSelected ? "text-[#d36b54] font-bold" : "text-[#5e5850]"
-                        }`}
-                      >
-                        {isSelected ? "►" : item.num}
-                      </span>
+        {/* Bottom Drawer Intel & Contact */}
+        <div className="w-full max-w-[1200px] mx-auto border-t border-white/[0.08] pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono text-[11px] text-gray-400">
+          <div className="flex flex-col gap-1">
+            <span className="text-white font-semibold">LOCATION</span>
+            <span>Philippines • {localTime || "GMT+8"}</span>
+          </div>
 
-                      <div>
-                        <div className="flex items-center gap-2 leading-none">
-                          <span
-                            className={`text-[8.5px] tracking-[1.5px] uppercase font-mono ${
-                              isSelected ? "text-[#d36b54]" : "text-[#665f54]"
-                            }`}
-                          >
-                            {item.stage}
-                          </span>
-                          {isActiveSection && (
-                            <span className="text-[7.5px] px-1 py-0.2 rounded bg-[#22c55e]/20 text-[#4ade80] border border-[#22c55e]/40 font-bold">
-                              CURRENT
-                            </span>
-                          )}
-                        </div>
-
-                        <span
-                          className={`font-stencil font-bold tracking-[1px] uppercase text-xl sm:text-2xl md:text-3xl transition-colors duration-150 leading-tight block mt-0.5 ${
-                            isSelected ? "text-[#f4ddb8]" : "text-[#706a60]"
-                          }`}
-                        >
-                          {item.name}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right: Stage Badge Chip & Enter hint */}
-                    <div className="flex items-center gap-2.5 text-right">
-                      <span
-                        className={`hidden sm:inline-block text-[9.5px] md:text-[10px] tracking-[1.5px] uppercase font-mono px-2 py-0.5 rounded border transition-colors ${
-                          isSelected
-                            ? "border-[#d36b54]/50 bg-[#261814] text-[#f4ddb8]"
-                            : "border-[#2b2723] text-[#5e5850]"
-                        }`}
-                      >
-                        {item.tag}
-                      </span>
-
-                      <span
-                        className={`text-[11px] text-[#d36b54] transition-opacity duration-150 ${
-                          isSelected ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        ↵
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </section>
-        </main>
-
-        {/* ── BOTTOM HUD FOOTER BAR ── */}
-        <footer className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 py-3 flex flex-col sm:flex-row justify-between items-center gap-2 border-t border-[#23201d] text-[10px] md:text-[11px] tracking-[1.5px] uppercase text-[#786c5f]">
-          <div className="flex items-center gap-4">
-            <span className="text-[#a8a59d]">CONNECT:</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-white font-semibold">DIRECT INQUIRIES</span>
             <a
               href="mailto:zandriebarraba.1305@gmail.com"
-              className="hover:text-[#f4ddb8] transition-colors cursor-pointer"
+              className="text-[#d36b54] hover:underline"
             >
               zandriebarraba.1305@gmail.com
             </a>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 text-xs">
             <a
               href="https://github.com/ZAndrie"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-[#f4ddb8] transition-colors cursor-pointer"
+              className="hover:text-white transition-colors"
             >
-              [GITHUB]
+              GitHub ↗
             </a>
-
             <a
               href="https://www.linkedin.com/in/z-andrie-barraba-474428401/"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-[#f4ddb8] transition-colors cursor-pointer"
+              className="hover:text-white transition-colors"
             >
-              [LINKEDIN]
+              LinkedIn ↗
             </a>
           </div>
-        </footer>
+        </div>
       </div>
     </>
   );

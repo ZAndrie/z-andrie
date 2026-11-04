@@ -25,14 +25,12 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
   const trackRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
 
-  // Dynamic scroll runway: gives each card ~340px of comfortable horizontal gliding distance
   const scrollDistance = Math.max(1, totalCards - 1) * 340;
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
   };
 
-  // Programmatic jump to a specific card
   const goToCard = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(totalCards - 1, index));
@@ -50,7 +48,6 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
     [totalCards]
   );
 
-  // Native CSS Sticky + GSAP Horizontal Conveyor Scrub
   useGSAP(
     () => {
       const container = containerRef.current;
@@ -91,19 +88,17 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
     { scope: containerRef, dependencies: [totalCards] }
   );
 
-  // Ref tracking activeCardIndex to prevent stale closures
   const activeCardIndexRef = useRef(activeCardIndex);
   useEffect(() => {
     activeCardIndexRef.current = activeCardIndex;
   }, [activeCardIndex]);
 
-  // Keyboard Navigation: ArrowRight / ArrowLeft / ArrowDown / ArrowUp
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const container = containerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
-      const isActive = rect.top <= 120 && rect.bottom >= 120;
+      const isActive = rect.top <= 100 && rect.bottom >= 100;
       if (!isActive) return;
 
       if (e.key === "ArrowRight" || e.key === "ArrowDown") {
@@ -125,7 +120,6 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [totalCards, goToCard]);
 
-  // Touch swipe support for mobile
   const touchStartX = useRef(0);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -141,55 +135,54 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
 
   return (
     <section
-      id="certificates"
       ref={containerRef}
+      id="certificates"
       style={{
         height: `calc(100vh + ${scrollDistance}px)`,
       }}
-      className="relative w-full bg-transparent text-[#e7e5df] border-t border-[#232220]/50 select-none"
+      className="relative w-full bg-transparent text-[#e7e5df] border-t border-white/[0.08] select-none"
     >
-      {/* ── THEATRICAL STAGE (STICKY TOP-0 FOR NATIVE 60FPS COMPOSITING) ── */}
+      {/* ── STICKY SHOWCASE VIEWPORT ── */}
       <div
         ref={stageRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[75px] md:pt-[85px] pb-5 px-6 md:px-12 bg-[#070707]/60 backdrop-blur-[1px] z-20"
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-[85px] md:pt-[95px] pb-6 px-6 md:px-12 bg-[#070707]/65 backdrop-blur-[2px] z-20"
       >
-        {/* Subtle theatrical background atmosphere */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-40"
+          className="absolute inset-0 pointer-events-none opacity-30"
           style={{
             backgroundImage:
               "radial-gradient(circle at 50% 30%, rgba(244, 221, 184, 0.08) 0%, rgba(7, 7, 7, 0.95) 75%)",
           }}
         />
 
-        {/* Top Header HUD */}
-        <div className="relative z-10 w-full max-w-[1550px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-3">
+        {/* Top Header */}
+        <div className="relative z-10 w-full max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-3 pb-3 border-b border-white/[0.08]">
             <div>
-              <p className="text-[11px] uppercase tracking-[3px] font-mono text-[#d36b54] font-bold mb-1.5 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#d36b54] animate-pulse" />
-                [ 03 // CREDENTIAL VAULT • {displayCertificates.length} ACCREDITATIONS ]
-              </p>
-              <h2 className="text-[32px] sm:text-[40px] md:text-[48px] font-stencil uppercase text-[#e7e5df] leading-[0.98] tracking-tight">
-               Credentials & <span className="text-[#f4ddb8]">Certificates</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-[10px] font-mono tracking-[2px] uppercase text-[#a8a59d] mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
+                <span>05 / Credentials • {displayCertificates.length} Accreditations</span>
+              </div>
+              <h2 className="text-[32px] sm:text-[42px] md:text-[48px] font-heading font-bold uppercase text-[#ffffff] leading-[0.98] tracking-tight">
+                Verified <span className="text-[#d36b54]">Certifications</span>
               </h2>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-[11px] font-mono text-[#888] uppercase tracking-wider hidden sm:inline-block">
-                Scroll to explore →
+              <span className="text-[11px] font-mono text-[#9ca3af] uppercase tracking-wider hidden sm:inline-block">
+                Scroll to slide →
               </span>
 
-              {/* Slider Navigation Buttons */}
+              {/* Slider Controls */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => goToCard(activeCardIndex - 1)}
                   disabled={activeCardIndex === 0}
-                  aria-label="Scroll certificates left"
-                  className="w-8 h-8 rounded-sm border border-[#2a2a28] bg-[#121110] hover:bg-[#d36b54] disabled:opacity-30 disabled:hover:bg-[#121110] text-[#aaa] hover:text-white hover:border-[#d36b54] transition-all flex items-center justify-center text-sm font-mono cursor-pointer"
+                  aria-label="Scroll left"
+                  className="w-8 h-8 rounded-full border border-white/[0.1] bg-white/[0.03] hover:bg-[#d36b54] hover:border-[#d36b54] disabled:opacity-25 text-white transition-all flex items-center justify-center text-xs font-mono cursor-pointer"
                 >
                   ←
                 </button>
@@ -197,8 +190,8 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                   type="button"
                   onClick={() => goToCard(activeCardIndex + 1)}
                   disabled={activeCardIndex === totalCards - 1}
-                  aria-label="Scroll certificates right"
-                  className="w-8 h-8 rounded-sm border border-[#2a2a28] bg-[#121110] hover:bg-[#d36b54] disabled:opacity-30 disabled:hover:bg-[#121110] text-[#aaa] hover:text-white hover:border-[#d36b54] transition-all flex items-center justify-center text-sm font-mono cursor-pointer"
+                  aria-label="Scroll right"
+                  className="w-8 h-8 rounded-full border border-white/[0.1] bg-white/[0.03] hover:bg-[#d36b54] hover:border-[#d36b54] disabled:opacity-25 text-white transition-all flex items-center justify-center text-xs font-mono cursor-pointer"
                 >
                   →
                 </button>
@@ -206,55 +199,45 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                   href="https://github.com/ZAndrie/portfolio-contents/tree/main/certificates"
                   target="_blank"
                   rel="noreferrer"
-                  className="ml-2 px-3.5 py-1.5 bg-[#161514] hover:bg-[#d36b54] text-[#e7e5df] hover:text-white border border-[#2e2d2b] hover:border-[#d36b54] text-[10px] uppercase font-mono font-bold tracking-[1.5px] transition-colors rounded-sm hidden md:inline-flex items-center gap-1.5"
+                  className="ml-2 px-4 py-1.5 bg-white/[0.04] hover:bg-[#d36b54] text-white border border-white/[0.1] hover:border-[#d36b54] text-[10px] uppercase font-mono font-semibold tracking-wider transition-all rounded-full hidden md:inline-flex items-center gap-1.5"
                 >
-                  <span>View Repo</span>
+                  <span>Repository</span>
                   <span>↗</span>
                 </a>
               </div>
             </div>
           </div>
-
-          {/* Horizontal Track Progress Line */}
-          <div className="w-full h-[2px] bg-[#1a1918] relative overflow-hidden rounded-full">
-            <div
-              className="absolute top-0 left-0 bottom-0 bg-[#d36b54] transition-all duration-150 ease-out"
-              style={{
-                width: `${Math.max(5, Math.round(scrollProgress * 100))}%`,
-              }}
-            />
-          </div>
         </div>
 
         {/* ── SMOOTH HORIZONTAL CONVEYOR TRACK ── */}
-        <div className="relative z-10 w-full max-w-[1550px] mx-auto flex-1 flex items-center min-h-0 overflow-hidden py-2">
+        <div className="relative z-10 w-full max-w-[1400px] mx-auto flex-1 flex items-center min-h-0 overflow-hidden py-4">
           <div
             ref={trackRef}
-            className="flex items-center gap-5 sm:gap-6 will-change-transform"
+            className="flex items-center gap-6 will-change-transform"
           >
             {/* Intro Lead Card */}
             <div
               onClick={() => goToCard(0)}
-              className={`w-[280px] sm:w-[310px] md:w-[330px] shrink-0 h-[330px] sm:h-[350px] bg-[#0c0c0b] border border-dashed rounded-sm flex flex-col justify-between p-6 transition-all duration-300 ${
+              className={`w-[290px] sm:w-[320px] md:w-[340px] shrink-0 h-[340px] sm:h-[360px] rounded-2xl bg-[#0c0c0f]/80 backdrop-blur-xl border flex flex-col justify-between p-6 transition-all duration-300 ${
                 activeCardIndex === 0
-                  ? "border-[#d36b54] shadow-[0_0_25px_rgba(211,107,84,0.18)]"
-                  : "border-[#282725]"
+                  ? "border-[#d36b54] shadow-[0_0_30px_rgba(211,107,84,0.2)]"
+                  : "border-white/[0.08]"
               }`}
             >
               <div>
-                <span className="text-[11px] font-mono text-[#d36b54] font-bold uppercase tracking-widest">
-                  CREDENTIAL VAULT
+                <span className="text-[10px] font-mono text-[#d36b54] font-semibold uppercase tracking-widest">
+                  CREDENTIAL OVERVIEW
                 </span>
-                <h3 className="text-[22px] sm:text-[24px] font-stencil uppercase text-[#e7e5df] leading-tight mt-3 mb-3">
-                  Verified <span className="text-[#f4ddb8]">Accreditations</span>
+                <h3 className="text-[22px] sm:text-[24px] font-heading font-bold uppercase text-[#ffffff] leading-tight mt-3 mb-3">
+                  Verified <span className="text-[#f4ddb8]">Honors</span>
                 </h3>
-                <p className="text-[12px] text-[#a8a59d] leading-relaxed font-sans font-light">
-                  Official technical certifications spanning Cybersecurity, Web Development, Systems Architecture, and Design Engineering.
+                <p className="text-[13px] text-[#9ca3af] leading-relaxed font-sans font-light">
+                  Official technical certifications covering Cybersecurity, Full-Stack Architecture, Cisco Network Defense, and Quality Assurance.
                 </p>
               </div>
-              <div className="pt-4 border-t border-[#1f1e1c] flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#d36b54]">
-                <span>SWIPE OR GLIDE</span>
-                <span className="text-base leading-none">→</span>
+              <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#d36b54]">
+                <span>Scroll or swipe</span>
+                <span>→</span>
               </div>
             </div>
 
@@ -269,46 +252,40 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                 <div
                   key={item.id || index}
                   onClick={() => setActiveModalCert(item)}
-                  className={`w-[280px] sm:w-[320px] md:w-[350px] shrink-0 h-[330px] sm:h-[350px] bg-[#0e0d0c] hover:bg-[#131210] border rounded-sm shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between p-4 group relative overflow-hidden ${
+                  className={`w-[290px] sm:w-[320px] md:w-[340px] shrink-0 h-[340px] sm:h-[360px] rounded-2xl bg-[#0c0c0f]/80 backdrop-blur-xl border shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between p-4 group relative overflow-hidden ${
                     isActive
-                      ? "border-[#d36b54] shadow-[0_0_25px_rgba(211,107,84,0.15)] -translate-y-1"
-                      : "border-[#242321] hover:border-[#d36b54]/70"
+                      ? "border-[#d36b54] shadow-[0_0_25px_rgba(211,107,84,0.2)] -translate-y-1"
+                      : "border-white/[0.08] hover:border-white/[0.2]"
                   }`}
                 >
-                  {/* Precision Corner Crosshairs */}
-                  <span className="absolute -top-1 -left-1 text-[11px] font-mono text-[#d36b54] leading-none font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-                  <span className="absolute -top-1 -right-1 text-[11px] font-mono text-[#d36b54] leading-none font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-                  <span className="absolute -bottom-1 -left-1 text-[11px] font-mono text-[#d36b54] leading-none font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-                  <span className="absolute -bottom-1 -right-1 text-[11px] font-mono text-[#d36b54] leading-none font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
-
                   <div>
-                    {/* Certificate Frame Preview */}
-                    <div className="relative w-full h-[155px] sm:h-[175px] rounded-[2px] overflow-hidden bg-[#070707] mb-3 border border-[#232220]">
+                    {/* Certificate Image Container */}
+                    <div className="relative w-full h-[160px] sm:h-[180px] rounded-xl overflow-hidden bg-black/60 mb-3 border border-white/[0.08]">
                       <Image
                         src={imageSrc}
                         alt={item.title}
                         fill
                         unoptimized={isExternal}
                         onError={() => handleImageError(item.id)}
-                        className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter contrast-[1.05]"
+                        className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter contrast-[1.04]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#070707]/60 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
 
                       {/* Badges */}
-                      <span className="absolute top-2 left-2 text-[9px] font-mono font-bold uppercase tracking-wider text-white bg-[#d36b54]/90 px-1.5 py-0.5 rounded-sm backdrop-blur-sm">
-                        ✦ VERIFIED
+                      <span className="absolute top-2.5 left-2.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-white bg-[#d36b54] px-2 py-0.5 rounded-full backdrop-blur-sm">
+                        Verified
                       </span>
 
-                      <span className="absolute bottom-2 right-2 text-[9px] font-mono font-medium text-[#f4ddb8] bg-black/70 px-1.5 py-0.5 rounded-sm backdrop-blur-sm">
+                      <span className="absolute bottom-2.5 right-2.5 text-[9px] font-mono text-[#f4ddb8] bg-black/75 px-2 py-0.5 rounded-full backdrop-blur-sm">
                         {item.date || "2026"}
                       </span>
                     </div>
 
                     {/* Details */}
-                    <h3 className="text-[13px] sm:text-[14px] font-bold text-[#e7e5df] uppercase tracking-[0.5px] group-hover:text-[#f4ddb8] transition-colors line-clamp-2 leading-snug mb-1">
+                    <h3 className="text-[13px] sm:text-[14px] font-heading font-semibold text-[#ffffff] uppercase group-hover:text-[#f4ddb8] transition-colors line-clamp-2 leading-snug mb-1">
                       {item.title}
                     </h3>
-                    <p className="text-[11px] font-mono uppercase tracking-wider text-[#d36b54] font-semibold line-clamp-1 mb-1">
+                    <p className="text-[11px] font-mono uppercase tracking-wider text-[#d36b54] font-medium line-clamp-1 mb-1">
                       {item.issuer}
                     </p>
                     <p className="text-[10px] text-[#888] font-mono">
@@ -316,9 +293,9 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                     </p>
                   </div>
 
-                  {/* Card Footer Action */}
-                  <div className="pt-2.5 border-t border-[#1f1e1c] flex items-center justify-between text-[10px] font-mono font-bold uppercase tracking-[1px] mt-2">
-                    <span className="text-[#a8a59d] group-hover:text-[#f4ddb8] inline-flex items-center gap-1 transition-colors">
+                  {/* Card Footer */}
+                  <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono uppercase tracking-wider mt-2">
+                    <span className="text-[#a8a59d] group-hover:text-white inline-flex items-center gap-1 transition-colors">
                       <span>Inspect Credential</span>
                       <span>↗</span>
                     </span>
@@ -328,7 +305,7 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="text-[#d36b54] hover:underline flex items-center gap-0.5"
+                        className="text-[#d36b54] hover:underline"
                         title="View file on GitHub"
                       >
                         GitHub ↗
@@ -346,30 +323,30 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
             {/* Outro Explorer Card */}
             <div
               onClick={() => goToCard(totalCards - 1)}
-              className={`w-[280px] sm:w-[310px] md:w-[330px] shrink-0 h-[330px] sm:h-[350px] bg-[#0c0c0b] text-white p-6 rounded-sm flex flex-col justify-between border transition-all duration-300 ${
+              className={`w-[290px] sm:w-[320px] md:w-[340px] shrink-0 h-[340px] sm:h-[360px] rounded-2xl bg-[#0c0c0f]/80 backdrop-blur-xl text-white p-6 flex flex-col justify-between border transition-all duration-300 ${
                 activeCardIndex === totalCards - 1
-                  ? "border-[#d36b54] shadow-[0_0_25px_rgba(211,107,84,0.18)]"
-                  : "border-[#232220]"
+                  ? "border-[#d36b54] shadow-[0_0_30px_rgba(211,107,84,0.2)]"
+                  : "border-white/[0.08]"
               }`}
             >
               <div>
-                <span className="text-[11px] font-mono text-[#d36b54] font-bold uppercase tracking-widest">
+                <span className="text-[10px] font-mono text-[#d36b54] font-semibold uppercase tracking-widest">
                   PORTFOLIO ARCHIVE
                 </span>
-                <h3 className="text-[22px] sm:text-[24px] font-stencil uppercase text-[#e7e5df] leading-tight mt-3 mb-2">
+                <h3 className="text-[22px] sm:text-[24px] font-heading font-bold uppercase text-[#ffffff] leading-tight mt-3 mb-2">
                   View Full <span className="text-[#f4ddb8]">Records</span>
                 </h3>
-                <p className="text-[12px] text-[#888] leading-relaxed font-sans font-light">
+                <p className="text-[13px] text-[#9ca3af] leading-relaxed font-sans font-light">
                   All certificates, source files, and verified image assets are hosted openly on GitHub.
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[#1f1e1c]">
+              <div className="pt-4 border-t border-white/[0.06]">
                 <a
                   href="https://github.com/ZAndrie/portfolio-contents/tree/main/certificates"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[11px] font-mono font-bold uppercase tracking-[2px] text-[#e7e5df] hover:text-[#f4ddb8] transition-colors inline-flex items-center gap-2"
+                  className="text-[11px] font-mono font-medium uppercase tracking-[2px] text-[#ffffff] hover:text-[#d36b54] transition-colors inline-flex items-center gap-2"
                 >
                   <span>OPEN REPOSITORY</span>
                   <span>↗</span>
@@ -379,25 +356,24 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
           </div>
         </div>
 
-        {/* ── BOTTOM STAGE PROGRESS BAR & CONTROLS HINT ── */}
-        <div className="relative z-10 w-full max-w-[1550px] mx-auto pt-2">
-          <div className="w-full flex items-center justify-between text-[10px] font-mono text-[#666] uppercase tracking-[2px] mb-2">
+        {/* ── BOTTOM PROGRESS LINE ── */}
+        <div className="relative z-10 w-full max-w-[1400px] mx-auto pt-2">
+          <div className="w-full flex items-center justify-between text-[10px] font-mono text-[#888] uppercase tracking-[2px] mb-2">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
-              Horizontal Vault Conveyor
+              Credentials Conveyor
             </span>
             <span className="hidden sm:inline-block">
-              [← / →] Scroll or Arrow Keys to Explore Credentials
+              Scroll or Swipe to View All
             </span>
             <span>
               {Math.round(((activeCardIndex + 1) / totalCards) * 100)}% Verified
             </span>
           </div>
 
-          {/* GSAP Progress Line */}
-          <div className="w-full h-[2px] bg-[#1a1918] relative overflow-hidden rounded-full">
+          <div className="w-full h-[2px] bg-white/[0.08] relative overflow-hidden rounded-full">
             <div
-              className="absolute top-0 left-0 bottom-0 bg-[#d36b54] transition-all duration-150 ease-out"
+              className="h-full bg-gradient-to-r from-[#d36b54] to-[#f4ddb8] transition-all duration-150 ease-out rounded-full"
               style={{
                 width: `${Math.max(4, Math.round(scrollProgress * 100))}%`,
               }}
@@ -409,23 +385,23 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
       {/* ── LIGHTBOX INSPECTION MODAL ── */}
       {activeModalCert && (
         <div
-          className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6"
           onClick={() => setActiveModalCert(null)}
         >
           <div
-            className="relative w-full max-w-[720px] bg-[#0e0d0c] rounded-sm border border-[#2e2d2b] p-5 sm:p-6 shadow-2xl flex flex-col gap-4 text-[#e7e5df]"
+            className="relative w-full max-w-[720px] rounded-2xl bg-[#0c0c0f] border border-white/[0.12] p-6 shadow-2xl flex flex-col gap-4 text-[#e7e5df]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex justify-between items-start gap-4">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-[2px] text-[#d36b54] font-bold">
+                <span className="text-[10px] font-mono uppercase tracking-[2px] text-[#d36b54] font-semibold">
                   OFFICIAL ACCREDITATION
                 </span>
-                <h3 className="text-[18px] sm:text-[22px] font-stencil uppercase text-[#e7e5df] leading-tight mt-1">
+                <h3 className="text-[18px] sm:text-[22px] font-heading font-bold uppercase text-[#ffffff] leading-tight mt-1">
                   {activeModalCert.title}
                 </h3>
-                <p className="text-[11px] font-mono text-[#888]">
+                <p className="text-[11px] font-mono text-[#9ca3af]">
                   Issued by {activeModalCert.issuer} • {activeModalCert.date}
                 </p>
               </div>
@@ -434,47 +410,20 @@ export default function Certificates({ certificates = [] }: { certificates?: Cer
                 type="button"
                 onClick={() => setActiveModalCert(null)}
                 aria-label="Close preview"
-                className="w-8 h-8 rounded-sm border border-[#2a2a28] hover:bg-[#d36b54] hover:text-white transition-all flex items-center justify-center text-sm font-bold shrink-0 cursor-pointer"
+                className="w-8 h-8 rounded-full border border-white/[0.15] hover:bg-white/[0.1] text-white transition-all flex items-center justify-center text-xs font-bold shrink-0 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            {/* Modal Large Image */}
-            <div className="relative w-full aspect-[4/3] rounded-sm overflow-hidden bg-black border border-[#232220]">
+            {/* Modal Image */}
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-black/60 border border-white/[0.08]">
               <Image
                 src={imageErrors[activeModalCert.id] ? "/download/Development.jpg" : activeModalCert.imageUrl}
                 alt={activeModalCert.title}
                 fill
                 className="object-contain"
               />
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex justify-between items-center pt-2 border-t border-[#1f1e1c] flex-wrap gap-2">
-              {activeModalCert.repoUrl ? (
-                <a
-                  href={activeModalCert.repoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[11px] font-mono font-bold text-[#d36b54] hover:text-[#f4ddb8] hover:underline inline-flex items-center gap-1"
-                >
-                  <span>View Original Record on GitHub</span>
-                  <span>↗</span>
-                </a>
-              ) : (
-                <span className="text-[10px] font-mono text-[#888]">
-                  ✦ Verified Digital Credential
-                </span>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setActiveModalCert(null)}
-                className="px-5 py-2 bg-[#181716] text-[#e7e5df] text-[10px] font-mono uppercase font-bold tracking-[1.5px] rounded-sm hover:bg-[#d36b54] hover:text-white transition-colors cursor-pointer"
-              >
-                Close Preview
-              </button>
             </div>
           </div>
         </div>

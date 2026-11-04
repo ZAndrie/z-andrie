@@ -51,69 +51,72 @@ export default function Hero() {
     <section
       ref={containerRef}
       id="home"
-      className="relative w-full min-h-[100vh] flex flex-col justify-between bg-transparent text-[#e7e5df] overflow-hidden pt-[90px] md:pt-[110px] pb-8 select-none z-10"
+      className="relative w-full min-h-[100vh] flex flex-col justify-between bg-transparent text-[#e7e5df] overflow-hidden pt-[100px] md:pt-[120px] pb-8 select-none z-10"
     >
-      {/* Main Diallo-Style Layout Container */}
-      <div className="relative z-10 w-full max-w-[1500px] mx-auto px-6 md:px-12 flex-1 flex flex-col justify-between pointer-events-none">
+      {/* Main Layout Container */}
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 flex-1 flex flex-col justify-between pointer-events-none">
         
         {/* Middle Stage: Left & Right Flanking Editorial Elements */}
         <div className="w-full flex-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-10 pt-8 pb-16">
           
           {/* Left Column: Role & Massive Editorial Heading */}
-          <div className="gsap-hero-left max-w-[460px] text-left pointer-events-auto">
-            <span className="block text-[11px] md:text-[12px] font-mono tracking-[2px] text-[#a8a59d] mb-4 uppercase">
-              Creative developer, freelance
-            </span>
-            <h1 className="text-[28px] sm:text-[34px] md:text-[40px] lg:text-[46px] font-normal leading-[1.12] tracking-[-0.01em] text-[#e7e5df] font-sans">
-              Crafting digital spaces that are intuitive, modern &amp; impactful.
+          <div className="gsap-hero-left max-w-[540px] text-left pointer-events-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] font-mono tracking-[2px] text-[#a8a59d] mb-5 uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
+              <span>Creative Developer &amp; Technologist</span>
+            </div>
+            
+            <h1 className="text-[32px] sm:text-[42px] md:text-[50px] lg:text-[58px] font-heading font-bold leading-[1.06] tracking-[-0.03em] text-[#ffffff]">
+              Crafting intuitive, high-velocity digital experiences &amp; 3D spaces.
             </h1>
           </div>
 
           {/* Right Column: CTA & Project Status */}
-          <div className="gsap-hero-right max-w-[280px] text-left md:text-right flex flex-col items-start md:items-end gap-3 pointer-events-auto ml-auto">
-            <span className="text-[11px] font-mono tracking-[1.5px] text-[#a8a59d] uppercase">
-              Taking new projects
+          <div className="gsap-hero-right max-w-[300px] text-left md:text-right flex flex-col items-start md:items-end gap-3 pointer-events-auto ml-auto">
+            <span className="text-[11px] font-mono tracking-[1.5px] text-[#9ca3af] uppercase">
+              Open to Opportunities
             </span>
             <Link
               href="/#contact"
               data-magnetic
-              className="px-6 py-3 border border-[#e7e5df]/30 text-[#e7e5df] text-[12px] font-mono tracking-[2px] uppercase hover:border-[#d36b54] hover:text-[#d36b54] transition-all duration-300 rounded-[2px] bg-[#0c0c0c]/60 backdrop-blur-sm shadow-lg inline-block"
+              className="px-6 py-3 rounded-full border border-white/[0.15] bg-white/[0.05] hover:bg-[#d36b54] text-[#ffffff] hover:border-[#d36b54] text-[12px] font-mono tracking-[2px] uppercase transition-all duration-300 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(211,107,84,0.4)] inline-flex items-center gap-2 group cursor-pointer"
             >
-              Start a project
+              <span>Start a Project</span>
+              <span className="transform group-hover:translate-x-1 transition-transform">→</span>
             </Link>
           </div>
 
         </div>
 
         {/* Center Bottom: Interaction Prompts & Telemetry */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 text-[11px] font-mono tracking-[1.5px] text-[#a8a59d] uppercase border-t border-[#1a1816]/70">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 text-[11px] font-mono tracking-[1.5px] text-[#9ca3af] uppercase border-t border-white/[0.08]">
           
           {/* Left: Device / Location */}
-          <div className="text-[10px] md:text-[11px] tracking-[2px] text-[#a8a59d]/70">
-            <span>Philippines · 2026</span>
+          <div className="text-[10px] md:text-[11px] tracking-[2px] text-[#9ca3af]/80">
+            <span>PHILIPPINES • 2026</span>
           </div>
 
-          {/* Center: Gamer & Dev Room Prompts */}
+          {/* Center: 3D Scene Interaction Cue */}
           <div className="gsap-hero-center-prompt flex flex-col items-center text-center gap-1.5 pointer-events-auto">
-            <span className="text-[#e7e5df] tracking-[1.5px]">
-              Move cursor to aim desk spotlight
+            <span className="text-[#ffffff] tracking-[1.5px] font-medium text-[11px]">
+              INTERACTIVE 3D WORKSPACE
             </span>
-            <span className="text-[10px] text-[#a8a59d]/60 tracking-[1.2px]">
-              Drag to explore indie dev room
+            <span className="text-[10px] text-[#9ca3af]/70 tracking-[1.2px]">
+              Direct cursor to aim spotlight • Drag to inspect room
             </span>
-            <div className="flex items-center gap-1.5 text-[10px] text-[#a8a59d]/50 mt-1">
-              <span>Scroll to explore portfolio</span>
+            <div className="flex items-center gap-1.5 text-[10px] text-[#d36b54] mt-1">
+              <span>Scroll to explore</span>
               <svg className="w-3 h-3 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
             </div>
           </div>
 
-          {/* Right: Diallo Telemetry Coordinates & Focus */}
+          {/* Right: Telemetry Coordinates */}
           <div className="text-right flex items-center gap-4 text-[10px] md:text-[11px]">
             <span>FOCUS {telemetry.focus}%</span>
-            <span className="text-[#e7e5df]">
-              x {telemetry.x >= 0 ? `+${telemetry.x.toFixed(2)}` : telemetry.x.toFixed(2)} y {telemetry.y >= 0 ? `+${telemetry.y.toFixed(2)}` : telemetry.y.toFixed(2)} 2700K
+            <span className="text-[#ffffff]">
+              {telemetry.target}
             </span>
           </div>
 
