@@ -43,6 +43,7 @@ export async function createExpertiseItem(data: {
   order?: number;
   desc?: string;
   bullets?: string[];
+  achievements?: string[];
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = getContentRepoName();
@@ -78,6 +79,15 @@ export async function createExpertiseItem(data: {
       list = [];
     }
 
+    const rawBullets =
+      data.achievements && data.achievements.length > 0
+        ? data.achievements
+        : data.bullets && data.bullets.length > 0
+        ? data.bullets
+        : data.desc
+        ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean)
+        : [];
+
     const newItem = {
       id: `exp-${Date.now()}`,
       category: data.category,
@@ -86,8 +96,9 @@ export async function createExpertiseItem(data: {
       year: data.year || "",
       percentage: data.percentage || "100%",
       order: list.length + 1,
-      desc: data.desc || "",
-      bullets: data.bullets || (data.desc ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean) : []),
+      desc: data.desc || rawBullets.join("\n"),
+      bullets: rawBullets,
+      achievements: rawBullets,
     };
 
     list.push(newItem);
@@ -200,6 +211,7 @@ export async function updateExpertiseItem(id: string, data: {
   order?: number;
   desc?: string;
   bullets?: string[];
+  achievements?: string[];
 }) {
   const username = process.env.GITHUB_USERNAME || "ZAndrie";
   const repoName = getContentRepoName();
@@ -236,6 +248,15 @@ export async function updateExpertiseItem(id: string, data: {
       throw new Error("Item not found");
     }
 
+    const rawBullets =
+      data.achievements !== undefined
+        ? data.achievements
+        : data.bullets !== undefined
+        ? data.bullets
+        : data.desc !== undefined
+        ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean)
+        : list[index].achievements || list[index].bullets || [];
+
     list[index] = {
       ...list[index],
       category: data.category,
@@ -243,13 +264,9 @@ export async function updateExpertiseItem(id: string, data: {
       subtitle: data.subtitle || "",
       year: data.year,
       percentage: data.percentage || "100%",
-      desc: data.desc !== undefined ? data.desc : list[index].desc || "",
-      bullets:
-        data.bullets !== undefined
-          ? data.bullets
-          : data.desc !== undefined
-          ? data.desc.split("\n").map((l) => l.trim()).filter(Boolean)
-          : list[index].bullets || [],
+      desc: data.desc !== undefined ? data.desc : list[index].desc || rawBullets.join("\n"),
+      bullets: rawBullets,
+      achievements: rawBullets,
     };
 
     const updateRes = await fetch(

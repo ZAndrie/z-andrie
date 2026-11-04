@@ -307,7 +307,16 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
     ])
   );
 
-  const milestoneBullets = activeMilestone.bullets || (activeMilestone.desc ? [activeMilestone.desc] : []);
+  const milestoneBullets: string[] =
+    (activeMilestone as any).achievements && (activeMilestone as any).achievements.length > 0
+      ? (activeMilestone as any).achievements
+      : activeMilestone.bullets && activeMilestone.bullets.length > 0
+      ? activeMilestone.bullets
+      : activeMilestone.desc
+      ? activeMilestone.desc.includes("\n")
+        ? activeMilestone.desc.split("\n").map((s) => s.trim()).filter(Boolean)
+        : [activeMilestone.desc]
+      : [];
 
   return (
     <>
@@ -514,16 +523,29 @@ export default function Expertise({ initialItems = [] }: { initialItems?: Resume
                   </div>
                 )}
 
-                {/* Bullets */}
+                {/* Tenure Credentials & Key Achievements */}
                 {milestoneBullets.length > 0 && (
-                  <ul className="flex flex-col gap-3 text-[13px] sm:text-[14px] text-[#9ca3af] font-sans leading-relaxed pl-1 mt-3">
-                    {milestoneBullets.map((bullet, bIdx) => (
-                      <li key={bIdx} className="flex items-start gap-3">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54] shrink-0 mt-2" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="mt-4 pt-3 border-t border-white/[0.08]">
+                    <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[2px] text-[#f4ddb8] mb-2.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#d36b54]" />
+                      <span>Tenure Credentials &amp; Achievements</span>
+                    </div>
+                    <ul className="flex flex-col gap-2">
+                      {milestoneBullets.map((bullet, bIdx) => (
+                        <li
+                          key={bIdx}
+                          className="flex items-start gap-2.5 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.15] transition-colors"
+                        >
+                          <span className="w-4 h-4 rounded-full bg-[#d36b54]/15 border border-[#d36b54]/30 flex items-center justify-center text-[9px] text-[#d36b54] shrink-0 mt-0.5">
+                            ✓
+                          </span>
+                          <span className="text-[12px] sm:text-[13px] text-[#e7e5df] font-sans leading-relaxed">
+                            {bullet}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
 

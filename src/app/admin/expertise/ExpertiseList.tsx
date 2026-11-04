@@ -15,6 +15,8 @@ import {
   ExternalLink,
   GitBranch,
   PlusCircle,
+  Award,
+  Plus,
 } from "lucide-react";
 import ExpertiseForm from "./ExpertiseForm";
 
@@ -27,6 +29,11 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   const [savingEdit, setSavingEdit] = useState(false);
   const [editStatus, setEditStatus] = useState<string | null>(null);
 
+  // Edit modal tenure achievements & credentials state
+  const [editAchievements, setEditAchievements] = useState<string[]>([]);
+  const [editAchievementInput, setEditAchievementInput] = useState("");
+  const [editIsBulkMode, setEditIsBulkMode] = useState(false);
+
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Delete "${title}" from GitHub repository?`)) return;
     setDeletingId(id);
@@ -36,11 +43,45 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
   };
 
   const handleStartEdit = (item: any) => {
+    const initialAchievements: string[] =
+      Array.isArray(item.achievements) && item.achievements.length > 0
+        ? item.achievements
+        : Array.isArray(item.bullets) && item.bullets.length > 0
+        ? item.bullets
+        : item.desc
+        ? item.desc.split("\n").map((l: string) => l.trim()).filter(Boolean)
+        : [];
+
     setEditingItem({
       ...item,
-      desc: item.desc || (item.bullets && item.bullets.length > 0 ? item.bullets.join("\n") : ""),
+      desc: item.desc || initialAchievements.join("\n"),
     });
+    setEditAchievements(initialAchievements);
+    setEditAchievementInput("");
+    setEditIsBulkMode(false);
     setEditStatus(null);
+  };
+
+  const handleAddEditAchievement = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e && "key" in e && e.key !== "Enter") return;
+    if (e) e.preventDefault();
+
+    const trimmed = editAchievementInput.trim();
+    if (!trimmed) return;
+
+    if (!editAchievements.includes(trimmed)) {
+      setEditAchievements((prev) => [...prev, trimmed]);
+    }
+    setEditAchievementInput("");
+  };
+
+  const handleRemoveEditAchievement = (index: number) => {
+    setEditAchievements((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditBulkChange = (text: string) => {
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+    setEditAchievements(lines);
   };
 
   const handleSaveEdit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -55,13 +96,12 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
     const title = (formData.get("title") as string).trim();
     const year = (formData.get("year") as string)?.trim() || "";
     const subtitle = (formData.get("subtitle") as string)?.trim() || "";
-    const desc = (formData.get("desc") as string)?.trim() || "";
-    const bullets = desc
-      ? desc
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean)
-      : [];
+
+    const finalAchievements = [...editAchievements];
+    if (editAchievementInput.trim() && !finalAchievements.includes(editAchievementInput.trim())) {
+      finalAchievements.push(editAchievementInput.trim());
+    }
+    const desc = finalAchievements.join("\n");
 
     const res = await updateExpertiseItem(editingItem.id, {
       category,
@@ -69,7 +109,8 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
       subtitle,
       year,
       desc,
-      bullets,
+      bullets: finalAchievements,
+      achievements: finalAchievements,
       percentage: editingItem.percentage || "100%",
     });
 
@@ -153,20 +194,55 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
                   </div>
                 </div>
 
-                {/* Bullets / Description */}
-                {item.bullets && item.bullets.length > 0 ? (
-                  <ul className="text-[10px] text-gray-400 pl-4 border-l border-[var(--color-primary)]/30 flex flex-col gap-0.5 mt-2 font-mono">
-                    {item.bullets.map((b: string, idx: number) => (
-                      <li key={idx} className="list-disc list-inside">
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                ) : item.desc ? (
-                  <p className="text-[10px] text-gray-400 pl-3 border-l border-[var(--color-primary)]/30 mt-2 font-mono italic line-clamp-2">
-                    {item.desc}
-                  </p>
-                ) : null}
+                {/* Tenure Credentials & Achievements Badges */}
+                {(() => {
+                  const itemCredentials: string[] =
+                    Array.isArray(item.achievements) && item.achievements.length > 0
+                      ? item.achievements
+                      : Array.isArray(item.bullets) && item.bullets.length > 0
+                      ? item.bullets
+                      : item.desc
+                      ? item.desc.split("\n").map((l: string) => l.trim()).filter(Boolean)
+                      : [];
+
+                  if (itemCredentials.length > 0) {
+                    return (
+                      <div className="flex flex-col gap-2 mt-2.5 pt-2 border-t border-white/5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-[#f4ddb8] bg-[#f4ddb8]/10 border border-[#f4ddb8]/20 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Award size={10} className="text-[#f4ddb8]" />
+                            {itemCredentials.length} {itemCredentials.length === 1 ? "CREDENTIAL" : "CREDENTIALS"}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {itemCredentials.map((ach: string, idx: number) => (
+                            <span
+                              key={idx}
+                              className="text-[10px] text-gray-300 bg-white/[0.04] border border-white/10 px-2 py-0.5 rounded flex items-center gap-1.5 hover:border-[var(--color-primary)]/40 transition-colors"
+                            >
+                              <span className="text-[#d36b54] text-[9px] font-bold">✓</span>
+                              <span>{ach}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-[10px] text-gray-500 italic">No credentials recorded</span>
+                      <button
+                        type="button"
+                        onClick={() => handleStartEdit(item)}
+                        className="text-[10px] text-[#f4ddb8] hover:text-white flex items-center gap-1 transition-colors px-2 py-0.5 rounded bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                      >
+                        <Plus size={11} />
+                        <span>Add Credentials</span>
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           ))
@@ -284,7 +360,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
       {/* Edit Modal Dialog */}
       {editingItem && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0e0e12] rounded-2xl shadow-2xl w-full max-w-lg p-6 md:p-8 flex flex-col gap-5 border border-white/15 animate-in fade-in zoom-in-95 font-mono">
+          <div className="bg-[#0e0e12] rounded-2xl shadow-2xl w-full max-w-lg p-6 md:p-8 flex flex-col gap-5 border border-white/15 animate-in fade-in zoom-in-95 font-mono max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
                 <span className="text-[9px] uppercase tracking-[2px] text-gray-500 block mb-0.5">MODIFICATION_GATE</span>
@@ -320,21 +396,21 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
                 <select
                   name="category"
                   defaultValue={editingItem.category}
-                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]"
+                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono"
                 >
-                  <option value="skills" className="bg-[#0e0e12]">Skills</option>
-                  <option value="education" className="bg-[#0e0e12]">Education &amp; Training</option>
-                  <option value="experience" className="bg-[#0e0e12]">Experience</option>
+                  <option value="skills" className="bg-[#0e0e12]">Skills &amp; Architectural Pillars</option>
+                  <option value="education" className="bg-[#0e0e12]">Education &amp; Academic Path (Timeline)</option>
+                  <option value="experience" className="bg-[#0e0e12]">Work Experience &amp; Appointments (Timeline)</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">Title / Designation</label>
+                <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">Title / Designation *</label>
                 <input
                   name="title"
                   required
                   defaultValue={editingItem.title}
-                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]"
+                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono"
                 />
               </div>
 
@@ -346,7 +422,7 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
                   name="year"
                   defaultValue={editingItem.year || ""}
                   placeholder="e.g. 2021-2023 or 2023-Present"
-                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]"
+                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono"
                 />
               </div>
 
@@ -358,27 +434,95 @@ export default function ExpertiseList({ items = [] }: { items?: any[] }) {
                   name="subtitle"
                   defaultValue={editingItem.subtitle || ""}
                   placeholder="e.g. Cor Jesu College"
-                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)]"
+                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
+              {/* ── TENURE ACHIEVEMENTS & CREDENTIALS BUILDER ── */}
+              <div className="flex flex-col gap-2.5 pt-2 border-t border-white/10">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] uppercase tracking-[2px] text-gray-400 font-bold">
-                    Key Accomplishments / Bullets (Optional)
-                  </label>
-                  <span className="text-[9px] text-gray-500 font-mono">OPTIONAL</span>
+                  <div className="flex items-center gap-2">
+                    <Award size={13} className="text-[#f4ddb8]" />
+                    <label className="text-[10px] uppercase tracking-[2px] text-[#f4ddb8] font-bold">
+                      Tenure Achievements &amp; Credentials
+                    </label>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/10 text-gray-400">
+                      {editAchievements.length} recorded
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditIsBulkMode(!editIsBulkMode)}
+                    className="text-[10px] text-gray-400 hover:text-white underline cursor-pointer"
+                  >
+                    {editIsBulkMode ? "Switch to badge view" : "Switch to multiline text"}
+                  </button>
                 </div>
-                <p className="text-[10px] text-gray-500 font-light">
-                  Separate each bullet point onto a new line. Leave blank for no bullets.
+
+                <p className="text-[10px] text-gray-400 font-light">
+                  Add honors, awards, leadership titles, certificates earned, or major accomplishments during this tenure.
                 </p>
-                <textarea
-                  name="desc"
-                  rows={4}
-                  defaultValue={editingItem.desc}
-                  placeholder="Enter accomplishments one per line..."
-                  className="bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] resize-y"
-                />
+
+                {!editIsBulkMode ? (
+                  <div className="flex flex-col gap-2.5">
+                    {/* Input row */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editAchievementInput}
+                        onChange={(e) => setEditAchievementInput(e.target.value)}
+                        onKeyDown={handleAddEditAchievement}
+                        placeholder="Type an achievement and press Enter..."
+                        className="flex-1 bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] font-mono placeholder:text-gray-600"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddEditAchievement}
+                        disabled={!editAchievementInput.trim()}
+                        className="px-3.5 py-2.5 bg-white/[0.06] hover:bg-[var(--color-primary)] text-white disabled:opacity-30 rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 border border-white/10"
+                      >
+                        <Plus size={13} />
+                        <span>Add</span>
+                      </button>
+                    </div>
+
+                    {/* Badges List */}
+                    {editAchievements.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5 p-2.5 bg-black/40 rounded-xl border border-white/[0.08] max-h-40 overflow-y-auto">
+                        {editAchievements.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/15 text-[10px] text-gray-200"
+                          >
+                            <span className="text-[#d36b54] text-[9px] font-bold">✓</span>
+                            <span>{item}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveEditAchievement(idx)}
+                              className="text-gray-500 hover:text-red-400 p-0.5 rounded transition-colors ml-1 cursor-pointer"
+                              title="Remove achievement"
+                            >
+                              <X size={11} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-gray-500 italic p-2.5 bg-black/30 rounded-lg border border-dashed border-white/10">
+                        No credentials recorded yet. Add one above or switch to multiline text.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <textarea
+                    rows={4}
+                    value={editAchievements.join("\n")}
+                    onChange={(e) => handleEditBulkChange(e.target.value)}
+                    placeholder="Type or paste achievements, one per line..."
+                    className="w-full bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[var(--color-primary)] resize-y font-mono placeholder:text-gray-600"
+                  />
+                )}
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10 mt-2">
