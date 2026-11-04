@@ -472,27 +472,27 @@ export default function Portfolio({ projects = [] }: { projects?: PortfolioItem[
                     alt={activeProject.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 540px"
-                    className="object-cover filter contrast-[1.05] brightness-[0.9] saturate-[0.85] transition-all duration-500 group-hover:scale-105"
+                    className="object-cover filter contrast-[1.05] brightness-[0.95] saturate-[0.9] transition-all duration-500 group-hover:scale-105"
                     onError={() =>
                       setImgErrorMap((prev) => ({ ...prev, [activeProject.id]: true }))
                     }
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070707]/90 via-[#070707]/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070707]/40 via-transparent to-transparent pointer-events-none" />
                 </div>
-              ) : null}
-
-              {/* Luminous Stencil Projection Overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 text-center pointer-events-none">
-                <span
-                  key={`proj-title-${activeProject.id}`}
-                  className="font-stencil text-[36px] sm:text-[46px] md:text-[54px] lg:text-[62px] font-black uppercase text-[#f4ddb8] drop-shadow-[0_0_25px_rgba(244,221,184,0.55)] tracking-wide leading-tight transition-all duration-300"
-                >
-                  {activeProject.title}
-                </span>
-                <span className="text-[11px] font-mono tracking-[3px] text-[#e7e5df]/70 uppercase mt-2">
-                  [ {activeProject.category || "Interactive System"} ]
-                </span>
-              </div>
+              ) : (
+                /* Fallback only when project visual is unavailable */
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-10 text-center pointer-events-none">
+                  <span
+                    key={`proj-title-${activeProject.id}`}
+                    className="font-stencil text-[32px] sm:text-[42px] font-black uppercase text-[#f4ddb8] drop-shadow-[0_0_20px_rgba(244,221,184,0.4)] tracking-wide leading-tight"
+                  >
+                    {activeProject.title}
+                  </span>
+                  <span className="text-[10px] font-mono tracking-[3px] text-[#e7e5df]/60 uppercase mt-2">
+                    [ {activeProject.category || "Interactive System"} ]
+                  </span>
+                </div>
+              )}
 
               {/* Screen Bezel Telemetry Stamp */}
               <div className="absolute bottom-2 left-3 z-30 font-mono text-[9px] text-[#777] uppercase tracking-widest flex items-center gap-2">
