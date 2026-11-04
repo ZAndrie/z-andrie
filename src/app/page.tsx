@@ -15,7 +15,7 @@ import {
   fetchGitHubBlogPosts,
 } from "@/lib/github";
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export default async function Home() {
   // Fetch dynamic content from repositories with graceful fallbacks

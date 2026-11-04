@@ -207,43 +207,116 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     return [pos, offsets, speeds, colors];
   }, [dustCount]);
 
-  // Texture for the glowing CRT monitor screen (Indie Dev Quest & Stats)
+  // Texture for the glowing Studio Display screen (Modern Creative Tech Architecture)
   const screenTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 512;
+    canvas.height = 320;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    ctx.fillStyle = "#07120a";
-    ctx.fillRect(0, 0, 256, 256);
+    // Dark sleek IDE backdrop
+    ctx.fillStyle = "#090a0f";
+    ctx.fillRect(0, 0, 512, 320);
 
-    ctx.fillStyle = "#4ade80";
-    ctx.font = "14px 'IBM Plex Mono', monospace";
-    ctx.fillText("> Z-ANDRIE // DEV_ROOM", 14, 32);
-    ctx.fillText("ENGINE: THREE.JS / R3F", 14, 54);
-    ctx.fillText("HP: [██████████] 100%", 14, 78);
-    ctx.fillText("MP: [████████░░] 85%", 14, 100);
-    ctx.fillText("QUEST: IMMERSIVE WEB", 14, 124);
-    ctx.fillText("FPS: 60 | 2700K AMBER", 14, 148);
-    ctx.fillText("STATUS: ACTIVE_PLAYER", 14, 172);
+    // Editor top tab bar
+    ctx.fillStyle = "#12141c";
+    ctx.fillRect(0, 0, 512, 28);
 
-    ctx.fillStyle = "#facc15";
-    ctx.fillText("▶ AWAITING INPUT_ █", 14, 202);
+    // Window controls
+    ctx.fillStyle = "#ef4444";
+    ctx.beginPath();
+    ctx.arc(16, 14, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f59e0b";
+    ctx.beginPath();
+    ctx.arc(30, 14, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#10b981";
+    ctx.beginPath();
+    ctx.arc(44, 14, 4, 0, Math.PI * 2);
+    ctx.fill();
 
-    // CRT Scanlines
-    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-    for (let y = 0; y < 256; y += 4) {
-      ctx.fillRect(0, y, 256, 2);
-    }
+    // Tab title
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "11px 'IBM Plex Mono', monospace";
+    ctx.fillText("StudioCore.ts", 64, 18);
+
+    // Code lines with modern syntax highlighting
+    ctx.font = "12px 'IBM Plex Mono', monospace";
+
+    ctx.fillStyle = "#c084fc";
+    ctx.fillText("import", 20, 56);
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText(" { Experience } ", 75, 56);
+    ctx.fillStyle = "#c084fc";
+    ctx.fillText("from", 195, 56);
+    ctx.fillStyle = "#34d399";
+    ctx.fillText(" \"@z-andrie/spatial\";", 235, 56);
+
+    ctx.fillStyle = "#60a5fa";
+    ctx.fillText("interface", 20, 84);
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText(" ModernCreative", 95, 84);
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText(" {", 225, 84);
+
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("  craft: ", 20, 108);
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("\"Sleek WebGL & 3D Experiences\";", 80, 108);
+
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("  velocity: ", 20, 130);
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText("100", 100, 130);
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("; // FPS 60", 125, 130);
+
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText("}", 20, 154);
+
+    ctx.fillStyle = "#c084fc";
+    ctx.fillText("export const", 20, 184);
+    ctx.fillStyle = "#60a5fa";
+    ctx.fillText(" studio", 115, 184);
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText(" = ", 170, 184);
+    ctx.fillStyle = "#c084fc";
+    ctx.fillText("new", 190, 184);
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText(" Experience", 220, 184);
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText("({", 310, 184);
+
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("  status: ", 20, 208);
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("\"AVAILABLE FOR COMMISSIONS\",", 90, 208);
+
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("  location: ", 20, 230);
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("\"PHILIPPINES (GMT+8)\",", 105, 230);
+
+    ctx.fillStyle = "#f3f4f6";
+    ctx.fillText("});", 20, 254);
+
+    // Terminal status footer line
+    ctx.fillStyle = "#131722";
+    ctx.fillRect(0, 285, 512, 35);
+    ctx.fillStyle = "#10b981";
+    ctx.fillText("● SYSTEM READY", 20, 307);
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("TS 5.5 | NEXT 16 | THREE.JS ACTIVE", 215, 307);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
     return tex;
   }, []);
 
-  // Procedural woven geometric area rug texture
+  // Procedural modern minimalist architectural area rug
   const rugTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
@@ -252,58 +325,35 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Base dark woven wool
-    ctx.fillStyle = "#161311";
+    // Dark charcoal woven wool
+    ctx.fillStyle = "#111114";
     ctx.fillRect(0, 0, 512, 384);
 
-    // Micro weave texture
-    ctx.fillStyle = "rgba(255, 255, 255, 0.025)";
-    for (let x = 0; x < 512; x += 4) {
-      ctx.fillRect(x, 0, 2, 384);
-    }
-    for (let y = 0; y < 384; y += 4) {
-      ctx.fillRect(0, y, 512, 2);
-    }
-
-    // Outer border (vintage terracotta)
-    ctx.strokeStyle = "#8c4033";
-    ctx.lineWidth = 14;
-    ctx.strokeRect(18, 18, 476, 348);
-
-    // Inner geometric border (warm sand)
-    ctx.strokeStyle = "#bfa67a";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(38, 38, 436, 308);
-
-    // Corner decorative diamonds
-    const drawDiamond = (cx: number, cy: number, size: number, color: string) => {
-      ctx.fillStyle = color;
+    // Subtle fine architectural grid
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < 512; x += 32) {
       ctx.beginPath();
-      ctx.moveTo(cx, cy - size);
-      ctx.lineTo(cx + size, cy);
-      ctx.lineTo(cx, cy + size);
-      ctx.lineTo(cx - size, cy);
-      ctx.closePath();
-      ctx.fill();
-    };
-
-    drawDiamond(56, 56, 12, "#d36b54");
-    drawDiamond(456, 56, 12, "#d36b54");
-    drawDiamond(56, 328, 12, "#d36b54");
-    drawDiamond(456, 328, 12, "#d36b54");
-
-    // Center stepped 8-bit medallion
-    drawDiamond(256, 192, 58, "#2d2420");
-    drawDiamond(256, 192, 44, "#8c4033");
-    drawDiamond(256, 192, 28, "#bfa67a");
-    drawDiamond(256, 192, 14, "#f4ddb8");
-
-    // Left and right fringed tassels
-    ctx.fillStyle = "#a89a88";
-    for (let y = 26; y < 360; y += 6) {
-      ctx.fillRect(6, y, 10, 2);
-      ctx.fillRect(496, y, 10, 2);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 384);
+      ctx.stroke();
     }
+    for (let y = 0; y < 384; y += 32) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(512, y);
+      ctx.stroke();
+    }
+
+    // Outer refined border (warm champagne)
+    ctx.strokeStyle = "rgba(244, 221, 184, 0.25)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(24, 24, 464, 336);
+
+    // Inner subtle terracotta hairline border
+    ctx.strokeStyle = "rgba(211, 107, 84, 0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(36, 36, 440, 312);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = THREE.ClampToEdgeWrapping;
@@ -312,7 +362,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     return tex;
   }, []);
 
-  // Framed retro indie game wall poster
+  // Framed sleek modern architectural exhibition print
   const posterTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
@@ -321,80 +371,46 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Dark parchment / indie art print border
-    ctx.fillStyle = "#221c18";
+    // Matte dark charcoal background
+    ctx.fillStyle = "#0c0d12";
     ctx.fillRect(0, 0, 256, 360);
 
-    // Warm sand inner border
-    ctx.strokeStyle = "#8c6f56";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(10, 10, 236, 340);
+    // Minimal hairline border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(12, 12, 232, 336);
 
-    // Midnight dark sky gradient
-    const grad = ctx.createLinearGradient(0, 16, 0, 340);
-    grad.addColorStop(0, "#0c0e18");
-    grad.addColorStop(0.55, "#22162e");
-    grad.addColorStop(1, "#452233");
+    // Bauhaus / Minimalist circle composition
+    const grad = ctx.createLinearGradient(60, 60, 200, 200);
+    grad.addColorStop(0, "#d36b54");
+    grad.addColorStop(1, "#f4ddb8");
     ctx.fillStyle = grad;
-    ctx.fillRect(14, 14, 228, 332);
-
-    // Glowing low-poly pixel moon
-    ctx.fillStyle = "#f4ddb8";
     ctx.beginPath();
-    ctx.arc(128, 95, 26, 0, Math.PI * 2);
+    ctx.arc(128, 120, 52, 0, Math.PI * 2);
     ctx.fill();
 
-    // Distant mountain silhouettes (synthwave / pixel adventure)
-    ctx.fillStyle = "#5c2f4f";
+    // Architectural geometric accent line
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(14, 230);
-    ctx.lineTo(65, 160);
-    ctx.lineTo(128, 205);
-    ctx.lineTo(190, 150);
-    ctx.lineTo(242, 215);
-    ctx.lineTo(242, 346);
-    ctx.lineTo(14, 346);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(32, 200);
+    ctx.lineTo(224, 200);
+    ctx.stroke();
 
-    // Foreground mountain ridge
-    ctx.fillStyle = "#2b172d";
-    ctx.beginPath();
-    ctx.moveTo(14, 250);
-    ctx.lineTo(90, 195);
-    ctx.lineTo(160, 245);
-    ctx.lineTo(215, 205);
-    ctx.lineTo(242, 240);
-    ctx.lineTo(242, 346);
-    ctx.lineTo(14, 346);
-    ctx.closePath();
-    ctx.fill();
-
-    // Pixel stars
-    ctx.fillStyle = "#fef08a";
-    [
-      [38, 42],
-      [78, 32],
-      [205, 48],
-      [175, 75],
-      [48, 105],
-      [218, 115],
-    ].forEach(([x, y]) => {
-      ctx.fillRect(x, y, 3, 3);
-    });
-
-    // Poster Title Typography
-    ctx.fillStyle = "#f4ddb8";
-    ctx.font = "bold 17px 'Courier New', monospace";
+    // Modern Swiss typography
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 18px 'Space Grotesk', 'Plus Jakarta Sans', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("INDIE QUEST", 128, 285);
+    ctx.fillText("Z ANDRIE", 128, 235);
 
     ctx.fillStyle = "#d36b54";
-    ctx.font = "10px 'Courier New', monospace";
-    ctx.fillText("16-BIT CHRONICLES // 199X", 128, 308);
+    ctx.font = "600 9px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillText("CREATIVE TECHNOLOGIST", 128, 256);
 
-    ctx.fillStyle = "#4ade80";
-    ctx.fillText("▶ PRESS START", 128, 328);
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "8px 'IBM Plex Mono', monospace";
+    ctx.fillText("SPATIAL ARCHITECTURE // 2026", 128, 276);
+    ctx.fillText("STUDIO PHILIPPINES", 128, 292);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
@@ -414,7 +430,7 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
     ctx.fillStyle = "#f4ddb8";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "900 84px 'Big Shoulders Stencil', Impact, sans-serif";
+    ctx.font = "700 76px 'Space Grotesk', 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("Z ANDRIE", 256, 128);
 
     const tex = new THREE.CanvasTexture(canvas);
@@ -797,215 +813,117 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
           </mesh>
         ))}
 
-        {/* Vintage CRT Computer Monitor */}
-        <group position={[-0.32, 0.82, -0.15]} rotation={[0, 0.12, 0]}>
-          {/* Monitor Casing */}
+        {/* Ultra-Slim Modern Studio Display */}
+        <group position={[-0.32, 0.88, -0.15]} rotation={[0, 0.12, 0]}>
+          {/* Anodized Aluminum Display Chassis */}
           <mesh castShadow receiveShadow>
-            <boxGeometry args={[0.62, 0.56, 0.52]} />
-            <meshStandardMaterial color="#cfc7b8" roughness={0.55} />
+            <boxGeometry args={[0.82, 0.52, 0.024]} />
+            <meshStandardMaterial color="#181a20" roughness={0.3} metalness={0.8} />
           </mesh>
 
-          {/* CRT Screen Frame */}
-          <mesh position={[0, 0, 0.265]}>
-            <boxGeometry args={[0.54, 0.46, 0.04]} />
-            <meshStandardMaterial color="#302d29" roughness={0.4} />
+          {/* Slim Outer Bezel */}
+          <mesh position={[0, 0, 0.013]}>
+            <boxGeometry args={[0.80, 0.50, 0.005]} />
+            <meshStandardMaterial color="#0c0d12" roughness={0.2} metalness={0.5} />
           </mesh>
 
-          {/* Sticky Note 1: Top Right of CRT Bezel */}
-          <group position={[0.22, 0.22, 0.288]} rotation={[0, 0, -0.1]}>
-            <mesh>
-              <planeGeometry args={[0.075, 0.075]} />
-              <meshStandardMaterial color="#facc15" roughness={0.7} />
-            </mesh>
-            <mesh position={[0, 0.01, 0.001]}>
-              <planeGeometry args={[0.05, 0.006]} />
-              <meshBasicMaterial color="#713f12" />
-            </mesh>
-            <mesh position={[0, -0.01, 0.001]}>
-              <planeGeometry args={[0.04, 0.006]} />
-              <meshBasicMaterial color="#713f12" />
-            </mesh>
-          </group>
-
-          {/* Sticky Note 2: Bottom Left of CRT Bezel */}
-          <group position={[-0.22, -0.18, 0.288]} rotation={[0, 0, 0.08]}>
-            <mesh>
-              <planeGeometry args={[0.065, 0.065]} />
-              <meshStandardMaterial color="#38bdf8" roughness={0.7} />
-            </mesh>
-            <mesh position={[0, 0, 0.001]}>
-              <planeGeometry args={[0.045, 0.005]} />
-              <meshBasicMaterial color="#0c4a6e" />
-            </mesh>
-          </group>
-
-          {/* Glowing Green Phosphor Display */}
+          {/* Active Screen Display (VS Code / Terminal Core) */}
           {screenTexture && (
-            <mesh position={[0, 0, 0.288]}>
-              <planeGeometry args={[0.48, 0.4]} />
+            <mesh position={[0, 0, 0.017]}>
+              <planeGeometry args={[0.78, 0.48]} />
               <meshBasicMaterial map={screenTexture} toneMapped={false} />
             </mesh>
           )}
 
-          {/* Monitor Stand */}
-          <mesh position={[0, -0.32, 0]}>
-            <cylinderGeometry args={[0.16, 0.22, 0.1, 16]} />
-            <meshStandardMaterial color="#948c7e" roughness={0.6} />
+          {/* Sleek Cantilever Stand Upright Arm */}
+          <mesh position={[0, -0.32, -0.06]} rotation={[-0.1, 0, 0]}>
+            <boxGeometry args={[0.08, 0.28, 0.02]} />
+            <meshStandardMaterial color="#2d3039" roughness={0.3} metalness={0.85} />
           </mesh>
 
-          {/* Vintage Keyboard */}
-          <mesh position={[0, -0.31, 0.54]} rotation={[-0.08, 0, 0]}>
-            <boxGeometry args={[0.56, 0.04, 0.22]} />
-            <meshStandardMaterial color="#c2baa9" roughness={0.5} />
+          {/* Precision Stand Base Plate */}
+          <mesh position={[0, -0.42, 0]}>
+            <boxGeometry args={[0.26, 0.008, 0.22]} />
+            <meshStandardMaterial color="#2d3039" roughness={0.3} metalness={0.85} />
           </mesh>
-        </group>
 
-        {/* Retro Gaming Mouse & Cable */}
-        <group position={[0.42, 0.505, 0.35]} rotation={[0, -0.15, 0]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.065, 0.024, 0.1]} />
-            <meshStandardMaterial color="#c2baa9" roughness={0.5} />
-          </mesh>
-          {/* Scroll Wheel */}
-          <mesh position={[0, 0.013, -0.015]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.006, 0.006, 0.01, 12]} />
-            <meshStandardMaterial color="#2d2a26" roughness={0.3} />
-          </mesh>
-          {/* Thin curved mouse wire */}
-          <mesh position={[-0.04, -0.008, -0.16]} rotation={[0, -0.2, 0]}>
-            <cylinderGeometry args={[0.0025, 0.0025, 0.24, 6]} />
-            <meshStandardMaterial color="#1a1715" roughness={0.6} />
-          </mesh>
-        </group>
-
-        {/* Retro Indie Gamepad / Controller */}
-        <group position={[0.08, 0.508, 0.38]} rotation={[-0.04, 0.22, 0]}>
-          {/* Controller Body Shell */}
-          <mesh castShadow>
-            <boxGeometry args={[0.16, 0.022, 0.09]} />
-            <meshStandardMaterial color="#2c2825" roughness={0.5} metalness={0.2} />
-          </mesh>
-          {/* Left Grip Wing */}
-          <mesh position={[-0.075, -0.004, 0.015]} rotation={[0, 0.28, 0]}>
-            <boxGeometry args={[0.05, 0.022, 0.095]} />
-            <meshStandardMaterial color="#2c2825" roughness={0.5} metalness={0.2} />
-          </mesh>
-          {/* Right Grip Wing */}
-          <mesh position={[0.075, -0.004, 0.015]} rotation={[0, -0.28, 0]}>
-            <boxGeometry args={[0.05, 0.022, 0.095]} />
-            <meshStandardMaterial color="#2c2825" roughness={0.5} metalness={0.2} />
-          </mesh>
-          {/* Cross D-Pad on Left */}
-          <group position={[-0.055, 0.013, -0.008]}>
-            <mesh>
-              <boxGeometry args={[0.009, 0.006, 0.028]} />
-              <meshStandardMaterial color="#141210" roughness={0.4} />
-            </mesh>
-            <mesh>
-              <boxGeometry args={[0.028, 0.006, 0.009]} />
-              <meshStandardMaterial color="#141210" roughness={0.4} />
-            </mesh>
-          </group>
-          {/* 4 Colored Action Buttons on Right (Diamond layout) */}
-          <group position={[0.055, 0.014, -0.008]}>
-            {/* Top Y (Blue) */}
-            <mesh position={[0, 0, -0.01]}>
-              <cylinderGeometry args={[0.005, 0.005, 0.006, 10]} />
-              <meshStandardMaterial color="#60a5fa" roughness={0.3} />
-            </mesh>
-            {/* Right B (Terracotta / Red) */}
-            <mesh position={[0.01, 0, 0]}>
-              <cylinderGeometry args={[0.005, 0.005, 0.006, 10]} />
-              <meshStandardMaterial color="#d36b54" roughness={0.3} />
-            </mesh>
-            {/* Bottom A (Golden Amber) */}
-            <mesh position={[0, 0, 0.01]}>
-              <cylinderGeometry args={[0.005, 0.005, 0.006, 10]} />
-              <meshStandardMaterial color="#f4ddb8" roughness={0.3} />
-            </mesh>
-            {/* Left X (Green) */}
-            <mesh position={[-0.01, 0, 0]}>
-              <cylinderGeometry args={[0.005, 0.005, 0.006, 10]} />
-              <meshStandardMaterial color="#4ade80" roughness={0.3} />
-            </mesh>
-          </group>
-          {/* Twin Thumbsticks */}
-          <mesh position={[-0.025, 0.015, 0.018]}>
-            <cylinderGeometry args={[0.012, 0.008, 0.012, 12]} />
-            <meshStandardMaterial color="#181614" roughness={0.6} />
-          </mesh>
-          <mesh position={[0.025, 0.015, 0.018]}>
-            <cylinderGeometry args={[0.012, 0.008, 0.012, 12]} />
-            <meshStandardMaterial color="#181614" roughness={0.6} />
-          </mesh>
-          {/* Controller Cord leading back */}
-          <mesh position={[0, 0.002, -0.12]} rotation={[0, 0.1, 0]}>
-            <cylinderGeometry args={[0.003, 0.003, 0.16, 6]} />
-            <meshStandardMaterial color="#1a1715" roughness={0.7} />
-          </mesh>
-        </group>
-
-        {/* Ceramic Developer Coffee Mug */}
-        <group position={[-0.78, 0.535, 0.32]} rotation={[0, 0.35, 0]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.048, 0.042, 0.09, 16]} />
-            <meshStandardMaterial color="#d9d3c5" roughness={0.4} />
-          </mesh>
-          {/* Coffee Surface */}
-          <mesh position={[0, 0.038, 0]}>
-            <cylinderGeometry args={[0.042, 0.042, 0.005, 16]} />
-            <meshStandardMaterial color="#26140b" roughness={0.2} metalness={0.1} />
-          </mesh>
-          {/* Mug Handle */}
-          <mesh position={[-0.05, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <torusGeometry args={[0.028, 0.007, 8, 16, Math.PI]} />
-            <meshStandardMaterial color="#d9d3c5" roughness={0.4} />
-          </mesh>
-        </group>
-
-        {/* Stack of Retro Game Cartridges & Floppy Disk */}
-        <group position={[-0.88, 0.505, -0.08]} rotation={[0, 0.16, 0]}>
-          {/* Bottom Cartridge (Grey 16-bit shell) */}
-          <group position={[0, 0, 0]}>
+          {/* Modern Low-Profile Aluminum Keyboard */}
+          <group position={[0, -0.41, 0.42]} rotation={[-0.04, 0, 0]}>
+            {/* Keyboard Aluminum Body */}
             <mesh castShadow>
-              <boxGeometry args={[0.13, 0.022, 0.16]} />
-              <meshStandardMaterial color="#9c9588" roughness={0.5} />
+              <boxGeometry args={[0.44, 0.012, 0.15]} />
+              <meshStandardMaterial color="#22252c" roughness={0.3} metalness={0.7} />
             </mesh>
-            {/* Colorful Label Decal */}
-            <mesh position={[0, 0.012, 0.01]}>
-              <planeGeometry args={[0.095, 0.1]} />
-              <meshStandardMaterial color="#d36b54" roughness={0.3} />
-            </mesh>
-          </group>
-          {/* Top Cartridge (Slightly turned) */}
-          <group position={[0.01, 0.023, -0.01]} rotation={[0, -0.15, 0]}>
-            <mesh castShadow>
-              <boxGeometry args={[0.13, 0.022, 0.16]} />
-              <meshStandardMaterial color="#2a2724" roughness={0.5} />
-            </mesh>
-            {/* Label Decal */}
-            <mesh position={[0, 0.012, 0.01]}>
-              <planeGeometry args={[0.095, 0.1]} />
-              <meshStandardMaterial color="#f4ddb8" roughness={0.3} />
+            {/* Keypad Plate */}
+            <mesh position={[0, 0.007, 0]}>
+              <boxGeometry args={[0.42, 0.005, 0.13]} />
+              <meshStandardMaterial color="#111317" roughness={0.5} />
             </mesh>
           </group>
-          {/* 3.5" Floppy Disk next to cartridges */}
-          <group position={[0.14, 0.004, 0.06]} rotation={[0, -0.32, 0]}>
-            <mesh>
-              <boxGeometry args={[0.1, 0.008, 0.105]} />
-              <meshStandardMaterial color="#1a1816" roughness={0.6} />
-            </mesh>
-            {/* Metal Shutter Slider */}
-            <mesh position={[0, 0.005, -0.03]}>
-              <boxGeometry args={[0.08, 0.002, 0.035]} />
-              <meshStandardMaterial color="#9ca3af" metalness={0.8} roughness={0.2} />
-            </mesh>
-            {/* Paper Label */}
-            <mesh position={[0, 0.005, 0.018]}>
-              <planeGeometry args={[0.075, 0.05]} />
-              <meshStandardMaterial color="#f3f4f6" roughness={0.8} />
-            </mesh>
-          </group>
+        </group>
+
+        {/* Sleek Ergonomic Precision Mouse */}
+        <group position={[0.34, 0.495, 0.24]} rotation={[0, -0.08, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.06, 0.022, 0.1]} />
+            <meshStandardMaterial color="#1e2129" roughness={0.25} metalness={0.6} />
+          </mesh>
+          {/* Subtle Accent Glow Ring */}
+          <mesh position={[0, 0.012, -0.01]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.005, 0.005, 0.004, 12]} />
+            <meshBasicMaterial color="#d36b54" toneMapped={false} />
+          </mesh>
+        </group>
+
+        {/* Designer Dot-Grid Sketchbook & Aluminum Stylus */}
+        <group position={[0.02, 0.495, 0.32]} rotation={[0, 0.14, 0]}>
+          {/* Sketchbook Hardcover */}
+          <mesh castShadow>
+            <boxGeometry args={[0.18, 0.012, 0.24]} />
+            <meshStandardMaterial color="#1a1c22" roughness={0.6} />
+          </mesh>
+          {/* Off-White Paper Pages Block */}
+          <mesh position={[0.005, 0.002, 0]}>
+            <boxGeometry args={[0.17, 0.01, 0.23]} />
+            <meshStandardMaterial color="#e5e5e5" roughness={0.8} />
+          </mesh>
+          {/* Minimalist Aluminum Stylus Pen */}
+          <mesh position={[0.07, 0.015, 0]} rotation={[0, 0, 0.02]} castShadow>
+            <cylinderGeometry args={[0.0035, 0.0035, 0.18, 10]} />
+            <meshStandardMaterial color="#9ca3af" roughness={0.2} metalness={0.9} />
+          </mesh>
+        </group>
+
+        {/* Sleek Matte Studio Audio Monitor Speaker */}
+        <group position={[-0.82, 0.62, -0.08]} rotation={[0, 0.25, 0]}>
+          {/* Speaker Cabinet */}
+          <mesh castShadow>
+            <boxGeometry args={[0.18, 0.28, 0.18]} />
+            <meshStandardMaterial color="#16181f" roughness={0.4} metalness={0.4} />
+          </mesh>
+          {/* Upper Tweeter Ring */}
+          <mesh position={[0, 0.06, 0.091]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 0.005, 16]} />
+            <meshStandardMaterial color="#2d3039" roughness={0.2} metalness={0.8} />
+          </mesh>
+          {/* Lower Woofer Cone with Champagne Ring */}
+          <mesh position={[0, -0.05, 0.091]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.05, 0.05, 0.006, 24]} />
+            <meshStandardMaterial color="#f4ddb8" roughness={0.3} metalness={0.6} />
+          </mesh>
+        </group>
+
+        {/* Minimalist Ceramic Tumbler */}
+        <group position={[-0.78, 0.54, 0.28]} rotation={[0, 0.2, 0]}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.042, 0.036, 0.1, 18]} />
+            <meshStandardMaterial color="#262830" roughness={0.3} metalness={0.2} />
+          </mesh>
+          {/* Tumbler Rim Ring */}
+          <mesh position={[0, 0.048, 0]}>
+            <cylinderGeometry args={[0.043, 0.043, 0.005, 18]} />
+            <meshStandardMaterial color="#d36b54" roughness={0.3} metalness={0.6} />
+          </mesh>
         </group>
 
         {/* Desktop Companion Robot / Radio */}
@@ -1114,69 +1032,71 @@ export default function RoomScene3D({ pointerRef, onTelemetryUpdate }: RoomScene
             </mesh>
           </group>
 
-          {/* Top of Bookshelf: Classic 8-Bit Game Console (NES Style) */}
-          <group position={[0, 0.94, 0]} rotation={[0, -0.1, 0]}>
-            {/* Console Body */}
-            <mesh castShadow>
-              <boxGeometry args={[0.24, 0.065, 0.18]} />
-              <meshStandardMaterial color="#c2baa9" roughness={0.5} />
+          {/* Top of Bookshelf: Modern Architectural Brass Sculpture & Stoneware */}
+          <group position={[0, 0.94, 0]} rotation={[0, 0.15, 0]}>
+            {/* Minimalist Brass Ring Sculpture */}
+            <mesh position={[-0.08, 0.08, 0]} rotation={[0.4, 0.6, 0]} castShadow>
+              <torusGeometry args={[0.07, 0.012, 16, 32]} />
+              <meshStandardMaterial color="#f4ddb8" metalness={0.85} roughness={0.2} />
             </mesh>
-            {/* Dark Front Flap */}
-            <mesh position={[0, -0.005, 0.088]}>
-              <boxGeometry args={[0.22, 0.032, 0.01]} />
-              <meshStandardMaterial color="#262320" roughness={0.4} />
+            {/* Matte Stoneware Base */}
+            <mesh position={[-0.08, 0.008, 0]} castShadow>
+              <cylinderGeometry args={[0.05, 0.05, 0.016, 20]} />
+              <meshStandardMaterial color="#1e2026" roughness={0.4} metalness={0.3} />
             </mesh>
-            {/* Power LED (Red) */}
-            <mesh position={[-0.08, -0.015, 0.095]}>
-              <boxGeometry args={[0.012, 0.008, 0.004]} />
-              <meshBasicMaterial color="#ef4444" toneMapped={false} />
-            </mesh>
+            {/* Minimalist Potted Desk Plant on Right */}
+            <group position={[0.1, 0, 0]}>
+              <mesh castShadow>
+                <cylinderGeometry args={[0.045, 0.038, 0.07, 16]} />
+                <meshStandardMaterial color="#2c2824" roughness={0.6} />
+              </mesh>
+              {/* Succulent Leaves */}
+              <mesh position={[0, 0.045, 0]}>
+                <sphereGeometry args={[0.038, 12, 12]} />
+                <meshStandardMaterial color="#4ade80" roughness={0.4} />
+              </mesh>
+            </group>
           </group>
 
-          {/* Top Shelf Compartment (y = 0.28): Books + Golden 16-Bit Cartridge */}
+          {/* Top Shelf Compartment (y = 0.28): Hardcover Architectural Monographs */}
           <group position={[-0.18, 0.44, 0]}>
             {[
               { x: 0.0, color: "#d36b54", h: 0.28 },
-              { x: 0.065, color: "#786c5f", h: 0.26 },
-              { x: 0.13, color: "#a8a59d", h: 0.29 },
-              { x: 0.195, color: "#d36b54", h: 0.27 },
+              { x: 0.065, color: "#22252e", h: 0.29 },
+              { x: 0.13, color: "#e5e7eb", h: 0.27 },
+              { x: 0.195, color: "#d36b54", h: 0.28 },
+              { x: 0.26, color: "#374151", h: 0.26 },
             ].map((book, idx) => (
               <mesh key={idx} position={[book.x, (book.h - 0.28) / 2, 0]} castShadow>
                 <boxGeometry args={[0.055, book.h, 0.22]} />
-                <meshStandardMaterial color={book.color} roughness={0.6} />
+                <meshStandardMaterial color={book.color} roughness={0.5} />
               </mesh>
             ))}
-            {/* Golden 16-Bit Cartridge standing on right */}
-            <mesh position={[0.31, -0.02, 0]} rotation={[0, 0, 0.12]} castShadow>
-              <boxGeometry args={[0.05, 0.22, 0.16]} />
-              <meshStandardMaterial color="#d4af37" metalness={0.7} roughness={0.25} />
+            {/* Minimalist Cast Aluminum Bookend */}
+            <mesh position={[0.33, -0.04, 0]} castShadow>
+              <boxGeometry args={[0.03, 0.16, 0.18]} />
+              <meshStandardMaterial color="#9ca3af" metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
 
-          {/* Middle Shelf Compartment (y = -0.30): Vintage Big-Box Game Cartons */}
+          {/* Middle Shelf Compartment (y = -0.30): Design Volumes & Ceramic Object */}
           <group position={[-0.20, -0.14, 0]}>
             {[
-              { x: 0.0, color: "#991b1b", w: 0.06, h: 0.28 },
-              { x: 0.07, color: "#1e3a8a", w: 0.065, h: 0.30 },
-              { x: 0.145, color: "#065f46", w: 0.07, h: 0.27 },
-              { x: 0.225, color: "#78350f", w: 0.065, h: 0.29 },
+              { x: 0.0, color: "#1f2937", w: 0.06, h: 0.28 },
+              { x: 0.07, color: "#4b5563", w: 0.065, h: 0.30 },
+              { x: 0.145, color: "#111827", w: 0.07, h: 0.27 },
+              { x: 0.225, color: "#d36b54", w: 0.065, h: 0.29 },
             ].map((box, idx) => (
               <mesh key={idx} position={[box.x, (box.h - 0.28) / 2, 0]} castShadow>
                 <boxGeometry args={[box.w, box.h, 0.24]} />
-                <meshStandardMaterial color={box.color} roughness={0.5} />
+                <meshStandardMaterial color={box.color} roughness={0.4} />
               </mesh>
             ))}
-            {/* Cartridge stack on right side of middle shelf */}
-            <group position={[0.36, -0.11, 0]}>
-              <mesh position={[0, 0, 0]} castShadow>
-                <boxGeometry args={[0.11, 0.025, 0.15]} />
-                <meshStandardMaterial color="#71717a" roughness={0.5} />
-              </mesh>
-              <mesh position={[0.01, 0.028, 0]} rotation={[0, 0.1, 0]} castShadow>
-                <boxGeometry args={[0.11, 0.025, 0.15]} />
-                <meshStandardMaterial color="#52525b" roughness={0.5} />
-              </mesh>
-            </group>
+            {/* Geometric Sphere Artifact on Right */}
+            <mesh position={[0.34, -0.06, 0]} castShadow>
+              <sphereGeometry args={[0.055, 20, 20]} />
+              <meshStandardMaterial color="#f4ddb8" roughness={0.25} metalness={0.7} />
+            </mesh>
           </group>
 
           {/* Bottom Shelf Compartment (y = -0.88): Full Library Row */}
